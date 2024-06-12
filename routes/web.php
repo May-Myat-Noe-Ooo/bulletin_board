@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\PostlistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +19,26 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::resource('/login', UsersController::class);
+Route::resource('/postlist', PostlistController::class);
+
+Route::group(['namespace' => 'App\Http\Controllers'], function () {
+    Route::get('/createpost','PostsController@createPost');
+    Route::post('/createconfirm','PostsController@confirmPost')->name("confirm");
+    Route::post('/store','PostsController@store')->name("store");
+
+    Route::get('/editpost/{id}','PostsController@editPost')->name("edit");
+    Route::post('/confirm/{id}','PostsController@confirmEditPost')->name("editconfirm");
+
+    Route::get('/createuser','UsersController@createUser');
+    Route::post('/registerconfirm','UsersController@confirmRegister')->name("registerconfirm");
+    Route::post('/storeregisteruser','UsersController@storeRegisterUser')->name("storeuser");
+    
+    Route::get('/displayuser','UsersController@displayUser')->name("displayuser");
+});
+
+    
+
+
+
