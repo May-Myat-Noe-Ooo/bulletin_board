@@ -11,8 +11,8 @@ class PostlistController extends Controller
      */
     public function index()
     {
-        $postlist= PostList::Paginate(5);
-       // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
+        $postlist = PostList::Paginate(5);
+        // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
         return view('home.postlist', compact('postlist'));
     }
 
@@ -46,7 +46,7 @@ class PostlistController extends Controller
     public function edit(string $id)
     {
         $postlist = Postlist::findOrFail($id);
- 
+
         return view('home.editpost', compact('postlist'));
     }
 
@@ -56,9 +56,9 @@ class PostlistController extends Controller
     public function update(Request $request, string $id)
     {
         $postlist = Postlist::findOrFail($id);
- 
+
         $postlist->update($request->all());
- 
+
         return redirect()->route('postlist.index')->with('success', 'post updated successfully');
     }
     //public function update(Request $request, string $id)

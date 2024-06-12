@@ -3,19 +3,19 @@
 @section('body')
     <nav class="navbar navbar-dark bg-success">
         <a class="navbar-brand" href="#">
-            Register
+            Profile Edit
         </a>
     </nav>
     <div class="container-md col-sm-4 mt-5">
 
 
 
-        <form class="form-horizontal" action="{{ route('registerconfirm') }}" method="POST" enctype="multipart/form-data">
+        <form class="form-horizontal" action="" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="row mb-3">
                 <div class="row d-flex justify-content-around align-item-center">
-                    <label for="" class="form-label required col-sm-4 ">Name</label>
+                    <label for="" class="control-label form-label required col-sm-4 ">Name</label>
                     <div class="col-sm-8"><input type="text" name="name" class="form-control" value=""></div>
                 </div>
             </div>
@@ -23,19 +23,6 @@
                 <div class="row d-flex justify-content-around align-item-center">
                     <label for="" class="form-label required col-sm-4 ">E-Mail Address</label>
                     <div class="col-sm-8"><input type="text" name="email" class="form-control" value=""></div>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="row d-flex justify-content-around align-item-center">
-                    <label for="" class="form-label required col-sm-4 ">Password</label>
-                    <div class="col-sm-8"><input type="password" name="password" class="form-control" value=""></div>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="row d-flex justify-content-around align-item-center">
-                    <label for="" class="form-label required col-sm-4 ">Password Confirmation</label>
-                    <div class="col-sm-8"><input type="password" name="confirmpassword" class="form-control" value="">
-                    </div>
                 </div>
             </div>
 
@@ -78,7 +65,18 @@
 
             <div class="row mb-3">
                 <div class="column d-flex justify-content-around align-item-center">
-                    <label class="form-label col-sm-4" for="customFile">Profile</label>
+                    <label class="form-label col-sm-4" for="customFile">Old Profile</label>
+                    <div class="col-sm-8">
+                        <img id="selectedImage" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
+                            alt="example placeholder" style="width: 300px;" />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mb-3">
+                <div class="column d-flex justify-content-around align-item-center">
+                    <label class="form-label col-sm-4" for="customFile">New Profile</label>
                     <div class="col-sm-8">
                         <input type="file" name="profile" class="form-control" id="customFile" />
                     </div>
@@ -88,11 +86,12 @@
 
             <div class="row mb-3">
                 <div class="row d-flex  justify-content-around align-item-center">
+                    <!--<label class="form-label col-sm-4" for="customFile">New Profile</label>-->
                     <div class="col-sm-8">
-                        <button type="submit" data-mdb-button-init data-mdb-ripple-init
-                            class="btn btn-success btn-block col-sm-4">Register</button>
+                        <a href="" type="button" class="btn btn-primary">Edit</a>
                         <button type="button" data-mdb-button-init data-mdb-ripple-init
                             class="btn btn-secondary btn-block col-sm-4">Clear</button>
+                        <a href="#" class="link-primary">Change Password</a>
                     </div>
                 </div>
 

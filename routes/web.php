@@ -24,21 +24,19 @@ Route::resource('/login', UsersController::class);
 Route::resource('/postlist', PostlistController::class);
 
 Route::group(['namespace' => 'App\Http\Controllers'], function () {
-    Route::get('/createpost','PostsController@createPost');
-    Route::post('/createconfirm','PostsController@confirmPost')->name("confirm");
-    Route::post('/store','PostsController@store')->name("store");
+    Route::get('/createpost', 'PostsController@createPost');
+    Route::post('/createconfirm', 'PostsController@confirmPost')->name('confirm');
+    Route::post('/store', 'PostsController@store')->name('store');
 
-    Route::get('/editpost/{id}','PostsController@editPost')->name("edit");
-    Route::post('/confirm/{id}','PostsController@confirmEditPost')->name("editconfirm");
+    Route::get('/editpost/{id}', 'PostsController@editPost')->name('edit');
+    Route::post('/confirm/{id}', 'PostsController@confirmEditPost')->name('editconfirm');
 
-    Route::get('/createuser','UsersController@createUser');
-    Route::post('/registerconfirm','UsersController@confirmRegister')->name("registerconfirm");
-    Route::post('/storeregisteruser','UsersController@storeRegisterUser')->name("storeuser");
-    
-    Route::get('/displayuser','UsersController@displayUser')->name("displayuser");
+    Route::get('/createuser', 'UsersController@createUser');
+    Route::post('/registerconfirm', 'UsersController@confirmRegister')->name('registerconfirm');
+    Route::post('/storeregisteruser', 'UsersController@storeRegisterUser')->name('storeuser');
+
+    Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
+
+    Route::get('/showprofile', 'UsersController@showProfile');
+    Route::post('/editprofile', 'UsersController@editProfile')->name('editprofile');
 });
-
-    
-
-
-

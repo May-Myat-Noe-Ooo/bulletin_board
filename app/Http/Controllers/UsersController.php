@@ -26,18 +26,20 @@ class UsersController extends Controller
     public function confirmRegister(\Illuminate\Http\Request $request)
     {
         $name = $request->name;
-        $email=$request->email;
-        $password=$request->password;
-        $cpassword=$request->confirmpassword;
-        $type=$request->type;
-        $phone=$request->phone;
-        $dob=$request->date;
-        $address=$request->address;
-        $profile=$request->profile;
-        return view('home.confirmregister',compact('name','email','password','cpassword','type','phone',
-    'dob','address','profile'));
+        $email = $request->email;
+        $password = $request->password;
+        $cpassword = $request->confirmpassword;
+        $type = $request->type;
+        $phone = $request->phone;
+        $dob = $request->date;
+        $address = $request->address;
+        $imageName = time() . '.' . $request->profile->extension();
+        $success = $request->profile->move(public_path('img'), $imageName);
+        $imagePath = 'img/' . $imageName;
+        $profile = 'img/' . $imageName;
+        return view('home.confirmregister', compact('name', 'email', 'password', 'cpassword', 'type', 'phone', 'dob', 'address', 'imagePath', 'profile'));
     }
-     
+
     public function create()
     {
         //
@@ -53,9 +55,10 @@ class UsersController extends Controller
 
     public function storeRegisterUser(\Illuminate\Http\Request $request)
     {
+        //dd ('$request->profile');
         User::create($request->all());
- 
-        return redirect()->route('userlist.index')->with('success', 'Register user added successfully');
+
+        return redirect()->route('displayuser')->with('success', 'Register user added successfully');
     }
 
     /**
@@ -63,9 +66,20 @@ class UsersController extends Controller
      */
     public function displayUser()
     {
-        $userlist= User::Paginate(5);
+        $userlist = User::Paginate(5);
         // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
-         return view('home.userlist', compact('userlist'));
+        return view('home.userlist', compact('userlist'));
+    }
+
+    public function showProfile()
+    {
+        return view('home.profile');
+    }
+
+    public function editProfile(\Illuminate\Http\Request $request)
+    {
+        $name = $request->name;
+        return view('home.editProfile', compact('name'));
     }
 
     public function show(string $id)
