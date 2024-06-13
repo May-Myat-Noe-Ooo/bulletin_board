@@ -39,4 +39,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     Route::get('/showprofile', 'UsersController@showProfile');
     Route::post('/editprofile', 'UsersController@editProfile')->name('editprofile');
+
+    Route::get('/change_password', 'UsersController@changePassword')->name('change_password');
+    Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
+    Route::get('/reset_password', 'UsersController@resetPassword')->name('reset_password');
 });
