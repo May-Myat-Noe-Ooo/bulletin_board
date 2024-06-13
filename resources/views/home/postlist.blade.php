@@ -49,7 +49,6 @@
                             <div class="btn-group justify-content-around" role="group" aria-label="Basic example">
                                 <a href="{{ route('postlist.edit', $rs->id) }}" type="button"
                                     class="btn btn-primary">Edit</a>
-                                <!--<a href="#" type="button" class="btn btn-warning">Edit</a>-->
                                 <form action="#" method="POST" type="button" class="btn btn-danger p-0"
                                     onsubmit="return confirm('Delete?')">
                                     @csrf
@@ -62,7 +61,7 @@
                 @endforeach
             @else
                 <tr>
-                    <td class="text-center" colspan="5">Product not found</td>
+                    <td class="text-center" colspan="5">Post not found</td>
                 </tr>
             @endif
         </tbody>
