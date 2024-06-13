@@ -18,8 +18,9 @@
 
 <body>
 
-
-    <div class="">
+@include('layouts.navbar')
+ 
+    <div class="container py-5">
         @yield('body')
     </div>
 
