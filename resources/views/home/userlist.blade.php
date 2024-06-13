@@ -11,49 +11,52 @@
             {{ Session::get('success') }}
         </div>
     @endif
-    <div class="col float-end mb-5 mt-5">
-        <form class="search-form">
-            <div class="row mb-3">
-                <div class="column d-flex justify-content-space-between align-item-center">
-                    <div>
-                        <label for="" class="form-label col-sm-2 ">Name:</label>
+    <div class="col float-middle mb-5 mt-5">
+        <div class="row ">
+            <div class="col-md-12">
+                <form class="search-form justify">
+
+                    <div class="col d-flex justify-content-around align-item-center">
+                        <div class="col d-flex justify-content-around align-item-center">
+                            <label for="" class="form-label col-sm-2 ">Name:</label>
+                            <div class="col-sm-8"><input type="text" name="name" class="form-control" value="">
+                            </div>
+                        </div>
+
+
+                        <div class="col d-flex justify-content-around align-item-center">
+                            <label for="" class="form-label col-sm-2 ">Email:</label>
+                            <div class="col-sm-8"><input type="text" name="mailaddr" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <div class="col d-flex justify-content-around align-item-center">
+                            <label for="" class="form-label col-sm-2 ">From:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control form-control-lg" id="dd" type="date" name="date" />
+                            </div>
+                        </div>
+
+                        <div class="col d-flex justify-content-around align-item-center">
+                            <label for="" class="form-label col-sm-2 ">To:</label>
+                            <div class="col-sm-8">
+                                <input class="form-control form-control-lg" id="dd" type="date" name="date" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-sm-8">
+                                <a href="#" class="btn btn-success">Search</a>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <div class="col-sm-8"><input type="text" name="name" class="form-control" value="">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="" class="form-label col-sm-2 ">Email:</label>
-                    </div>
-                    <div>
-                        <div class="col-sm-8"><input type="text" name="mailaddr" class="form-control" value="">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="" class="form-label col-sm-2 ">From:</label>
-                    </div>
-                    <div>
-                        <div class="col-sm-12">
-                            <input class="form-control form-control-lg" id="dd" type="date" name="date" />
-                        </div>
-                    </div>
-                    <div>
-                        <label for="" class="form-label col-sm-2 ">To:</label>
-                    </div>
-                    <div>
-                        <div class="col-sm-12">
-                            <input class="form-control form-control-lg" id="dd" type="date" name="date" />
-                        </div>
-                    </div>
-                    <div>
-                        <div class="col-sm-8">
-                            <a href="#" class="btn btn-primary">Search</a>
-                        </div>
-                    </div>
-                </div>
+                </form>
+
             </div>
-        </form>
+
+        </div>
+
     </div>
 
 
