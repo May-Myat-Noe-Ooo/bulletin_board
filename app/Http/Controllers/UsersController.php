@@ -82,6 +82,24 @@ class UsersController extends Controller
         return view('home.editProfile', compact('name'));
     }
 
+    //User/Admin password control section start
+    public function changePassword(\Illuminate\Http\Request $request)
+    {
+        return view('home.changepassword');
+    }
+
+    public function forgotPassword(\Illuminate\Http\Request $request)
+    {
+        return view('home.forgotPassword');
+    }
+
+    public function resetPassword(\Illuminate\Http\Request $request)
+    {
+        return view('home.resetPassword');
+    }
+
+    //User/Admin password control section end
+
     public function show(string $id)
     {
         //
