@@ -7,9 +7,6 @@
         </a>
     </nav>
     <div class="container-md col-sm-4 mt-5">
-
-
-
         <form class="form-horizontal" action="{{ route('editprofile') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
@@ -92,6 +89,7 @@
                     </div>
 
                 </div>
+            </div>
 
 
 
@@ -103,8 +101,5 @@
 
 
         </form>
-
-
-
     </div>
 @endsection

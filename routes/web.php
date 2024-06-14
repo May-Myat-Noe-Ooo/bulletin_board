@@ -43,4 +43,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::get('/change_password', 'UsersController@changePassword')->name('change_password');
     Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
     Route::get('/reset_password', 'UsersController@resetPassword')->name('reset_password');
+
+    Route::get('/upload_file', 'UsersController@uploadFile');
 });

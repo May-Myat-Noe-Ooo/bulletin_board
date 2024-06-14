@@ -13,20 +13,35 @@
             color: red;
             font-weight: 100;
         }
+
+        footer {
+            width: 100%;
+            background-color: #343a40; /* Change background color as needed */
+            color: #ffffff; /* Change text color as needed */
+            margin-top:50px;
+            padding: 20px 0; /* Adjust padding as needed */
+        }
+        
     </style>
 </head>
 
 <body>
 
 @include('layouts.navbar')
- 
+
     <div class="container py-5">
         @yield('body')
-    </div>
+    </div> 
 
+    <!-- Footer -->
+@include('layouts.footer')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
     </script>
+            
+    
+   
+    
 
 </body>
 
