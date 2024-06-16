@@ -21,9 +21,18 @@ Route::get('/', function () {
 });
 
 Route::resource('/login', UsersController::class);
-Route::resource('/postlist', PostlistController::class);
+Route::middleware(['auth'])->group(function () {
+    Route::resource('/postlist', PostlistController::class);
+});
+
+// Authentication required for post list
+// Route::middleware(['auth'])->group(function () {
+//     Route::get('/postlist', [PostlistController::class, 'index'])->name('postlist');
+// });
 
 Route::group(['namespace' => 'App\Http\Controllers'], function () {
+    Route::get('/postlist', [PostlistController::class, 'index'])->name('postlist');
+    Route::post('/login', 'UsersController@login')->name('login.perform');
     Route::get('/createpost', 'PostsController@createPost');
     Route::post('/createconfirm', 'PostsController@confirmPost')->name('confirm');
     Route::post('/store', 'PostsController@store')->name('store');

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class UsersController extends Controller
 {
@@ -13,6 +15,41 @@ class UsersController extends Controller
     public function index()
     {
         return view('home.login');
+    }
+
+    public function login(\Illuminate\Http\Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ], [
+            'email.required' => 'Email cannot be blank.',
+            'email.email' => 'Email format is invalid.',
+            'password.required' => 'Password cannot be blank.',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            // Authentication passed, redirect to post list
+            return redirect()->route('postlist');
+        }
+
+        // Check if email exists in the database
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'There is no such account. Please sign up and create an account.');
+        }
+
+        // Check if the password is incorrect
+        return redirect()->back()->with('error', 'Incorrect password. Please try again.');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/login');
     }
 
     /**
