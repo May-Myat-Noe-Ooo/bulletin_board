@@ -89,26 +89,82 @@
                         <td class="align-middle">{{ $rs->address }}</td>
                         <td class="align-middle">
                             <div class="btn-group" role="group" aria-label="Basic example">
-                                <!--<a href="{{ route('postlist.edit', $rs->id) }}" type="button" class="btn btn-warning">Edit</a>-->
-                                <!--<a href="#" type="button" class="btn btn-warning">Edit</a>-->
-                                <form action="#" method="POST" type="button" class="btn btn-danger p-0"
-                                    onsubmit="return confirm('Delete?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-danger m-0">Delete</button>
-                                </form>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="{{ $rs->id }}" data-name="{{ $rs->name }}" data-type="{{ $rs->type }}" data-email="{{ $rs->email }}" data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}" data-address="{{ $rs->address }}">Delete</button>
                             </div>
                         </td>
                     </tr>
                 @endforeach
             @else
                 <tr>
-                    <td class="text-center" colspan="5">User not found</td>
+                    <td class="text-center" colspan="9">User not found</td>
                 </tr>
             @endif
         </tbody>
     </table>
     {!! $userlist->links() !!}
 
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the user?</p>
+                    <p><strong>ID:</strong> <span id="userId"></span></p>
+                    <p><strong>Name:</strong> <span id="userName"></span></p>
+                    <p><strong>Type:</strong> <span id="userType"></span></p>
+                    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+                    <p><strong>Phone:</strong> <span id="userPhone"></span></p>
+                    <p><strong>Date of Birth:</strong> <span id="userDob"></span></p>
+                    <p><strong>Address:</strong> <span id="userAddress"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form id="deleteForm" action="#" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const userId = button.getAttribute('data-id');
+            const userName = button.getAttribute('data-name');
+            const userType = button.getAttribute('data-type');
+            const userEmail = button.getAttribute('data-email');
+            const userPhone = button.getAttribute('data-phone');
+            const userDob = button.getAttribute('data-dob');
+            const userAddress = button.getAttribute('data-address');
+
+            const modalTitle = deleteModal.querySelector('.modal-title');
+            const modalBodyId = deleteModal.querySelector('#userId');
+            const modalBodyName = deleteModal.querySelector('#userName');
+            const modalBodyType = deleteModal.querySelector('#userType');
+            const modalBodyEmail = deleteModal.querySelector('#userEmail');
+            const modalBodyPhone = deleteModal.querySelector('#userPhone');
+            const modalBodyDob = deleteModal.querySelector('#userDob');
+            const modalBodyAddress = deleteModal.querySelector('#userAddress');
+            const deleteForm = deleteModal.querySelector('#deleteForm');
+
+            modalTitle.textContent = `Delete Confirm - ${userName}`;
+            modalBodyId.textContent = userId;
+            modalBodyName.textContent = userName;
+            modalBodyType.textContent = userType;
+            modalBodyEmail.textContent = userEmail;
+            modalBodyPhone.textContent = userPhone;
+            modalBodyDob.textContent = userDob;
+            modalBodyAddress.textContent = userAddress;
+            deleteForm.action = `/users/${userId}`;
+        });
+    </script>
 
 @endsection
