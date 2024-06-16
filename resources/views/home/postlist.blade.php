@@ -1,72 +1,68 @@
 @extends('layouts.app')
 
 @section('body')
-    <nav class="navbar navbar-dark bg-success">
-        <a class="navbar-brand" href="#">
-            Post List
-        </a>
-    </nav>
     @if (Session::has('success'))
         <div class="alert alert-success" role="alert">
             {{ Session::get('success') }}
         </div>
     @endif
-    <div class="col float-end mb-5 mt-5">
-        <form class="search-form">
-            <label class=""> Keyword: </label>
-            <input class="search btn border border-secondary" type="text" name="search-keyword"
-                placeholder="Type Something">
-            <a href="#" class="btn btn-primary">Search</a>
-            <a href="#" class="btn btn-primary">Create</a>
-            <a href="#" class="btn btn-primary">Upload</a>
-            <a href="#" class="btn btn-primary">Download</a>
-        </form>
+    <div class="container-md col-sm-12 mt-5">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                Post List
+            </div>
+            <div class="card-body">
+                <form class="search-form float-end mb-5">
+                    <label class=""> Keyword: </label>
+                    <input class="search btn border border-secondary" type="text" name="search-keyword"
+                        placeholder="Type Something">
+                    <a href="#" class="btn btn-primary">Search</a>
+                    <a href="#" class="btn btn-primary">Create</a>
+                    <a href="#" class="btn btn-primary">Upload</a>
+                    <a href="#" class="btn btn-primary">Download</a>
+                </form>
+                <table class="table table-hover table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>#</th>
+                            <th>Post title</th>
+                            <th>Post Description</th>
+                            <th>Posted User</th>
+                            <th>Posted Date</th>
+                            <th>Operation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if ($postlist->count() > 0)
+                            @foreach ($postlist as $rs)
+                                <tr>
+                                    <td class="align-middle">{{ $loop->iteration }}</td>
+                                    <td class="align-middle">{{ $rs->title }}</td>
+                                    <td class="align-middle">{{ $rs->description }}</td>
+                                    <td class="align-middle">admin</td>
+                                    <td class="align-middle">{{ $rs->created_at }}</td>
+                                    <td class="align-middle">
+                                        <div class="d-flex">
+                                            <a href="{{ route('postlist.edit', $rs->id) }}"
+                                                class="btn btn-primary me-2">Edit</a>
+                                            <form action="#" method="POST" onsubmit="return confirm('Delete?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td class="text-center" colspan="5">Post not found</td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+                {!! $postlist->links() !!}
+            </div>
+        </div>
     </div>
-
-
-
-    <table class="table table-hover table-striped">
-        <thead class="table-primary">
-            <tr>
-                <th>#</th>
-                <th>Post title</th>
-                <th>Post Description</th>
-                <th>Posted User</th>
-                <th>Posted Date</th>
-                <th>Operation</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if ($postlist->count() > 0)
-                @foreach ($postlist as $rs)
-                    <tr>
-                        <td class="align-middle">{{ $loop->iteration }}</td>
-                        <td class="align-middle">{{ $rs->title }}</td>
-                        <td class="align-middle">{{ $rs->description }}</td>
-                        <td class="align-middle">admin</td>
-                        <td class="align-middle">{{ $rs->created_at }}</td>
-                        <td class="align-middle">
-                            <div class="btn-group justify-content-around" role="group" aria-label="Basic example">
-                                <a href="{{ route('postlist.edit', $rs->id) }}" type="button"
-                                    class="btn btn-primary">Edit</a>
-                                <form action="#" method="POST" type="button" class="btn btn-danger p-0"
-                                    onsubmit="return confirm('Delete?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-danger m-0">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            @else
-                <tr>
-                    <td class="text-center" colspan="5">Post not found</td>
-                </tr>
-            @endif
-        </tbody>
-    </table>
-    {!! $postlist->links() !!}
-
-
 @endsection

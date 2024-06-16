@@ -1,21 +1,12 @@
 <!-- resources/views/layouts/footer.blade.php -->
-<footer class="bg-dark text-light ">
-    <div class="container">
+<footer class="footer-light footer-shadow content bg-light text-success ">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">
-                <h5>Contact Information</h5>
-                <p>123 Main Street</p>
-                <p>City, State, ZIP</p>
-                <p>Email: info@example.com</p>
-                <p>Phone: 123-456-7890</p>
+                <h5>Meta Team Myanmar</h5>
             </div>
-            <div class="col-md-6">
-                <h5>Follow Us</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#">Facebook</a></li>
-                    <li><a href="#">Twitter</a></li>
-                    <li><a href="#">Instagram</a></li>
-                </ul>
+            <div class="col-md-6 d-flex justify-content-end align-items-center">
+                <p class="mb-0">Copyright &copy; Meta Team Myanmar Co.,Ltd.All Rights Reserved</p>
             </div>
         </div>
     </div>

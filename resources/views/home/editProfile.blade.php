@@ -1,16 +1,13 @@
 @extends('layouts.app')
 
 @section('body')
-    <nav class="navbar navbar-dark bg-success">
-        <a class="navbar-brand" href="#">
-            Profile Edit
-        </a>
-    </nav>
-    <div class="container-md col-sm-4 mt-5">
-
-
-
-        <form class="form-horizontal" action="" method="POST" enctype="multipart/form-data">
+    <div class="container-md col-sm-7 mt-5">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                Profile Edit
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                 <form class="form-horizontal" action="" method="POST" enctype="multipart/form-data" style="max-width: 600px; width: 100%;">
             @csrf
 
             <div class="row mb-3">
@@ -100,8 +97,7 @@
 
 
         </form>
-
-
-
+            </div>
+        </div>
     </div>
 @endsection
