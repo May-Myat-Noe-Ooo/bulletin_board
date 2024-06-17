@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class UsersController extends Controller
@@ -15,6 +17,37 @@ class UsersController extends Controller
     public function index()
     {
         return view('home.login');
+    }
+
+    public function signup()
+    {
+        return view('home.createAccount');
+    }
+
+    public function signupSave(Request $request)
+    {
+         // Validate the request
+         $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => 'required|string|min:8|confirmed',
+        ], [
+            'name.required' => 'Name cannot be blank.',
+            'email.required' => 'Email cannot be blank.',
+            'email.email' => 'Email format is invalid.',
+            'password.required' => 'Password cannot be blank.',
+            'password.confirmed' => 'Password and password confirmation do not match.',
+        ]);
+
+        // Create a new user
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Redirect to the login page with a success message
+        return redirect()->route('login.index')->with('success', 'Account created successfully. Please login.');
     }
 
     public function login(\Illuminate\Http\Request $request)
@@ -30,10 +63,15 @@ class UsersController extends Controller
         ]);
 
         $credentials = $request->only('email', 'password');
-
+        $remember = $request->has('remember');
         if (Auth::attempt($credentials)) {
             // Authentication passed, redirect to post list
-            return redirect()->route('postlist');
+            if ($remember) {
+                // Set a cookie that lasts for one week
+                cookie()->queue('remember_email', $request->email, 10080);
+                cookie()->queue('remember_password', $request->password, 10080);
+            }
+            return redirect()->route('postlist.index');
         }
 
         // Check if email exists in the database
@@ -49,7 +87,10 @@ class UsersController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-        return redirect('/login');
+        // Clear the cookies
+        cookie()->queue(cookie()->forget('remember_email'));
+        cookie()->queue(cookie()->forget('remember_password'));
+        return redirect()->route('login.index');
     }
 
     /**

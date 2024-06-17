@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\PostlistController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,10 +21,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('/login', UsersController::class);
 Route::middleware(['auth'])->group(function () {
-    Route::resource('/postlist', PostlistController::class);
+    Route::resource('postlist', PostlistController::class);
+
 });
+
+//Route::resource('/login', UsersController::class);
 
 // Authentication required for post list
 // Route::middleware(['auth'])->group(function () {
@@ -31,8 +34,12 @@ Route::middleware(['auth'])->group(function () {
 // });
 
 Route::group(['namespace' => 'App\Http\Controllers'], function () {
-    Route::get('/postlist', [PostlistController::class, 'index'])->name('postlist');
-    Route::post('/login', 'UsersController@login')->name('login.perform');
+    Route::get('/login', 'UsersController@index')->name('login.index');
+    Route::post('/login', 'UsersController@login')->name('login.store');
+    Route::get('/logout', 'UsersController@logout')->name('logout');
+    Route::get('/signup', 'UsersController@signup')->name('signup.form');
+    Route::post('/signup', 'UsersController@signupSave')->name('signup.save');
+
     Route::get('/createpost', 'PostsController@createPost');
     Route::post('/createconfirm', 'PostsController@confirmPost')->name('confirm');
     Route::post('/store', 'PostsController@store')->name('store');

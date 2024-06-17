@@ -7,15 +7,15 @@
                 Log in
             </div>
             <div class="card-body d-flex justify-content-center">
-                <form class="form-horizontal" action="{{ route('login.perform') }}" method="POST"
+                <form class="form-horizontal" action="{{ route('login.store') }}" method="POST"
                     style="max-width: 400px; width: 100%;">
                     @csrf
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4 ">Email:</label>
                             <div class="col-sm-8"><input id="email" type="email" name="email"
-                                    class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}"
-                                    required autocomplete="email" autofocus style="max-width: 100%;">
+                                    class="form-control @error('email') is-invalid @enderror" 
+                                    value="{{ old('email', Cookie::get('remember_email')) }}" required autocomplete="email" autofocus style="max-width: 100%;">
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -29,7 +29,7 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4 ">Password:</label>
                             <div class="col-sm-8"><input id="password" type="password" name="password"
-                                    class="form-control @error('password') is-invalid @enderror" value="" required
+                                    class="form-control @error('password') is-invalid @enderror" value="{{ old('password', Cookie::get('remember_password')) }}"  required
                                     autocomplete="current-password" style="max-width: 100%;">
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
@@ -45,9 +45,9 @@
                             <div class="col-sm-8 offset-sm-4">
                                 <div class="col d-flex  justify-content-around align-item-center">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="form2Example31"
-                                            checked />
-                                        <label class="form-check-label" for="form2Example31"> Remember me </label>
+                                        <input class="form-check-input" name="remember" type="checkbox" value="1" id="remember"
+                                            {{ old('remember') ? 'checked' : '' }} />
+                                        <label class="form-check-label" for="remember"> Remember me </label>
                                     </div>
                                     <a href="#!">Forgot password?</a>
                                 </div>
@@ -57,7 +57,7 @@
                                 </div>
 
                                 <div class="text-center">
-                                    <p>Create account? <a href="#!"><svg xmlns="http://www.w3.org/2000/svg"
+                                    <p>Create account? <a href="{{ route('signup.form') }}"><svg xmlns="http://www.w3.org/2000/svg"
                                                 width="16" height="16" fill="currentColor" class="bi bi-person"
                                                 viewBox="0 0 16 16">
                                                 <path

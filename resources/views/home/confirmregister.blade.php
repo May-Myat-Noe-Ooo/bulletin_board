@@ -4,7 +4,7 @@
     <div class="container-md col-sm-7 mt-5">
         <div class="card">
             <div class="card-header bg-success text-white">
-                Register
+                Register Confirm
             </div>
             <div class="card-body d-flex justify-content-center">
                 <form class="form-horizontal" action="{{ route('storeuser') }}" method="POST"
