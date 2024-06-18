@@ -11,7 +11,7 @@ class PostsController extends Controller
     {
         $this->middleware('auth'); // Ensure user is authenticated
     }
-    
+
     public function createPost()
     {
         return view('home.createpost');
@@ -19,6 +19,15 @@ class PostsController extends Controller
 
     public function confirmPost(\Illuminate\Http\Request $request)
     {
+        //Validate the request
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+        ],[
+            'title.required' => 'Title cannot be blank.',
+            'title.max' => 'Title cannot exceed 255 characters.',
+            'description.required' => 'Description cannot be blank.',
+        ]);
         $title = $request->title;
         $des = $request->description;
         return view('home.createconfirmpost', compact('title', 'des'));
