@@ -39,7 +39,17 @@
                                     <td class="align-middle">{{ $loop->iteration }}</td>
                                     <td class="align-middle">{{ $rs->title }}</td>
                                     <td class="align-middle">{{ $rs->description }}</td>
-                                    <td class="align-middle">admin</td>
+                                    <td class="align-middle">
+                                     @if ($rs->user)
+                                            @if ($rs->user->type == 0)
+                                                admin
+                                            @elseif ($rs->user->type == 1)
+                                                user
+                                            @endif
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td class="align-middle">{{ $rs->created_at }}</td>
                                     <td class="align-middle">
                                         <div class="d-flex">

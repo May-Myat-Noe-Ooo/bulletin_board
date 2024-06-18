@@ -7,6 +7,11 @@ use App\Models\Postlist;
 
 class PostsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth'); // Ensure user is authenticated
+    }
+    
     public function createPost()
     {
         return view('home.createpost');
@@ -21,9 +26,17 @@ class PostsController extends Controller
 
     public function store(\Illuminate\Http\Request $request)
     {
-        Postlist::create($request->all());
-
-        return redirect()->route('postlist.index')->with('success', 'Post uploads successfully');
+        $validatedData = $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required',
+        ]);
+    
+        // Add the currently logged-in user's ID
+        $validatedData['create_user_id'] = auth()->id();
+    
+        Postlist::create($validatedData);
+    
+        return redirect()->route('postlist.index')->with('success', 'Post uploaded successfully');
     }
 
     public function editPost()
