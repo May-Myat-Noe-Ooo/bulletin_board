@@ -40,7 +40,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::get('/signup', 'UsersController@signup')->name('signup.form');
     Route::post('/signup', 'UsersController@signupSave')->name('signup.save');
 
-    Route::get('/createpost', 'PostsController@createPost');
+    Route::get('/createpost', 'PostsController@createPost')->name('createpost');
     Route::post('/createconfirm', 'PostsController@confirmPost')->name('confirm');
     Route::post('/store', 'PostsController@store')->name('store');
 

@@ -17,7 +17,7 @@
                     <input class="search btn border border-secondary" type="text" name="search-keyword"
                         placeholder="Type Something">
                     <a href="#" class="btn btn-primary">Search</a>
-                    <a href="#" class="btn btn-primary">Create</a>
+                    <a href="{{ route('createpost') }}" class="btn btn-primary">Create</a>
                     <a href="#" class="btn btn-primary">Upload</a>
                     <a href="#" class="btn btn-primary">Download</a>
                 </form>
