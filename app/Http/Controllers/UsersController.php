@@ -40,11 +40,16 @@ class UsersController extends Controller
         ]);
 
         // Create a new user
-        User::create([
+        $user =User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Update the create_user_id field to be the same as the user's id
+        $user->create_user_id = $user->id;
+        $user->updated_user_id = $user->id;
+        $user->save();
 
         // Redirect to the login page with a success message
         return redirect()->route('login.index')->with('success', 'Account created successfully. Please login.');

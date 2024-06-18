@@ -19,35 +19,19 @@ class UsersSeeder extends Seeder
         DB::table('users')->insert([
 
         [
-            'name' => 'Jay',
-            'email' => 'jay@gmail.com',
+            'name' => 'Kenya',
+            'email' => 'kenya@gmail.com',
             'password' => Hash::make('password126'),
             'profile' => 'D:\MMNO\bulletin_board\img\karina.jpg',
             'type' => '0',
-            'phone' => '912784615',
+            'phone' => '0912784615',
             'address' => 'magway',
             'dob' => '12.3.2001',
             'create_user_id' => 1,
             'updated_user_id' => 1,
-            'deleted_user_id' => 1,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ],
-        [
-            'name' => 'BOA',
-            'email' => 'boa@gmail.com',
-            'password' => Hash::make('password123'),
-            'profile' => 'D:\MMNO\bulletin_board\img\karina.jpg',
-            'type' => '0',
-            'phone' => '912787854',
-            'address' => 'Mandalay',
-            'dob' => '10.3.2001',
-            'create_user_id' => 2,
-            'updated_user_id' => 2,
-            'deleted_user_id' => 2,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]
             
         ]);
     }
