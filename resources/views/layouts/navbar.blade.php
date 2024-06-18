@@ -1,6 +1,7 @@
 <nav class="navbar navbar-light navbar-expand-lg bg-light">
     <div class="container-fluid">
         <a class="navbar-brand text-success" href="#">Bulletinboard</a>
+        @auth
         <ul class="navbar-nav me-auto flex-row mb-2 mb-lg-0">
             <li class="nav-item">
                 <a class="nav-link text-success" href="#">Users</a>
@@ -21,7 +22,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-success" href="#" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        Zaw Zaw
+                        {{ auth()->user()->name }}
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                             class="bi bi-person-fill-gear text-success" viewBox="0 0 16 16">
                             <path
@@ -36,8 +37,8 @@
                         <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
                     </ul>
                 </li>
-
             </ul>
         </div>
+        @endauth
     </div>
 </nav>

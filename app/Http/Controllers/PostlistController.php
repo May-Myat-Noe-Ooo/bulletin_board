@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Postlist;
+use Illuminate\Support\Facades\Auth;
 class PostlistController extends Controller
 {
     /**
@@ -11,8 +12,17 @@ class PostlistController extends Controller
      */
     public function index()
     {
-        $postlist = PostList::Paginate(5);
-        // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
+        // $postlist = PostList::Paginate(5);
+        // // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
+        // return view('home.postlist', compact('postlist'));
+        if (Auth::user()->type == 0) {
+            // Admin user
+            $postlist = Postlist::orderBy('created_at', 'DESC')->paginate(5);
+        } else {
+            // Regular user
+            $postlist = Postlist::where('create_user_id', Auth::id())->orderBy('created_at', 'DESC')->paginate(5);
+        }
+
         return view('home.postlist', compact('postlist'));
     }
 
