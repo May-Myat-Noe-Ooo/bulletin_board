@@ -34,19 +34,20 @@ Route::middleware(['auth'])->group(function () {
 // });
 
 Route::group(['namespace' => 'App\Http\Controllers'], function () {
+    // Authentication routes
     Route::get('/login', 'UsersController@index')->name('login.index');
     Route::post('/login', 'UsersController@login')->name('login.store');
     Route::get('/logout', 'UsersController@logout')->name('logout');
     Route::get('/signup', 'UsersController@signup')->name('signup.form');
     Route::post('/signup', 'UsersController@signupSave')->name('signup.save');
-
+    // Post creation routes
     Route::get('/createpost', 'PostsController@createPost')->name('createpost');
     Route::post('/createconfirm', 'PostsController@confirmPost')->name('confirm');
     Route::post('/store', 'PostsController@store')->name('store');
-
+    // Post editing routes
     Route::get('/editpost/{id}', 'PostsController@editPost')->name('edit');
     Route::post('/confirm/{id}', 'PostsController@confirmEditPost')->name('editconfirm');
-
+    //Player routes
     Route::get('/createuser', 'UsersController@createUser');
     Route::post('/registerconfirm', 'UsersController@confirmRegister')->name('registerconfirm');
     Route::post('/storeregisteruser', 'UsersController@storeRegisterUser')->name('storeuser');

@@ -12,11 +12,11 @@
                 Post List
             </div>
             <div class="card-body">
-                <form class="search-form float-end mb-5">
+                <form class="search-form float-end mb-5" method="GET" action="{{ route('postlist.index') }}">
                     <label class=""> Keyword: </label>
                     <input class="search btn border border-secondary" type="text" name="search-keyword"
-                        placeholder="Type Something">
-                    <a href="#" class="btn btn-primary">Search</a>
+                        placeholder="Type Something" value="{{ request('search-keyword') }}">
+                    <button type="submit" class="btn btn-primary">Search</button>
                     <a href="{{ route('createpost') }}" class="btn btn-primary">Create</a>
                     <a href="#" class="btn btn-primary">Upload</a>
                     <a href="#" class="btn btn-primary">Download</a>

@@ -10,17 +10,25 @@ class PostlistController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // $postlist = PostList::Paginate(5);
-        // // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
-        // return view('home.postlist', compact('postlist'));
+        $keyword = $request->input('search-keyword');
+        
         if (Auth::user()->type == 0) {
-            // Admin user
-            $postlist = Postlist::orderBy('created_at', 'DESC')->paginate(5);
+            // Admin user: can search all posts
+            $postlist = Postlist::when($keyword, function ($query, $keyword) {
+                return $query->where('title', 'LIKE', "%{$keyword}%")
+                             ->orWhere('description', 'LIKE', "%{$keyword}%")
+                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+            })->orderBy('created_at', 'DESC')->paginate(5);
         } else {
-            // Regular user
-            $postlist = Postlist::where('create_user_id', Auth::id())->orderBy('created_at', 'DESC')->paginate(5);
+            // Regular user: can only search their own posts
+            $postlist = Postlist::where('create_user_id', Auth::id())
+                ->when($keyword, function ($query, $keyword) {
+                    return $query->where('title', 'LIKE', "%{$keyword}%")
+                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
+                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+                })->orderBy('created_at', 'DESC')->paginate(5);
         }
 
         return view('home.postlist', compact('postlist'));

@@ -30,7 +30,7 @@
                             <button type="submit" data-mdb-button-init data-mdb-ripple-init
                                 class="btn btn-success btn-block col-sm-4">Confirm</button>
                             <button type="button" data-mdb-button-init data-mdb-ripple-init
-                                class="btn btn-secondary btn-block col-sm-4">Cancel</button>
+                                class="btn btn-secondary btn-block col-sm-4" onclick="window.history.back();">Cancel</button>
                         </div>
                     </div>
 
