@@ -66,7 +66,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td class="text-center" colspan="5">Post not found</td>
+                                <td class="text-center" colspan="6">Post not found</td>
                             </tr>
                         @endif
                     </tbody>
