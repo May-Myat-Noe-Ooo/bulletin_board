@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Postlist;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 class PostlistController extends Controller
 {
     /**
@@ -16,7 +17,8 @@ class PostlistController extends Controller
         
         if (Auth::user()->type == 0) {
             // Admin user: can search all posts
-            $postlist = Postlist::when($keyword, function ($query, $keyword) {
+            $postlist = Postlist::whereNull('deleted_at')
+            ->when($keyword, function ($query, $keyword) {
                 return $query->where('title', 'LIKE', "%{$keyword}%")
                              ->orWhere('description', 'LIKE', "%{$keyword}%")
                              ->orWhere('created_at', 'LIKE', "%{$keyword}%");
@@ -24,7 +26,8 @@ class PostlistController extends Controller
         } else {
             // Regular user: can only search their own posts
             $postlist = Postlist::where('create_user_id', Auth::id())
-                ->when($keyword, function ($query, $keyword) {
+            ->whereNull('deleted_at')
+            ->when($keyword, function ($query, $keyword) {
                     return $query->where('title', 'LIKE', "%{$keyword}%")
                                  ->orWhere('description', 'LIKE', "%{$keyword}%")
                                  ->orWhere('created_at', 'LIKE', "%{$keyword}%");
@@ -88,7 +91,17 @@ class PostlistController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-        //
-    }
+{
+    $postlist = Postlist::findOrFail($id);
+
+    // Update fields before deleting (soft delete)
+    $postlist->deleted_at = Carbon::now();
+    $postlist->deleted_user_id = Auth::id();
+    $postlist->save();
+
+    // Perform the delete operation (soft delete)
+    // $postlist->delete();
+
+    return redirect()->route('postlist.index')->with('success', 'Post deleted successfully');
+}
 }

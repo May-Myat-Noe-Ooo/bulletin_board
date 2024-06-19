@@ -55,11 +55,10 @@
                                         <div class="d-flex">
                                             <a href="{{ route('postlist.edit', $rs->id) }}"
                                                 class="btn btn-primary me-2">Edit</a>
-                                            <form action="#" method="POST" onsubmit="return confirm('Delete?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </form>
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
+                                                        data-title="{{ $rs->title }}" data-description="{{ $rs->description }}"
+                                                        data-status="{{$rs->status}}" >Delete</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -75,4 +74,55 @@
             </div>
         </div>
     </div>
+     <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the post?</p>
+                    <p><strong>ID:</strong> <span id="postId"></span></p>
+                    <p><strong>Title:</strong> <span id="postTitle"></span></p>
+                    <p><strong>Description:</strong> <span id="postDescription"></span></p>
+                    <p><strong>Status:</strong> <span id="postStatus"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form id="deleteForm" action="#" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const postId = button.getAttribute('data-id');
+            const postTitle = button.getAttribute('data-title');
+            const postDescription = button.getAttribute('data-description');
+            const postStatus = button.getAttribute('data-status');
+
+            const modalTitle = deleteModal.querySelector('.modal-title');
+            const modalBodyId = deleteModal.querySelector('#postId');
+            const modalBodyTitle = deleteModal.querySelector('#postTitle');
+            const modalBodyDescription = deleteModal.querySelector('#postDescription');
+            const modalBodyStatus = deleteModal.querySelector('#postStatus');
+
+            modalTitle.textContent = `Delete Confirm - ${postTitle}`;
+            modalBodyId.textContent = postId;
+            modalBodyTitle.textContent = postTitle;
+            modalBodyDescription.textContent = postDescription;
+            modalBodyStatus.textContent = postStatus == 1 ? 'Active' : 'Inactive';
+            deleteForm.action = `/postlists/${postId}/destroy`;
+        });
+    </script>
+
 @endsection

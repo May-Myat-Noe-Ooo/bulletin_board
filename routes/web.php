@@ -47,6 +47,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     // Post editing routes
     Route::get('/editpost/{id}', 'PostsController@editPost')->name('edit');
     Route::post('/confirm/{id}', 'PostsController@confirmEditPost')->name('editconfirm');
+    // Post soft deleting routes
+    Route::delete('/postlists/{id}/destroy', [PostlistController::class, 'destroy'])->name('postlist.destroy');
     //Player routes
     Route::get('/createuser', 'UsersController@createUser');
     Route::post('/registerconfirm', 'UsersController@confirmRegister')->name('registerconfirm');

@@ -42,6 +42,7 @@ class PostsController extends Controller
     
         // Add the currently logged-in user's ID
         $validatedData['create_user_id'] = auth()->id();
+        $validatedData['updated_user_id'] = auth()->id();
     
         Postlist::create($validatedData);
     
