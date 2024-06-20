@@ -37,7 +37,19 @@
                             @foreach ($postlist as $rs)
                                 <tr>
                                     <td class="align-middle">{{ $loop->iteration }}</td>
-                                    <td class="align-middle">{{ $rs->title }}</td>
+                                    <td class="align-middle"><a href="#" 
+                                        class="post-title-link" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#postDetailModal"
+                                        data-title="{{ $rs->title }}"
+                                        data-description="{{ $rs->description }}"
+                                        data-status="{{ $rs->status }}"
+                                        data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                        data-created="{{ $rs->created_at }}"
+                                        data-updated="{{ $rs->updated_at }}"
+                                        data-updated-user="{{ $rs->updated_user_id }}">
+                                        {{ $rs->title }}
+                                     </a></td>
                                     <td class="align-middle">{{ $rs->description }}</td>
                                     <td class="align-middle">
                                      @if ($rs->user)
@@ -101,6 +113,31 @@
         </div>
     </div>
 
+    <!-- Post Detail Modal -->
+<div class="modal fade" id="postDetailModal" tabindex="-1" aria-labelledby="postDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postDetailModalLabel">Post Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Title:</strong> <span id="modalPostTitle"></span></p>
+                <p><strong>Description:</strong> <span id="modalPostDescription"></span></p>
+                <p><strong>Status:</strong> <span id="modalPostStatus"></span></p>
+                <p><strong>Posted User:</strong> <span id="modalPostedUser"></span></p>
+                <p><strong>Posted Date:</strong> <span id="modalPostedDate"></span></p>
+                <p><strong>Updated Date:</strong> <span id="modalUpdatedDate"></span></p>
+                <p><strong>Updated User:</strong> <span id="modalUpdatedUser"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <script>
         const deleteModal = document.getElementById('deleteModal');
         deleteModal.addEventListener('show.bs.modal', function(event) {
@@ -123,6 +160,35 @@
             modalBodyStatus.textContent = postStatus == 1 ? 'Active' : 'Inactive';
             deleteForm.action = `/postlists/${postId}/destroy`;
         });
+
+    const postDetailModal = document.getElementById('postDetailModal');
+    postDetailModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const postTitle = button.getAttribute('data-title');
+        const postDescription = button.getAttribute('data-description');
+        const postStatus = button.getAttribute('data-status');
+        const postedUser = button.getAttribute('data-user');
+        const postedDate = button.getAttribute('data-created');
+        const updatedDate = button.getAttribute('data-updated');
+        const updatedUser = button.getAttribute('data-updated-user');
+
+        const modalPostTitle = postDetailModal.querySelector('#modalPostTitle');
+        const modalPostDescription = postDetailModal.querySelector('#modalPostDescription');
+        const modalPostStatus = postDetailModal.querySelector('#modalPostStatus');
+        const modalPostedUser = postDetailModal.querySelector('#modalPostedUser');
+        const modalPostedDate = postDetailModal.querySelector('#modalPostedDate');
+        const modalUpdatedDate = postDetailModal.querySelector('#modalUpdatedDate');
+        const modalUpdatedUser = postDetailModal.querySelector('#modalUpdatedUser');
+
+        modalPostTitle.textContent = postTitle;
+        modalPostDescription.textContent = postDescription;
+        modalPostStatus.textContent = postStatus == 1 ? 'Active' : 'Inactive';
+        modalPostedUser.textContent = postedUser;
+        modalPostedDate.textContent = postedDate;
+        modalUpdatedDate.textContent = updatedDate;
+        modalUpdatedUser.textContent = updatedUser;
+    });
+
     </script>
 
 @endsection
