@@ -36,27 +36,20 @@
                         <div class="col-sm-8 offset-sm-3" style="max-width: 100%;">
                             <button type="submit" data-mdb-button-init data-mdb-ripple-init
                                 class="btn btn-success btn-block col-sm-4">Create</button>
-                            <button type="reset" data-mdb-button-init data-mdb-ripple-init
-                                class="btn btn-secondary btn-block col-sm-4" id="clearButton">Clear</button>
+                            <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-secondary btn-block col-sm-4" id="resetBtn">Clear</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
     <script>
-        document.getElementById('clearButton').addEventListener('click', function() {
-            // Clear any validation errors
-            document.querySelectorAll('.text-danger').forEach(function(error) {
-                error.textContent = '';
-            });
-            // Reset the form
-            document.getElementById('createPostForm').reset();
-            // Clear the input fields
-            document.getElementById('title').value = '';
-            document.getElementById('description').value = '';
+        document.addEventListener('DOMContentLoaded', function () {
+          var resetButton = document.getElementById('resetBtn');
+          resetButton.addEventListener('click', function () {
+            document.getElementById('title').value = "  ";
+            document.getElementById('description').value = " ";
+          });
         });
-    </script>
+      </script>
 @endsection

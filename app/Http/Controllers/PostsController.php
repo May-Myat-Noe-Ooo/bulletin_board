@@ -64,6 +64,14 @@ class PostsController extends Controller
     public function confirmEditPost(\Illuminate\Http\Request $request, $id)
     {
         $postlist = $request;
+        $validatedData = $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required',
+        ],[
+            'title.required' => 'Title cannot be blank.',
+            'title.max' => 'Title cannot exceed 255 characters.',
+            'description.required' => 'Description cannot be blank.',
+        ]);
         $title = $request->title;
         $des = $request->description;
         $toggleStatus = $request->input('toggle_switch');
@@ -129,7 +137,7 @@ public function uploadCsv(Request $request)
         return redirect()->back()->with('error', 'There was an error processing the CSV file.')->withInput();
     }
 }
-
+//Download CSV file
 public function export(Request $request)
     {
         $keyword = $request->input('search-keyword');
