@@ -18,7 +18,7 @@
                         placeholder="Type Something" value="{{ request('search-keyword') }}">
                     <button type="submit" class="btn btn-primary">Search</button>
                     <a href="{{ route('createpost') }}" class="btn btn-primary">Create</a>
-                    <a href="#" class="btn btn-primary">Upload</a>
+                    <a href="{{ route('upload_file') }}" class="btn btn-primary">Upload</a>
                     <a href="#" class="btn btn-primary">Download</a>
                 </form>
                 <table class="table table-hover table-striped">

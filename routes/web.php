@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\PostlistController;
+use App\Http\Controllers\PostsController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -63,5 +64,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
     Route::get('/reset_password', 'UsersController@resetPassword')->name('reset_password');
 
-    Route::get('/upload_file', 'UsersController@uploadFile');
+    Route::get('/upload_file', 'PostsController@uploadFile')->name('upload_file');
+    Route::post('/upload-csv', 'PostsController@uploadCsv')->name('upload_csv');
 });

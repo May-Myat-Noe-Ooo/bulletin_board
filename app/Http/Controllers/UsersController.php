@@ -183,10 +183,7 @@ class UsersController extends Controller
 
     //User/Admin password control section end
 
-    public function uploadFile()
-    {
-        return view('home.uploadFile');
-    }
+    
 
     public function show(string $id)
     {
