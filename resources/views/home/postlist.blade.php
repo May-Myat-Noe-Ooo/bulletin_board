@@ -19,7 +19,7 @@
                     <button type="submit" class="btn btn-primary">Search</button>
                     <a href="{{ route('createpost') }}" class="btn btn-primary">Create</a>
                     <a href="{{ route('upload_file') }}" class="btn btn-primary">Upload</a>
-                    <a href="#" class="btn btn-primary">Download</a>
+                    <a href="{{ route('postlists.export', ['search-keyword' => request('search-keyword')]) }}" class="btn btn-primary">Download</a>
                 </form>
                 <table class="table table-hover table-striped">
                     <thead class="table-primary">
