@@ -13,7 +13,7 @@
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-3 ">Title</label>
-                            <div class="col-sm-8"><input type="text" name="title" class="form-control"
+                            <div class="col-sm-8"><input type="text" name="title" id="title" class="form-control"
                                     value="{{ old('title', $postlist->title) }}">
                                 @error('title')
                                     <span class="text-danger">{{ $message }}</span>
@@ -25,7 +25,7 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-3 ">Description</label>
                             <div class="col-sm-8">
-                                <textarea class="form-control" name="description" id="textAreaExample1" rows="4">{{ old('description', $postlist->description) }}</textarea>
+                                <textarea class="form-control" name="description" id="description" rows="4">{{ old('description', $postlist->description) }}</textarea>
                                 @error('description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -43,7 +43,7 @@
                                 </div>
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init
                                     class="btn btn-success btn-block col-sm-4">Edit</button>
-                                <button type="reset" data-mdb-button-init data-mdb-ripple-init
+                                <button type="button" data-mdb-button-init data-mdb-ripple-init
                                     class="btn btn-secondary btn-block col-sm-4" id="resetBtn">Clear</button>
                             </div>
                         </div>

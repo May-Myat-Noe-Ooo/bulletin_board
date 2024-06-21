@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('postlists', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('description');
-            $table->integer('status');
+            $table->string('name')->unique();
+            $table->string('email')->unique();
+            $table->text('password');
+            $table->string('profile')->nullable();
+            $table->string('type', 1)->default('1');
+            $table->string('phone', 20)->nullable();
+            $table->string('address')->nullable();
+            $table->date('dob')->nullable();
             $table->unsignedBigInteger('create_user_id')->nullable();
             $table->unsignedBigInteger('updated_user_id')->nullable();
             $table->unsignedBigInteger('deleted_user_id')->nullable();
@@ -33,12 +38,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('postlists', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             // Dropping foreign key constraints
             $table->dropForeign(['create_user_id']);
             $table->dropForeign(['updated_user_id']);
         });
 
-        Schema::dropIfExists('postlists');
+        Schema::dropIfExists('users');
     }
 };

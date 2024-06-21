@@ -13,7 +13,7 @@ class PostlistsExport implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return Postlist::all();
+        return Post::all();
     }
     public function headings(): array
     {

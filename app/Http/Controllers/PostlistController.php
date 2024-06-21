@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Postlist;
+use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 class PostlistController extends Controller
@@ -17,7 +18,7 @@ class PostlistController extends Controller
         
         if (Auth::user()->type == 0) {
             // Admin user: can search all posts
-            $postlist = Postlist::whereNull('deleted_at')
+            $postlist = Post::whereNull('deleted_at')
             ->when($keyword, function ($query, $keyword) {
                 return $query->where('title', 'LIKE', "%{$keyword}%")
                              ->orWhere('description', 'LIKE', "%{$keyword}%")
@@ -25,7 +26,7 @@ class PostlistController extends Controller
             })->orderBy('created_at', 'DESC')->paginate(5);
         } else {
             // Regular user: can only search their own posts
-            $postlist = Postlist::where('create_user_id', Auth::id())
+            $postlist = Post::where('create_user_id', Auth::id())
             ->whereNull('deleted_at')
             ->when($keyword, function ($query, $keyword) {
                     return $query->where('title', 'LIKE', "%{$keyword}%")
@@ -66,7 +67,7 @@ class PostlistController extends Controller
      */
     public function edit(string $id)
     {
-        $postlist = Postlist::findOrFail($id);
+        $postlist = Post::findOrFail($id);
 
         return view('home.editpost', compact('postlist'));
     }
@@ -76,11 +77,12 @@ class PostlistController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $postlist = Postlist::findOrFail($id);
-
+        $postlist = Post::findOrFail($id);
+        $postlist->status=$request->input('toggle_switch');
+        $postlist->updated_user_id=Auth::id();
         $postlist->update($request->all());
 
-        return redirect()->route('postlist.index')->with('success', 'post updated successfully');
+        return redirect()->route('postlist.index')->with('success', 'post edited successfully');
     }
     //public function update(Request $request, string $id)
     //{
@@ -92,7 +94,7 @@ class PostlistController extends Controller
      */
     public function destroy(string $id)
 {
-    $postlist = Postlist::findOrFail($id);
+    $postlist = Post::findOrFail($id);
 
     // Update fields before deleting (soft delete)
     $postlist->deleted_at = Carbon::now();
