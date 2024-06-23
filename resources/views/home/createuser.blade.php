@@ -89,7 +89,7 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label class="form-label col-sm-6 required" for="customFile">Profile</label>
                             <div class="col-sm-8">
-                                <input type="file" name="profile" class="form-control" id="profile" />
+                                <input type="file" name="profile" class="form-control" id="profile">
                                 @error('profile')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror

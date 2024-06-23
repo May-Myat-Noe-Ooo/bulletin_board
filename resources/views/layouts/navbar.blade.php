@@ -30,7 +30,7 @@
                         </svg>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end text-success" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="{{ route('showprofile', auth()->user()->id) }}">Profile</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>

@@ -60,8 +60,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     // Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
 
-    Route::get('/showprofile', 'UsersController@showProfile');
-    Route::post('/editprofile', 'UsersController@editProfile')->name('editprofile');
+    Route::get('/showprofile/{id}', 'UsersController@showProfile')->name('showprofile');
+    Route::post('/editprofile/{id}', 'UsersController@editProfile')->name('editprofile');
+    // Route::post('/updateprofile/{id}', 'UsersController@update')->name('update_profile');
+    Route::patch('/updateprofile/{id}', [UsersController::class, 'updateProfile'])->name('updateprofile');
 
     Route::get('/change_password', 'UsersController@changePassword')->name('change_password');
     Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
