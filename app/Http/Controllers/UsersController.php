@@ -111,11 +111,25 @@ class UsersController extends Controller
 
     public function confirmRegister(\Illuminate\Http\Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => 'required|string|min:8|confirmed',
+            'profile' => 'required|file',
+        ], [
+            'name.required' => 'Name cannot be blank.',
+            'email.required' => 'Email cannot be blank.',
+            'email.email' => 'Email format is invalid.',
+            'password.required' => 'Password cannot be blank.',
+            'password.confirmed' => 'Password and password confirmation do not match.',
+            'profile.required' => 'Profile cannot be blank',
+        ]);
         $name = $request->name;
         $email = $request->email;
         $password = $request->password;
-        $cpassword = $request->confirmpassword;
+        $cpassword = $request->password_confirmation;
         $type = $request->type;
+        //dd($type);
         $phone = $request->phone;
         $dob = $request->date;
         $address = $request->address;
@@ -141,8 +155,35 @@ class UsersController extends Controller
 
     public function storeRegisterUser(\Illuminate\Http\Request $request)
     {
-        //dd ('$request->profile');
-        User::create($request->all());
+    //     // Validate the request data
+    // $request->validate([
+    //     'name' => 'required|string|max:255',
+    //     'email' => 'required|email|unique:users,email|max:255',
+    //     'password' => 'required|string|min:8|confirmed',
+    //     'profile' => 'required|string|max:255',
+    // ]);
+        //dd($request->profile_path);
+
+    // Create a new user
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'phone' => $request->phone,
+        'dob' => $request->date,
+        'address' => $request->address,
+        'profile' => $request->profile_path,
+        'type' => $request->type == 'Admin' ? 0 : 1,
+        'create_user_id' => Auth::id(),
+        'updated_user_id' => Auth::id()
+    ]);
+
+    // // Update the create_user_id and updated_user_id fields to be the same as the user's id
+    // $user->create_user_id = Auth::id();
+    // $user->updated_user_id = $user->id;
+    // $user->save();
+
+    // Redirect to the user list page with a success message
 
         return redirect()->route('displayuser')->with('success', 'Register user added successfully');
     }
@@ -150,12 +191,48 @@ class UsersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function displayUser()
-    {
-        $userlist = User::Paginate(5);
-        // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
-        return view('home.userlist', compact('userlist'));
+    public function displayUser(Request $request)
+{
+    // Get search parameters
+    $name = $request->input('name');
+    $email = $request->input('mailaddr');
+    $fromDate = $request->input('from-date');
+    $toDate = $request->input('to-date');
+
+    // Get the authenticated user's type
+    $userType = Auth::user()->type;
+
+    // Base query for users
+    $query = User::query();
+
+    // Apply filters
+    if ($name) {
+        $query->where('name', 'LIKE', "%{$name}%");
     }
+    if ($email) {
+        $query->where('email', 'LIKE', "%{$email}%");
+    }
+    if ($fromDate) {
+        $query->whereDate('created_at', '>=', $fromDate);
+    }
+    if ($toDate) {
+        $query->whereDate('created_at', '<=', $toDate);
+    }
+
+    // Apply user type filter
+    if ($userType != 0) {
+        $query->where('create_user_id', Auth::id());
+    }
+
+    // Order by user ID in descending order
+    $query->orderBy('id', 'DESC');
+
+    // Paginate the results
+    $userlist = $query->paginate(5);
+
+    // Return the view with the user list
+    return view('home.userlist', compact('userlist'));
+}
 
     public function showProfile()
     {

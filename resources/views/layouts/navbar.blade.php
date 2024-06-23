@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link text-success" href="#">Create User</a>
+                    <a class="nav-link text-success" href="{{ route('registeruser') }}">Create User</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-success" href="#" id="navbarDropdown" role="button"

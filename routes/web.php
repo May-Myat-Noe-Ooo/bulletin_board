@@ -24,7 +24,10 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('postlist', PostlistController::class);
-
+    Route::group(['namespace' => 'App\Http\Controllers'], function (){
+        Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
+    });
+    
 });
 
 //Route::resource('/login', UsersController::class);
@@ -51,11 +54,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     // Post soft deleting routes
     Route::delete('/postlists/{id}/destroy', [PostlistController::class, 'destroy'])->name('postlist.destroy');
     //Player routes
-    Route::get('/createuser', 'UsersController@createUser');
+    Route::get('/createuser', 'UsersController@createUser')->name('registeruser');
     Route::post('/registerconfirm', 'UsersController@confirmRegister')->name('registerconfirm');
-    Route::post('/storeregisteruser', 'UsersController@storeRegisterUser')->name('storeuser');
+    Route::post('/store-registeruser', 'UsersController@storeRegisterUser')->name('storeRegisterUser');
 
-    Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
+    // Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
 
     Route::get('/showprofile', 'UsersController@showProfile');
     Route::post('/editprofile', 'UsersController@editProfile')->name('editprofile');

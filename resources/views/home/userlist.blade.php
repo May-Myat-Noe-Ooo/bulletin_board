@@ -14,23 +14,23 @@
             <div class="card-body">
                 <div class="row ">
                     <div class="col-md-12">
-                         <form class="search-form mb-5">
+                         <form class="search-form mb-5" method="GET" action="{{ route('displayuser') }}">
                             <div class="row d-flex justify-content-around align-items-center">
                                 <div class="col-md-3 d-flex ">
                                     <label for="name" class="form-label col-sm-2">Name:</label>
-                                    <input type="text" name="name" class="form-control" id="name">
+                                    <input type="text" name="name" class="form-control" id="name" value="{{ request('name') }}">
                                 </div>
                                 <div class="col-md-3 d-flex">
                                     <label for="email" class="form-label col-sm-2">Email:</label>
-                                    <input type="text" name="mailaddr" class="form-control" id="email">
+                                    <input type="text" name="mailaddr" class="form-control" id="email" id="email" value="{{ request('mailaddr') }}">
                                 </div>
                                 <div class="col-md-2 d-flex">
                                     <label for="from-date" class="form-label col-sm-3">From:</label>
-                                    <input type="date" name="from-date" class="form-control" id="from-date">
+                                    <input type="date" name="from-date" class="form-control" id="from-date" value="{{ request('from-date') }}">
                                 </div>
                                 <div class="col-md-2 d-flex">
                                     <label for="to-date" class="form-label col-sm-2">To:</label>
-                                    <input type="date" name="to-date" class="form-control" id="to-date">
+                                    <input type="date" name="to-date" class="form-control" id="to-date" value="{{ request('to-date') }}">
                                 </div>
                                 <div class="col-md-1 d-flex align-items-end">
                                     <button type="submit" class="btn btn-success w-100">Search</button>
@@ -59,7 +59,7 @@
                                             <td class="align-middle">{{ $rs->name }}</td>
                                             <td class="align-middle">{{ $rs->email }}</td>
                                             <td class="align-middle">{{ $rs->name }}</td>
-                                            <td class="align-middle">admin</td>
+                                            <td class="align-middle">{{ $rs->type == 0 ? 'Admin' : 'User' }}</td>
                                             <td class="align-middle">{{ $rs->phone }}</td>
                                             <td class="align-middle">{{ $rs->dob }}</td>
                                             <td class="align-middle">{{ $rs->address }}</td>
