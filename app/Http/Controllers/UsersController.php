@@ -44,6 +44,9 @@ class UsersController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'profile' => ' ',
+            'create_user_id' => 1,
+            'updated_user_id' => 1
         ]);
 
         // Update the create_user_id field to be the same as the user's id
@@ -52,7 +55,7 @@ class UsersController extends Controller
         $user->save();
 
         // Redirect to the login page with a success message
-        return redirect()->route('login.index')->with('success', 'Account created successfully. Please login.');
+        return redirect()->route('login.index')->with('success', 'Account created successfully.Log in Again.');
     }
 
     public function login(\Illuminate\Http\Request $request)

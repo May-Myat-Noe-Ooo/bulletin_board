@@ -30,7 +30,7 @@ class PostsController extends Controller
         //Validate the request
         $request->validate(
             [
-                'title' => 'required|string|max:255',
+                'title' => 'required|string|max:255|unique:posts,title',
                 'description' => 'required|string',
             ],
             [
@@ -47,15 +47,22 @@ class PostsController extends Controller
 
     public function store(\Illuminate\Http\Request $request)
     {
-        $validatedData = $request->validate([
+        $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
         ]);
-            // Add the currently logged-in user's ID
-            $validatedData['create_user_id'] = auth()->id();
-            $validatedData['updated_user_id'] = auth()->id();
+        // Create a new post
+        $post = Post::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'create_user_id' => auth()->id(),
+            'updated_user_id' => auth()->id(),
+        ]);
+        // // Add the currently logged-in user's ID
+        // $post->create_user_id = auth()->id();
+        // $post->updated_user_id = auth()->id();
 
-            Post::create($validatedData);
+        // $post->save();
         return redirect()->route('postlist.index')->with('success', 'Post uploaded successfully');
     }
 
@@ -95,7 +102,7 @@ class PostsController extends Controller
     {
         // Validate the file input
         $validator = Validator::make($request->all(), [
-            'csvfile' => 'required|file|mimes:csv',
+            'csvfile' => 'required|file|mimes:csv|mimetypes:text/csv',
         ]);
 
         if ($validator->fails()) {
@@ -106,8 +113,18 @@ class PostsController extends Controller
         $file = $request->file('csvfile');
 
         try {
+            // Read the file content
+            $content = file_get_contents($file->getRealPath());
+
+            // Normalize line endings to Unix style
+            $content = str_replace(["\r\n", "\r"], "\n", $content);
+
+            // Write the normalized content back to a temporary file
+            $tempPath = sys_get_temp_dir() . '/' . uniqid() . '.csv';
+            file_put_contents($tempPath, $content);
+
             // Parse the CSV file using league/csv
-            $csv = Reader::createFromPath($file->getRealPath(), 'r');
+            $csv = Reader::createFromPath($tempPath, 'r');
             $csv->setHeaderOffset(0); // Set the header offset
 
             // Get the header and check its length
@@ -121,52 +138,36 @@ class PostsController extends Controller
             // Get the records
             $records = Statement::create()->process($csv);
 
+            // Array to collect errors
+            $errors = [];
+
             // Validate each row
-            foreach ($records as $record) {
+            foreach ($records as $index => $record) {
                 if (count($record) !== 3) {
-                    return redirect()->back()->with('error', 'Each row in the CSV must have exactly 3 columns.')->withInput();
+                    $errors[] = 'Row ' . ($index + 1) . ': Each row in the CSV must have exactly 3 columns.';
+                    continue;
                 }
 
-                $existingPost = Post::withTrashed() //check post deleted
-                    ->where('title', $record['title'])
-                    ->first();
-
-                if ($existingPost) {
-                    //dd($existingPost->deleted_at);Checking if deleted value exists
-                    if ($existingPost->deleted_at) {
-                        // Restore the soft deleted post
-                        $existingPost->restore();
-
-                        // Update the restored post with new description if needed
-                        $existingPost->update([
-                            'title' => $record['title'],
-                            'description' => $record['description'],
-                            'status' => $record['status'],
-                            'created_user_id' => Auth::id(),
-                            'updated_user_id' => Auth::id(),
-                            'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now(),
-                        ]);
-                    } else {
-                        // Post with the same title exists and is not soft deleted
-                        return redirect()
-                            ->back()
-                            ->with(['error' => 'This title has already been taken.'])
-                            ->withInput();
-                    }
-                } else {
-                    Post::create([
-                        'title' => $record['title'],
-                        'description' => $record['description'],
-                        'status' => $record['status'],
-                        'create_user_id' => Auth::id(),
-                        'updated_user_id' => Auth::id(),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
+                // Check for unique title in the database
+                if (Post::where('title', $record['title'])->exists()) {
+                    $errors[] = 'Row ' . ($index + 1) . ": The title '{$record['title']}' has already been taken.";
+                    continue;
                 }
 
                 // Create a new postlist entry
+                Post::create([
+                    'title' => $record['title'],
+                    'description' => $record['description'],
+                    'status' => $record['status'],
+                    'create_user_id' => Auth::id(),
+                    'updated_user_id' => Auth::id(),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+            }
+
+            if (!empty($errors)) {
+                return redirect()->back()->with('error_html', $errors)->withInput();
             }
 
             return redirect()->route('postlist.index')->with('success', 'CSV data uploaded successfully.');
@@ -174,6 +175,7 @@ class PostsController extends Controller
             return redirect()->back()->with('error', 'There was an error processing the CSV file.')->withInput();
         }
     }
+
     //Download CSV file
     public function export(Request $request)
     {
@@ -183,8 +185,7 @@ class PostsController extends Controller
             // Admin user: can search all posts
 
             //dd($keyword);
-            $postlist = Post::whereNull('deleted_at')
-                ->when($keyword, function ($query, $keyword) {
+            $postlist = Post::when($keyword, function ($query, $keyword) {
                     return $query
                         ->where('title', 'LIKE', "%{$keyword}%")
                         ->orWhere('description', 'LIKE', "%{$keyword}%")
@@ -209,7 +210,6 @@ class PostsController extends Controller
         } else {
             // Regular user: can only search their own posts
             $postlist = Post::where('create_user_id', Auth::id())
-                ->whereNull('deleted_at')
                 ->when($keyword, function ($query, $keyword) {
                     return $query
                         ->where('title', 'LIKE', "%{$keyword}%")

@@ -18,21 +18,19 @@ class PostlistController extends Controller
         
         if (Auth::user()->type == 0) {
             // Admin user: can search all posts
-            $postlist = Post::whereNull('deleted_at')
-            ->when($keyword, function ($query, $keyword) {
+            $postlist = Post::when($keyword, function ($query, $keyword) {
                 return $query->where('title', 'LIKE', "%{$keyword}%")
                              ->orWhere('description', 'LIKE', "%{$keyword}%")
                              ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-            })->orderBy('created_at', 'DESC')->paginate(5);
+            })->orderBy('id', 'DESC')->paginate(5);
         } else {
             // Regular user: can only search their own posts
             $postlist = Post::where('create_user_id', Auth::id())
-            ->whereNull('deleted_at')
             ->when($keyword, function ($query, $keyword) {
                     return $query->where('title', 'LIKE', "%{$keyword}%")
                                  ->orWhere('description', 'LIKE', "%{$keyword}%")
                                  ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })->orderBy('created_at', 'DESC')->paginate(5);
+                })->orderBy('id', 'DESC')->paginate(5);
         }
 
         return view('home.postlist', compact('postlist'));
@@ -97,12 +95,12 @@ class PostlistController extends Controller
     $postlist = Post::findOrFail($id);
 
     // Update fields before deleting (soft delete)
-    $postlist->deleted_at = Carbon::now();
+    //$postlist->deleted_at = Carbon::now();
     $postlist->deleted_user_id = Auth::id();
     $postlist->save();
 
     // Perform the delete operation (soft delete)
-    // $postlist->delete();
+    $postlist->delete();
 
     return redirect()->route('postlist.index')->with('success', 'Post deleted successfully');
 }

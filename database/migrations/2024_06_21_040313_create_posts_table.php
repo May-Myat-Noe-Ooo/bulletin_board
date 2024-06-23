@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('title',255)->unique();
             $table->string('description');
-            $table->integer('status')->default(1);;
-            $table->unsignedBigInteger('create_user_id')->nullable();
-            $table->unsignedBigInteger('updated_user_id')->nullable();
+            $table->integer('status')->default(1);
+            $table->unsignedBigInteger('create_user_id');
+            $table->unsignedBigInteger('updated_user_id');
             $table->unsignedBigInteger('deleted_user_id')->nullable();
             $table->timestamps();
-            $table->softDeletes();
 
             // Adding foreign key constraints
             $table->foreign('create_user_id')->references('id')->on('users')->onDelete('cascade');

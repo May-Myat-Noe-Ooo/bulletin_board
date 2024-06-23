@@ -7,8 +7,8 @@
                 Upload CSV File
             </div>
             <div class="card-body d-flex justify-content-center">
-                <form class="form-horizontal" action="{{ route('upload_csv') }}" method="POST" enctype="multipart/form-data"
-                    style="max-width: 500px; width: 100%;">
+                <form class="form-horizontal" id="uploadForm" action="{{ route('upload_csv') }}" method="POST"
+                    enctype="multipart/form-data" style="max-width: 500px; width: 100%;">
                     @csrf
                     @if (session('success'))
                         <div class="alert alert-success">
@@ -21,6 +21,13 @@
                             {{ session('error') }}
                         </div>
                     @endif
+
+                    @if (session('error_html'))
+                        <div class="alert alert-danger">
+                            {!! implode('<br>', session('error_html')) !!}
+                        </div>
+                    @endif
+
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label class="form-label col-sm-4" for="customFile">CSV file:</label>
@@ -35,7 +42,7 @@
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init
                                     class="btn btn-success btn-block col-sm-4">Upload</button>
                                 <button type="button" data-mdb-button-init data-mdb-ripple-init
-                                    class="btn btn-secondary btn-block col-sm-4">Clear</button>
+                                    class="btn btn-secondary btn-block col-sm-4" id="resetBtn">Clear</button>
                             </div>
                         </div>
                     </div>
@@ -43,4 +50,13 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var resetButton = document.getElementById('resetBtn');
+            resetButton.addEventListener('click', function() {
+                var form = document.getElementById('uploadForm');
+                form.reset();
+            });
+        });
+    </script>
 @endsection

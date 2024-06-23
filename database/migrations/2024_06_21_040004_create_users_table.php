@@ -16,17 +16,16 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('email')->unique();
             $table->text('password');
-            $table->string('profile')->nullable();
+            $table->string('profile');
             $table->string('type', 1)->default('1');
             $table->string('phone', 20)->nullable();
             $table->string('address')->nullable();
             $table->date('dob')->nullable();
-            $table->unsignedBigInteger('create_user_id')->nullable();
-            $table->unsignedBigInteger('updated_user_id')->nullable();
+            $table->unsignedBigInteger('create_user_id');
+            $table->unsignedBigInteger('updated_user_id');
             $table->unsignedBigInteger('deleted_user_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
-
             // Adding foreign key constraints
             $table->foreign('create_user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('updated_user_id')->references('id')->on('users')->onDelete('cascade');

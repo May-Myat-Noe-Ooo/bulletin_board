@@ -10,6 +10,11 @@
                 <form class="form-horizontal" action="{{ route('login.store') }}" method="POST" novalidate
                     style="max-width: 400px; width: 100%;">
                     @csrf
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4 ">Email:</label>
