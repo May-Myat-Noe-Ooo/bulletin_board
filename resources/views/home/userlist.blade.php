@@ -56,9 +56,24 @@
                                     @foreach ($userlist as $rs)
                                         <tr>
                                             <td class="align-middle">{{ $loop->iteration }}</td>
-                                            <td class="align-middle">{{ $rs->name }}</td>
+                                            <td class="align-middle"><a href="#" 
+                                                class="user-name-link" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#userDetailModal"
+                                                data-name="{{ $rs->name }}"
+                                                data-type="{{ $rs->type }}"
+                                                data-email="{{ $rs->email }}"
+                                                data-phone="{{ $rs->phone }}"
+                                                data-dob="{{ $rs->dob }}"
+                                                data-address="{{ $rs->address }}"
+                                                data-created="{{ $rs->created_at }}"
+                                                data-created-user="{{ $rs->createdBy->name}}"
+                                                data-updated="{{ $rs->updated_at }}"
+                                                data-updated-user="{{ $rs->updatedBy->name }}">
+                                                {{ $rs->name }}
+                                             </a></td>
                                             <td class="align-middle">{{ $rs->email }}</td>
-                                            <td class="align-middle">{{ $rs->name }}</td>
+                                            <td class="align-middle">{{ $rs->createdBy->name}}</td>
                                             <td class="align-middle">{{ $rs->type == 0 ? 'Admin' : 'User' }}</td>
                                             <td class="align-middle">{{ $rs->phone }}</td>
                                             <td class="align-middle">{{ $rs->dob }}</td>
@@ -118,6 +133,33 @@
         </div>
     </div>
 
+    <!-- User Detail Modal -->
+<div class="modal fade" id="userDetailModal" tabindex="-1" aria-labelledby="userDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailModalLabel">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Name:</strong> <span id="userName"></span></p>
+                    <p><strong>Type:</strong> <span id="userType"></span></p>
+                    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+                    <p><strong>Phone:</strong> <span id="userPhone"></span></p>
+                    <p><strong>Date of Birth:</strong> <span id="userDob"></span></p>
+                    <p><strong>Address:</strong> <span id="userAddress"></span></p>
+                    <p><strong>Created Date:</strong> <span id="userCreatedDate"></span></p>
+                    <p><strong>Created User:</strong> <span id="userCreatedUser"></span></p>
+                    <p><strong>Updated Date:</strong> <span id="userUpdatedDate"></span></p>
+                    <p><strong>Updated User:</strong> <span id="userUpdatedUser"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script>
         const deleteModal = document.getElementById('deleteModal');
         deleteModal.addEventListener('show.bs.modal', function(event) {
@@ -143,13 +185,51 @@
             modalTitle.textContent = `Delete Confirm - ${userName}`;
             modalBodyId.textContent = userId;
             modalBodyName.textContent = userName;
-            modalBodyType.textContent = userType;
+            modalBodyType.textContent = userType == 0 ? 'Admin' : 'User';;
             modalBodyEmail.textContent = userEmail;
             modalBodyPhone.textContent = userPhone;
             modalBodyDob.textContent = userDob;
             modalBodyAddress.textContent = userAddress;
-            deleteForm.action = `/users/${userId}`;
+            deleteForm.action = `/users/${userId}/destroy`;
         });
+
+        const userDetailModal = document.getElementById('userDetailModal');
+    userDetailModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const userName = button.getAttribute('data-name');
+        const userType = button.getAttribute('data-type');
+        const userEmail = button.getAttribute('data-email');
+        const userPhone = button.getAttribute('data-phone');
+        const userDob = button.getAttribute('data-dob');
+        const userAddress = button.getAttribute('data-address');
+        const userCreatedDate = button.getAttribute('data-created');
+        const userCreatedUser = button.getAttribute('data-created-user');
+        const userUpdatedDate = button.getAttribute('data-updated');
+        const userUpdatedUser = button.getAttribute('data-updated-user');
+
+        const modalBodyName = userDetailModal.querySelector('#userName');
+        const modalBodyType = userDetailModal.querySelector('#userType');
+        const modalBodyEmail = userDetailModal.querySelector('#userEmail');
+        const modalBodyPhone = userDetailModal.querySelector('#userPhone');
+        const modalBodyDob = userDetailModal.querySelector('#userDob');
+        const modalBodyAddress = userDetailModal.querySelector('#userAddress');
+        const modalCreatedDate = userDetailModal.querySelector('#userCreatedDate');
+        const modalCreatedUser = userDetailModal.querySelector('#userCreatedUser');
+        const modalUpdatedDate = userDetailModal.querySelector('#userUpdatedDate');
+        const modalUpdatedUser = userDetailModal.querySelector('#userUpdatedUser');
+
+        modalBodyName.textContent = userName;
+        modalBodyType.textContent = userType == 0 ? 'Admin' : 'User';;
+        modalBodyEmail.textContent = userEmail;
+        modalBodyPhone.textContent = userPhone;
+        modalBodyDob.textContent = userDob;
+        modalBodyAddress.textContent = userAddress;
+        modalCreatedDate.textContent = userCreatedDate;
+        modalCreatedUser.textContent = userCreatedUser;
+        modalUpdatedDate.textContent = userUpdatedDate;
+        modalUpdatedUser.textContent = userUpdatedUser;
+    });
+
     </script>
 
 @endsection

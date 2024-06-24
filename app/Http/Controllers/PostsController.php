@@ -129,7 +129,6 @@ class PostsController extends Controller
 
             // Get the header and check its length
             $header = $csv->getHeader();
-
             // Check if the header has exactly 3 columns
             if (count($header) !== 3) {
                 return redirect()->back()->with('error', 'CSV must have exactly 3 columns.')->withInput();

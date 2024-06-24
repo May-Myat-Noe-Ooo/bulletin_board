@@ -4,10 +4,10 @@
         @auth
         <ul class="navbar-nav me-auto flex-row mb-2 mb-lg-0">
             <li class="nav-item">
-                <a class="nav-link text-success" href="#">Users</a>
+                <a class="nav-link text-success" href="{{ route('displayuser') }}">Users</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-success" href="#">Posts</a>
+                <a class="nav-link text-success" href="{{ route('postlist.index') }}">Posts</a>
             </li>
         </ul>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class UsersController extends Controller
 {
@@ -29,36 +30,60 @@ class UsersController extends Controller
         // Validate the request
         $request->validate(
             [
-                'name' => 'required|string|max:255',
+                'name' => 'required|string|unique:users,name|max:255',
                 'email' => 'required|email|unique:users,email|max:255',
                 'password' => 'required|string|min:8|confirmed',
             ],
             [
                 'name.required' => 'Name cannot be blank.',
+                'name.unique' => 'Name has already taken.',
                 'email.required' => 'Email cannot be blank.',
                 'email.email' => 'Email format is invalid.',
+                'email.unique' => 'Email has already taken.',
                 'password.required' => 'Password cannot be blank.',
                 'password.confirmed' => 'Password and password confirmation do not match.',
             ],
         );
 
-        // Create a new user
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'profile' => ' ',
-            'create_user_id' => 1,
-            'updated_user_id' => 1,
-        ]);
+        // Check for a soft-deleted user with the same name or email
+        $softDeletedUser = User::onlyTrashed()
+            ->where(function ($query) use ($request) {
+                $query->where('name', $request->name)->orWhere('email', $request->email);
+            })
+            ->first();
 
-        // Update the create_user_id field to be the same as the user's id
-        $user->create_user_id = $user->id;
-        $user->updated_user_id = $user->id;
-        $user->save();
+        if ($softDeletedUser) {
+            // Update the existing soft-deleted user
+            $softDeletedUser->name = $request->name;
+            $softDeletedUser->email = $request->email;
+            $softDeletedUser->password = Hash::make($request->password);
+            $softDeletedUser->profile = ' ';
+            $softDeletedUser->create_user_id = $softDeletedUser->id;
+            $softDeletedUser->updated_user_id = $softDeletedUser->id;
+            $softDeletedUser->deleted_at = null; // Reset the deleted_at field
+            $softDeletedUser->save();
 
-        // Redirect to the login page with a success message
-        return redirect()->route('login.index')->with('success', 'Account created successfully.Log in Again.');
+            // Redirect to the login page with a success message
+            return redirect()->route('login.index')->with('success', 'Account reactivated successfully. Log in again.');
+        } else {
+            // Create a new user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'profile' => ' ',
+                'create_user_id' => 1,
+                'updated_user_id' => 1,
+            ]);
+
+            // Update the create_user_id field to be the same as the user's id
+            $user->create_user_id = $user->id;
+            $user->updated_user_id = $user->id;
+            $user->save();
+
+            // Redirect to the login page with a success message
+            return redirect()->route('login.index')->with('success', 'Account created successfully. Log in again.');
+        }
     }
 
     public function login(\Illuminate\Http\Request $request)
@@ -117,10 +142,11 @@ class UsersController extends Controller
 
     public function confirmRegister(\Illuminate\Http\Request $request)
     {
+        // Validate the request
         $request->validate(
             [
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email|max:255',
+                'email' => 'required|email|max:255',
                 'password' => 'required|string|min:8|confirmed',
                 'profile' => 'required|file',
             ],
@@ -133,20 +159,63 @@ class UsersController extends Controller
                 'profile.required' => 'Profile cannot be blank',
             ],
         );
-        $name = $request->name;
-        $email = $request->email;
-        $password = $request->password;
-        $cpassword = $request->password_confirmation;
-        $type = $request->type;
-        //dd($type);
-        $phone = $request->phone;
-        $dob = $request->date;
-        $address = $request->address;
-        $imageName = time() . '.' . $request->profile->extension();
-        $success = $request->profile->move(public_path('img'), $imageName);
-        $imagePath = 'img/' . $imageName;
-        $profile = 'img/' . $imageName;
-        return view('home.confirmregister', compact('name', 'email', 'password', 'cpassword', 'type', 'phone', 'dob', 'address', 'imagePath', 'profile'));
+
+        // Check for a soft-deleted user with the same name or email
+        $softDeletedUser = User::onlyTrashed()
+            ->where(function ($query) use ($request) {
+                $query->where('name', $request->name)->orWhere('email', $request->email);
+            })
+            ->first();
+
+        // If a soft-deleted user exists, pass the data as usual
+        if ($softDeletedUser) {
+            $name = $request->name;
+            $email = $request->email;
+            $password = $request->password;
+            $cpassword = $request->password_confirmation;
+            $type = $request->type;
+            $phone = $request->phone;
+            $dob = $request->date;
+            $address = $request->address;
+            $imageName = time() . '.' . $request->profile->extension();
+            $success = $request->profile->move(public_path('img'), $imageName);
+            $imagePath = 'img/' . $imageName;
+            $profile = 'img/' . $imageName;
+
+            return view('home.confirmregister', compact('name', 'email', 'password', 'cpassword', 'type', 'phone', 'dob', 'address', 'imagePath', 'profile'));
+        } else {
+            // Check for existing active users with the same name or email
+            $activeUserExists = User::where('name', $request->name)
+                ->orWhere('email', $request->email)
+                ->exists();
+
+            if ($activeUserExists) {
+                // If an active user with the same name or email exists, show error messages
+                return redirect()
+                    ->back()
+                    ->withErrors([
+                        'name' => 'Name must be unique.',
+                        'email' => 'Email must be unique.',
+                    ])
+                    ->withInput();
+            }
+
+            // If no soft-deleted or active user exists with the same name or email, pass the data as usual
+            $name = $request->name;
+            $email = $request->email;
+            $password = $request->password;
+            $cpassword = $request->password_confirmation;
+            $type = $request->type;
+            $phone = $request->phone;
+            $dob = $request->date;
+            $address = $request->address;
+            $imageName = time() . '.' . $request->profile->extension();
+            $success = $request->profile->move(public_path('img'), $imageName);
+            $imagePath = 'img/' . $imageName;
+            $profile = 'img/' . $imageName;
+
+            return view('home.confirmregister', compact('name', 'email', 'password', 'cpassword', 'type', 'phone', 'dob', 'address', 'imagePath', 'profile'));
+        }
     }
 
     public function create()
@@ -209,36 +278,42 @@ class UsersController extends Controller
         $toDate = $request->input('to-date');
 
         // Get the authenticated user's type
-        $userType = Auth::user()->type;
-
-        // Base query for users
-        $query = User::query();
-
-        // Apply filters
-        if ($name) {
-            $query->where('name', 'LIKE', "%{$name}%");
+        //$userType = Auth::user()->type;
+        if (Auth::user()->type == 0) {
+            // Base query for users, excluding soft-deleted users
+            $userlist = User::whereNull('deleted_at')
+                ->when($name, function ($query, $name) {
+                    return $query->where('name', 'LIKE', "%{$name}%");
+                })
+                ->when($email, function ($query, $email) {
+                    return $query->where('email', 'LIKE', "%{$email}%");
+                })
+                ->when($fromDate, function ($query, $fromDate) {
+                    return $query->whereDate('created_at', '>=', $fromDate);
+                })
+                ->when($toDate, function ($query, $toDate) {
+                    return $query->whereDate('created_at', '<=', $toDate);
+                })
+                ->orderBy('id', 'DESC')
+                ->paginate(5);
+        } else {
+            $userlist = User::where('create_user_id', Auth::id())
+                ->whereNull('deleted_at')
+                ->when($name, function ($query, $name) {
+                    return $query->where('name', 'LIKE', "%{$name}%");
+                })
+                ->when($email, function ($query, $email) {
+                    return $query->where('email', 'LIKE', "%{$email}%");
+                })
+                ->when($fromDate, function ($query, $fromDate) {
+                    return $query->whereDate('created_at', '>=', $fromDate);
+                })
+                ->when($toDate, function ($query, $toDate) {
+                    return $query->whereDate('created_at', '<=', $toDate);
+                })
+                ->orderBy('id', 'DESC')
+                ->paginate(5);
         }
-        if ($email) {
-            $query->where('email', 'LIKE', "%{$email}%");
-        }
-        if ($fromDate) {
-            $query->whereDate('created_at', '>=', $fromDate);
-        }
-        if ($toDate) {
-            $query->whereDate('created_at', '<=', $toDate);
-        }
-
-        // Apply user type filter
-        if ($userType != 0) {
-            $query->where('create_user_id', Auth::id());
-        }
-
-        // Order by user ID in descending order
-        $query->orderBy('id', 'DESC');
-
-        // Paginate the results
-        $userlist = $query->paginate(5);
-
         // Return the view with the user list
         return view('home.userlist', compact('userlist'));
     }
@@ -292,7 +367,7 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
 
         $user->name = $request->input('name');
-        $user->type = $request->input('type') == 'Admin' ? 0 : 1;
+        $user->type = $request->input('type');
         $user->email = $request->input('email');
         $user->phone = $request->input('phone');
         $user->dob = $request->input('date');
@@ -316,6 +391,16 @@ class UsersController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        // Update fields before deleting (soft delete)
+        $user->deleted_at = Carbon::now();
+        $user->deleted_user_id = Auth::id();
+        $user->save();
+
+        // Perform the delete operation (soft delete)
+        //$postlist->delete();
+
+        return redirect()->route('displayuser')->with('success', 'User deleted successfully');
     }
 }

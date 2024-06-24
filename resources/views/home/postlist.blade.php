@@ -27,7 +27,7 @@
                             <th>#</th>
                             <th>Post title</th>
                             <th>Post Description</th>
-                            <th>Posted User</th>
+                            <th>Created User</th>
                             <th>Posted Date</th>
                             <th>Operation</th>
                         </tr>
@@ -47,7 +47,7 @@
                                         data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
                                         data-created="{{ $rs->created_at }}"
                                         data-updated="{{ $rs->updated_at }}"
-                                        data-updated-user="{{ $rs->updated_user_id }}">
+                                        data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}">
                                         {{ $rs->title }}
                                      </a></td>
                                     <td class="align-middle">{{ $rs->description }}</td>
