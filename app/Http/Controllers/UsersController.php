@@ -332,10 +332,31 @@ class UsersController extends Controller
     }
 
     //User/Admin password control section start
-    public function changePassword(\Illuminate\Http\Request $request)
-    {
-        return view('home.changepassword');
+    public function changePassword($id)
+{
+    $user = User::find($id);
+    return view('home.changepassword', compact('user'));
+}
+
+public function updatePassword(Request $request, $id)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|min:6',
+        'new_password_confirmation' => 'required|same:new_password',
+    ]);
+
+    $user = User::find($id);
+
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Current password is incorrect']);
     }
+
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return redirect()->route('displayuser')->with('success', 'Password updated successfully');
+}
 
     public function forgotPassword(\Illuminate\Http\Request $request)
     {

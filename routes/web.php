@@ -67,7 +67,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     // Route::post('/updateprofile/{id}', 'UsersController@update')->name('update_profile');
     Route::patch('/updateprofile/{id}', [UsersController::class, 'updateProfile'])->name('updateprofile');
 
-    Route::get('/change_password', 'UsersController@changePassword')->name('change_password');
+    //User Password Changing
+    Route::get('/change_password/{id}', 'UsersController@changePassword')->name('change_password');
+    Route::post('/change_password/{id}', 'UsersController@updatePassword')->name('update_password');
+
     Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
     Route::get('/reset_password', 'UsersController@resetPassword')->name('reset_password');
 

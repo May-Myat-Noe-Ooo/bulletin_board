@@ -88,7 +88,7 @@
                             <div class="col-sm-8 offset-sm-4">
                                 <button type="submit" class="btn btn-primary">Save</button>
                                 <button type="reset" class="btn btn-secondary btn-block col-sm-3">Clear</button>
-                                <a href="{{ route('change_password') }}" class="link-primary">Change Password</a>
+                                <a href="{{ route('change_password', ['id' => $user->id]) }}" class="link-primary">Change Password</a>
                             </div>
                         </div>
                     </div>
