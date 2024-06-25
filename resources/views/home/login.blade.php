@@ -54,7 +54,7 @@
                                             {{ old('remember') ? 'checked' : '' }} />
                                         <label class="form-check-label" for="remember"> Remember me </label>
                                     </div>
-                                    <a href="#!">Forgot password?</a>
+                                    <a href="{{ route('forgot_password') }}">Forgot password?</a>
                                 </div>
                                 <div>
                                     <button type="submit" data-mdb-button-init data-mdb-ripple-init

@@ -13,9 +13,10 @@ class PostlistController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $keyword = $request->input('search-keyword');
-        
+{
+    $keyword = $request->input('search-keyword');
+
+    if (Auth::check()) {
         if (Auth::user()->type == 0) {
             // Admin user: can search all posts
             $postlist = Post::when($keyword, function ($query, $keyword) {
@@ -32,9 +33,18 @@ class PostlistController extends Controller
                                  ->orWhere('created_at', 'LIKE', "%{$keyword}%");
                 })->orderBy('id', 'DESC')->paginate(5);
         }
-
-        return view('home.postlist', compact('postlist'));
+    } else {
+        // Unauthenticated users: can view all posts with status 1
+        $postlist = Post::where('status', 1)
+        ->when($keyword, function ($query, $keyword) {
+                return $query->where('title', 'LIKE', "%{$keyword}%")
+                             ->orWhere('description', 'LIKE', "%{$keyword}%")
+                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+            })->orderBy('id', 'DESC')->paginate(5);
     }
+
+    return view('home.postlist', compact('postlist'));
+}
 
     /**
      * Show the form for creating a new resource.

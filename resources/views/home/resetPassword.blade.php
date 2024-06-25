@@ -7,18 +7,27 @@
                 Reset Password
             </div>
             <div class="card-body d-flex justify-content-center">
-                <form class="form-horizontal" action="" method="POST" style="max-width: 500px; width: 100%;">
+                <form class="form-horizontal" action="{{ route('reset_password.update') }}" method="POST" style="max-width: 500px; width: 100%;">
                     @csrf
+                    <input type="hidden" name="token" value="{{ $token }}">
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-5">Password:</label>
-                            <div class="col-sm-8"><input type="password" name="password" class="form-control"></div>
+                            <div class="col-sm-8"><input type="password" name="password" class="form-control" >
+                                @error('password')
+                                <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-5">Password Confirmation:</label>
-                            <div class="col-sm-8"><input type="password" name="confirm_password" class="form-control"></div>
+                            <div class="col-sm-8"><input type="password" name="password_confirmation" class="form-control" >
+                                @error('password_confirmation')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                         </div>
                     </div>
                     <div class="row mb-3">

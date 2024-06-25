@@ -21,13 +21,14 @@ use App\Http\Controllers\AuthController;
 Route::get('/', function () {
     return view('welcome');
 });
+// Route for viewing posts (accessible by both authenticated and unauthenticated users)
+Route::get('/postlist', [PostlistController::class, 'index'])->name('postlist.index');
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('postlist', PostlistController::class);
-    Route::group(['namespace' => 'App\Http\Controllers'], function (){
+    Route::resource('postlist', PostlistController::class)->except(['index']);
+    Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
     });
-    
 });
 
 //Route::resource('/login', UsersController::class);
@@ -71,8 +72,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::get('/change_password/{id}', 'UsersController@changePassword')->name('change_password');
     Route::post('/change_password/{id}', 'UsersController@updatePassword')->name('update_password');
 
+    //Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
+    //Route::get('/reset_password', 'UsersController@resetPassword')->name('reset_password');
     Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
-    Route::get('/reset_password', 'UsersController@resetPassword')->name('reset_password');
+    Route::post('/forgot_password', 'UsersController@sendResetLink')->name('forgot_password.send');
+    Route::get('/reset_password/{token}', 'UsersController@showResetForm')->name('reset_password');
+    Route::post('/reset_password', 'UsersController@resetPassword')->name('reset_password.update');
 
     Route::get('/upload_file', 'PostsController@uploadFile')->name('upload_file');
     Route::post('/upload-csv', 'PostsController@uploadCsv')->name('upload_csv');

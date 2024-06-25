@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use App\Mail\PasswordResetMail;
 
 class UsersController extends Controller
 {
@@ -32,7 +36,8 @@ class UsersController extends Controller
             [
                 'name' => 'required|string|unique:users,name|max:255',
                 'email' => 'required|email|unique:users,email|max:255',
-                'password' => 'required|string|min:8|confirmed',
+                'password' => 'required|string|min:8',
+                'password_confirmation' => 'required|string|min:8|confirmed',
             ],
             [
                 'name.required' => 'Name cannot be blank.',
@@ -41,7 +46,8 @@ class UsersController extends Controller
                 'email.email' => 'Email format is invalid.',
                 'email.unique' => 'Email has already taken.',
                 'password.required' => 'Password cannot be blank.',
-                'password.confirmed' => 'Password and password confirmation do not match.',
+                'password_confirmation.required' => 'Password cannot be blank.',
+                'password_confirmation.confirmed' => 'Password and password confirmation do not match.',
             ],
         );
 
@@ -357,15 +363,72 @@ public function updatePassword(Request $request, $id)
 
     return redirect()->route('displayuser')->with('success', 'Password updated successfully');
 }
-
-    public function forgotPassword(\Illuminate\Http\Request $request)
+    //Forgot Password session
+    public function forgotPassword()
     {
         return view('home.forgotPassword');
     }
 
+    public function sendResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email does not exist in the system']);
+        }
+
+        $token = Str::random(60);
+
+        DB::table('password_resets')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => now(),
+        ]);
+       // dd($user);
+        Mail::to($request->email)->send(new PasswordResetMail($user, $token));
+
+        return redirect()->route('login.index')->with('success', 'Email sent with password reset instructions.');
+    }
+
+    public function showResetForm($token)
+    {
+        return view('home.resetPassword', ['token' => $token]);
+    }
+
     public function resetPassword(\Illuminate\Http\Request $request)
     {
-        return view('home.resetPassword');
+        $request->validate([
+            'token' => 'required',
+            'password' => 'required|string|min:8',
+            'password_confirmation' => 'required|string|min:8|confirmed',
+        ],[
+            'password.required' => 'Password cannot be blank.',
+            'password_confirmation.required' => 'Password confirmation cannot be blank.',
+            'password_confirmation.confirmed' => 'Password and password confirmation do not match.',
+        ],);
+
+        $passwordReset = DB::table('password_resets')->where('token', $request->token)->first();
+
+        if (!$passwordReset) {
+            return back()->withErrors(['token' => 'Invalid token']);
+        }
+
+        $user = User::where('email', $passwordReset->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email does not exist']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        DB::table('password_resets')->where('email', $user->email)->delete();
+
+        return redirect()->route('login.index')->with('success', 'Password has been reset.');
     }
 
     //User/Admin password control section end

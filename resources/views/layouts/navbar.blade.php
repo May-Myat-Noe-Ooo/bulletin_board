@@ -1,15 +1,18 @@
 <nav class="navbar navbar-light navbar-expand-lg bg-light">
     <div class="container-fluid">
         <a class="navbar-brand text-success" href="#">Bulletinboard</a>
-        @auth
+        
         <ul class="navbar-nav me-auto flex-row mb-2 mb-lg-0">
+            @auth
             <li class="nav-item">
                 <a class="nav-link text-success" href="{{ route('displayuser') }}">Users</a>
             </li>
+            @endauth
             <li class="nav-item">
                 <a class="nav-link text-success" href="{{ route('postlist.index') }}">Posts</a>
             </li>
         </ul>
+        @auth
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
