@@ -41,6 +41,12 @@
             text-decoration: none;
             -webkit-tap-highlight-color: transparent;
         }
+.message-avatar img {
+    display: inline-block;
+    width: 51px;
+    height: 48px;
+    border-radius: 50%;
+}
     </style>
 </head>
 

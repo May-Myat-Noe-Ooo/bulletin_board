@@ -41,6 +41,7 @@
                             <thead class="table-primary">
                                 <tr>
                                     <th>No</th>
+                                    <th>Profile</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Created User</th>
@@ -56,6 +57,9 @@
                                     @foreach ($userlist as $rs)
                                         <tr>
                                             <td class="align-middle">{{ $loop->iteration }}</td>
+                                            <td class="align-middele"><div class="message-avatar">
+                                                <img src="{{ asset($rs->profile) }}" alt="error" class="rounded-circle" width="200" height="200">
+                                            </div></td>
                                             <td class="align-middle"><a href="#" 
                                                 class="user-name-link" 
                                                 data-bs-toggle="modal" 
