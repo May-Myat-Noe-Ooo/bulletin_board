@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -34,20 +35,20 @@ class UsersController extends Controller
         // Validate the request
         $request->validate(
             [
-                'name' => 'required|string|unique:users,name|max:255',
-                'email' => 'required|email|unique:users,email|max:255',
-                'password' => 'required|string|min:8',
-                'password_confirmation' => 'required|string|min:8|confirmed',
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'password' => 'required|string|min:8|confirmed',
+                'password_confirmation' => 'required|string|min:8',
             ],
             [
                 'name.required' => 'Name cannot be blank.',
-                'name.unique' => 'Name has already taken.',
+                //'name.unique' => 'Name has already taken.',
                 'email.required' => 'Email cannot be blank.',
                 'email.email' => 'Email format is invalid.',
-                'email.unique' => 'Email has already taken.',
+                //'email.unique' => 'Email has already taken.',
                 'password.required' => 'Password cannot be blank.',
+                'password.confirmed' => 'Password and password confirmation do not match.',
                 'password_confirmation.required' => 'Password cannot be blank.',
-                'password_confirmation.confirmed' => 'Password and password confirmation do not match.',
             ],
         );
 
@@ -59,25 +60,58 @@ class UsersController extends Controller
             ->first();
 
         if ($softDeletedUser) {
-            // Update the existing soft-deleted user
-            $softDeletedUser->name = $request->name;
-            $softDeletedUser->email = $request->email;
-            $softDeletedUser->password = Hash::make($request->password);
-            $softDeletedUser->profile = ' ';
-            $softDeletedUser->create_user_id = $softDeletedUser->id;
-            $softDeletedUser->updated_user_id = $softDeletedUser->id;
-            $softDeletedUser->deleted_at = null; // Reset the deleted_at field
-            $softDeletedUser->save();
+            // Restore the soft deleted post
+            $softDeletedUser->restore();
+
+            // Update the restored post with new description if needed
+            $softDeletedUser->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+                'dob' => $request->date,
+                'address' => $request->address,
+                'profile' => 'img/defaultprofile.png',
+                'type' => '1',
+                'create_user_id' => $softDeletedUser->id,
+                'updated_user_id' => $softDeletedUser->id,
+            ]);
+            //// Update the existing soft-deleted user
+            //$softDeletedUser->name = $request->name;
+            //$softDeletedUser->email = $request->email;
+            //$softDeletedUser->password = Hash::make($request->password);
+            //$softDeletedUser->profile = ' ';
+            //$softDeletedUser->create_user_id = $softDeletedUser->id;
+            //$softDeletedUser->updated_user_id = $softDeletedUser->id;
+            //$softDeletedUser->deleted_at = null; // Reset the deleted_at field
+            //$softDeletedUser->save();
 
             // Redirect to the login page with a success message
             return redirect()->route('login.index')->with('success', 'Account reactivated successfully. Log in again.');
         } else {
+            // Check for existing active users with the same name or email
+            $activeUserExists = User::where('name', $request->name)
+                ->orWhere('email', $request->email)
+                ->exists();
+
+            if ($activeUserExists) {
+                // If an active user with the same name or email exists, show error messages
+                return redirect()
+                    ->back()
+                    ->withErrors([
+                        'name' => 'Name must be unique.',
+                        'email' => 'Email must be unique.',
+                    ])
+                    ->withInput();
+            }
+
+            // If no soft-deleted or active user exists with the same name or email, pass the data as usual
             // Create a new user
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'profile' => ' ',
+                'profile' => 'img/defaultprofile.png',
                 'create_user_id' => 1,
                 'updated_user_id' => 1,
             ]);
@@ -239,37 +273,74 @@ class UsersController extends Controller
 
     public function storeRegisterUser(\Illuminate\Http\Request $request)
     {
-        //     // Validate the request data
-        // $request->validate([
-        //     'name' => 'required|string|max:255',
-        //     'email' => 'required|email|unique:users,email|max:255',
-        //     'password' => 'required|string|min:8|confirmed',
-        //     'profile' => 'required|string|max:255',
-        // ]);
-        //dd($request->profile_path);
+        // Check for a soft-deleted user with the same name or email
+        $softDeletedUser = User::onlyTrashed()
+            ->where(function ($query) use ($request) {
+                $query->where('name', $request->name)->orWhere('email', $request->email);
+            })
+            ->first();
 
-        // Create a new user
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'dob' => $request->date,
-            'address' => $request->address,
-            'profile' => $request->profile_path,
-            'type' => $request->type == 'Admin' ? 0 : 1,
-            'create_user_id' => Auth::id(),
-            'updated_user_id' => Auth::id(),
-        ]);
+        // If a soft-deleted user exists, pass the data as usual
+        if ($softDeletedUser) {
+            // Restore the soft deleted post
+            $softDeletedUser->restore();
 
-        // // Update the create_user_id and updated_user_id fields to be the same as the user's id
-        // $user->create_user_id = Auth::id();
-        // $user->updated_user_id = $user->id;
-        // $user->save();
+            // Update the restored post with new description if needed
+            $softDeletedUser->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+                'dob' => $request->date,
+                'address' => $request->address,
+                'profile' => $request->profile_path,
+                'type' => $request->type == 'Admin' ? 0 : 1,
+                'create_user_id' => Auth::id(),
+                'updated_user_id' => Auth::id(),
+            ]);
 
-        // Redirect to the user list page with a success message
+            return redirect()->route('displayuser')->with('success', 'Register user added successfully');
+        } else {
+            // Check for existing active users with the same name or email
+            $activeUserExists = User::where('name', $request->name)
+                ->orWhere('email', $request->email)
+                ->exists();
 
-        return redirect()->route('displayuser')->with('success', 'Register user added successfully');
+            if ($activeUserExists) {
+                // If an active user with the same name or email exists, show error messages
+                return redirect()
+                    ->back()
+                    ->withErrors([
+                        'name' => 'Name must be unique.',
+                        'email' => 'Email must be unique.',
+                    ])
+                    ->withInput();
+            }
+
+            // If no soft-deleted or active user exists with the same name or email, pass the data as usual
+            // Create a new user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+                'dob' => $request->date,
+                'address' => $request->address,
+                'profile' => $request->profile_path,
+                'type' => $request->type == 'Admin' ? 0 : 1,
+                'create_user_id' => Auth::id(),
+                'updated_user_id' => Auth::id(),
+            ]);
+
+            // // Update the create_user_id and updated_user_id fields to be the same as the user's id
+            // $user->create_user_id = Auth::id();
+            // $user->updated_user_id = $user->id;
+            // $user->save();
+
+            // Redirect to the user list page with a success message
+
+            return redirect()->route('displayuser')->with('success', 'Register user added successfully');
+        }
     }
 
     /**
@@ -339,30 +410,30 @@ class UsersController extends Controller
 
     //User/Admin password control section start
     public function changePassword($id)
-{
-    $user = User::find($id);
-    return view('home.changepassword', compact('user'));
-}
-
-public function updatePassword(Request $request, $id)
-{
-    $request->validate([
-        'current_password' => 'required',
-        'new_password' => 'required|min:6',
-        'new_password_confirmation' => 'required|same:new_password',
-    ]);
-
-    $user = User::find($id);
-
-    if (!Hash::check($request->current_password, $user->password)) {
-        return back()->withErrors(['current_password' => 'Current password is incorrect']);
+    {
+        $user = User::find($id);
+        return view('home.changepassword', compact('user'));
     }
 
-    $user->password = Hash::make($request->new_password);
-    $user->save();
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:6',
+            'new_password_confirmation' => 'required|same:new_password',
+        ]);
 
-    return redirect()->route('displayuser')->with('success', 'Password updated successfully');
-}
+        $user = User::find($id);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('displayuser')->with('success', 'Password updated successfully');
+    }
     //Forgot Password session
     public function forgotPassword()
     {
@@ -388,7 +459,7 @@ public function updatePassword(Request $request, $id)
             'token' => $token,
             'created_at' => now(),
         ]);
-       // dd($user);
+        // dd($user);
         Mail::to($request->email)->send(new PasswordResetMail($user, $token));
 
         return redirect()->route('login.index')->with('success', 'Email sent with password reset instructions.');
@@ -401,17 +472,22 @@ public function updatePassword(Request $request, $id)
 
     public function resetPassword(\Illuminate\Http\Request $request)
     {
-        $request->validate([
-            'token' => 'required',
-            'password' => 'required|string|min:8',
-            'password_confirmation' => 'required|string|min:8|confirmed',
-        ],[
-            'password.required' => 'Password cannot be blank.',
-            'password_confirmation.required' => 'Password confirmation cannot be blank.',
-            'password_confirmation.confirmed' => 'Password and password confirmation do not match.',
-        ],);
+        $request->validate(
+            [
+                'token' => 'required',
+                'password' => 'required|string|min:8|confirmed',
+                'password_confirmation' => 'required|string|min:8',
+            ],
+            [
+                'password.required' => 'Password cannot be blank.',
+                'password_confirmation.required' => 'Password confirmation cannot be blank.',
+                'password.confirmed' => 'Password and password confirmation do not match.',
+            ],
+        );
 
-        $passwordReset = DB::table('password_resets')->where('token', $request->token)->first();
+        $passwordReset = DB::table('password_resets')
+            ->where('token', $request->token)
+            ->first();
 
         if (!$passwordReset) {
             return back()->withErrors(['token' => 'Invalid token']);
@@ -426,7 +502,9 @@ public function updatePassword(Request $request, $id)
         $user->password = Hash::make($request->password);
         $user->save();
 
-        DB::table('password_resets')->where('email', $user->email)->delete();
+        DB::table('password_resets')
+            ->where('email', $user->email)
+            ->delete();
 
         return redirect()->route('login.index')->with('success', 'Password has been reset.');
     }
@@ -482,8 +560,8 @@ public function updatePassword(Request $request, $id)
         $user->deleted_user_id = Auth::id();
         $user->save();
 
-        // Perform the delete operation (soft delete)
-        //$postlist->delete();
+        // Hard delete all posts related to the user
+        Post::where('create_user_id', $user->id)->forceDelete();
 
         return redirect()->route('displayuser')->with('success', 'User deleted successfully');
     }
