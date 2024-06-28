@@ -353,6 +353,7 @@ class UsersController extends Controller
         $email = $request->input('mailaddr');
         $fromDate = $request->input('from-date');
         $toDate = $request->input('to-date');
+        $pageSize = $request->input('page-size', 5); // Default page size is 5
 
         // Get the authenticated user's type
         //$userType = Auth::user()->type;
@@ -372,7 +373,7 @@ class UsersController extends Controller
                     return $query->whereDate('created_at', '<=', $toDate);
                 })
                 ->orderBy('id', 'DESC')
-                ->paginate(5);
+                ->paginate($pageSize);
         } else {
             $userlist = User::where('create_user_id', Auth::id())
                 ->whereNull('deleted_at')
@@ -389,10 +390,12 @@ class UsersController extends Controller
                     return $query->whereDate('created_at', '<=', $toDate);
                 })
                 ->orderBy('id', 'DESC')
-                ->paginate(5);
+                ->paginate($pageSize);
         }
+        // Pass additional data to the view
+    $userlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
         // Return the view with the user list
-        return view('home.userlist', compact('userlist'));
+        return view('home.userlist', compact('userlist', 'pageSize'));
     }
 
     public function showProfile(string $id)

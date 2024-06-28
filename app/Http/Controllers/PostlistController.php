@@ -13,38 +13,43 @@ class PostlistController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-{
-    $keyword = $request->input('search-keyword');
-
-    if (Auth::check()) {
-        if (Auth::user()->type == 0) {
-            // Admin user: can search all posts
-            $postlist = Post::when($keyword, function ($query, $keyword) {
-                return $query->where('title', 'LIKE', "%{$keyword}%")
-                             ->orWhere('description', 'LIKE', "%{$keyword}%")
-                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-            })->orderBy('id', 'DESC')->paginate(5);
-        } else {
-            // Regular user: can only search their own posts
-            $postlist = Post::where('create_user_id', Auth::id())
-            ->when($keyword, function ($query, $keyword) {
+    {
+        $keyword = $request->input('search-keyword');
+        $pageSize = $request->input('page-size', 5); // Default page size is 5
+    
+        if (Auth::check()) {
+            if (Auth::user()->type == 0) {
+                // Admin user: can search all posts
+                $postlist = Post::when($keyword, function ($query, $keyword) {
                     return $query->where('title', 'LIKE', "%{$keyword}%")
                                  ->orWhere('description', 'LIKE', "%{$keyword}%")
                                  ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })->orderBy('id', 'DESC')->paginate(5);
+                })->orderBy('id', 'DESC')->paginate($pageSize);
+            } else {
+                // Regular user: can only search their own posts
+                $postlist = Post::where('create_user_id', Auth::id())
+                    ->when($keyword, function ($query, $keyword) {
+                        return $query->where('title', 'LIKE', "%{$keyword}%")
+                                     ->orWhere('description', 'LIKE', "%{$keyword}%")
+                                     ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+                    })->orderBy('id', 'DESC')->paginate($pageSize);
+            }
+        } else {
+            // Unauthenticated users: can view all posts with status 1
+            $postlist = Post::where('status', 1)
+                ->when($keyword, function ($query, $keyword) {
+                    return $query->where('title', 'LIKE', "%{$keyword}%")
+                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
+                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+                })->orderBy('id', 'DESC')->paginate($pageSize);
         }
-    } else {
-        // Unauthenticated users: can view all posts with status 1
-        $postlist = Post::where('status', 1)
-        ->when($keyword, function ($query, $keyword) {
-                return $query->where('title', 'LIKE', "%{$keyword}%")
-                             ->orWhere('description', 'LIKE', "%{$keyword}%")
-                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-            })->orderBy('id', 'DESC')->paginate(5);
+    
+        // Pass additional data to the view
+        $postlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
+    
+        return view('home.postlist', compact('postlist', 'pageSize'));
     }
-
-    return view('home.postlist', compact('postlist'));
-}
+    
 
     /**
      * Show the form for creating a new resource.

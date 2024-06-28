@@ -1,109 +1,123 @@
 @extends('layouts.app')
 
 @section('body')
-    @if (Session::has('success'))
-        <div class="alert alert-success" role="alert">
-            {{ Session::get('success') }}
-        </div>
-    @endif
+
     <div class="col float-middle mb-5 mt-5">
         <div class="card">
             <div class="card-header bg-success text-white">
                 User List
             </div>
+            @if (Session::has('success'))
+        <div id="success-message" class="alert alert-success" role="alert">
+            {{ Session::get('success') }}
+        </div>
+    @endif
             <div class="card-body">
-                <div class="row ">
-                    <div class="col-md-12">
-                         <form class="search-form mb-5" method="GET" action="{{ route('displayuser') }}">
-                            <div class="row d-flex justify-content-around align-items-center">
-                                <div class="col-md-3 d-flex ">
-                                    <label for="name" class="form-label col-sm-2">Name:</label>
-                                    <input type="text" name="name" class="form-control" id="name" value="{{ request('name') }}">
-                                </div>
-                                <div class="col-md-3 d-flex">
-                                    <label for="email" class="form-label col-sm-2">Email:</label>
-                                    <input type="text" name="mailaddr" class="form-control" id="email" id="email" value="{{ request('mailaddr') }}">
-                                </div>
-                                <div class="col-md-2 d-flex">
-                                    <label for="from-date" class="form-label col-sm-3">From:</label>
-                                    <input type="date" name="from-date" class="form-control" id="from-date" value="{{ request('from-date') }}">
-                                </div>
-                                <div class="col-md-2 d-flex">
-                                    <label for="to-date" class="form-label col-sm-2">To:</label>
-                                    <input type="date" name="to-date" class="form-control" id="to-date" value="{{ request('to-date') }}">
-                                </div>
-                                <div class="col-md-1 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-success w-100">Search</button>
-                                </div>
+                <div class="row mb-4">
+                    
+                    <form class="search-form col-md-2 text-start mb-3" method="GET" action="{{ route('displayuser') }}">
+                        <label for="page-size">Page Size:</label>
+                        <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
+                            <option value="5" {{ $pageSize == 5 ? 'selected' : '' }}>5</option>
+                            <option value="10" {{ $pageSize == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ $pageSize == 15 ? 'selected' : '' }}>15</option>
+                            <option value="20" {{ $pageSize == 20 ? 'selected' : '' }}>20</option>
+                        </select>
+                    </form>
+                    <form class="search-form col-md-10 text-end mb-3" method="GET" action="{{ route('displayuser') }}">
+                        <div class="row d-flex justify-content-between align-items-center">
+                            <div class="col-md-2 d-flex">
+                                <label for="name" class="form-label col-sm-4">Name:</label>
+                                <input type="text" name="name" class="form-control" id="name" value="{{ request('name') }}">
                             </div>
-                        </form>
-                        <table class="table table-hover table-striped">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Profile</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Created User</th>
-                                    <th>Type</th>
-                                    <th>Phone</th>
-                                    <th>Date of Birth</th>
-                                    <th>Address</th>
-                                    <th>Operation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($userlist->count() > 0)
-                                    @foreach ($userlist as $rs)
-                                        <tr>
-                                            <td class="align-middle">{{ $loop->iteration }}</td>
-                                            <td class="align-middele"><div class="message-avatar">
-                                                <img src="{{ asset($rs->profile) }}" alt="error" class="rounded-circle" width="200" height="200">
-                                            </div></td>
-                                            <td class="align-middle"><a href="#" 
-                                                class="user-name-link" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#userDetailModal"
-                                                data-name="{{ $rs->name }}"
-                                                data-type="{{ $rs->type }}"
-                                                data-email="{{ $rs->email }}"
-                                                data-phone="{{ $rs->phone }}"
-                                                data-dob="{{ $rs->dob }}"
-                                                data-address="{{ $rs->address }}"
-                                                data-created="{{ $rs->created_at }}"
-                                                data-created-user="{{ $rs->createdBy->name}}"
-                                                data-updated="{{ $rs->updated_at }}"
-                                                data-updated-user="{{ $rs->updatedBy->name }}">
-                                                {{ $rs->name }}
-                                             </a></td>
-                                            <td class="align-middle">{{ $rs->email }}</td>
-                                            <td class="align-middle">{{ $rs->createdBy->name}}</td>
-                                            <td class="align-middle">{{ $rs->type == 0 ? 'Admin' : 'User' }}</td>
-                                            <td class="align-middle">{{ $rs->phone }}</td>
-                                            <td class="align-middle">{{ $rs->dob }}</td>
-                                            <td class="align-middle">{{ $rs->address }}</td>
-                                            <td class="align-middle">
-                                                <div class="btn-group" role="group" aria-label="Basic example">
-                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
-                                                        data-name="{{ $rs->name }}" data-type="{{ $rs->type }}"
-                                                        data-email="{{ $rs->email }}" data-phone="{{ $rs->phone }}"
-                                                        data-dob="{{ $rs->dob }}"
-                                                        data-address="{{ $rs->address }}">Delete</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td class="text-center" colspan="9">User not found</td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                        {!! $userlist->links() !!}
-                    </div>
+                            <div class="col-md-2 d-flex">
+                                <label for="email" class="form-label col-sm-4">Email:</label>
+                                <input type="text" name="mailaddr" class="form-control" id="email" value="{{ request('mailaddr') }}">
+                            </div>
+                            <div class="col-md-3 d-flex">
+                                <label for="from-date" class="form-label col-sm-3">From:</label>
+                                <input type="date" name="from-date" class="form-control" id="from-date" value="{{ request('from-date') }}">
+                            </div>
+                            <div class="col-md-3 d-flex">
+                                <label for="to-date" class="form-label col-sm-2">To:</label>
+                                <input type="date" name="to-date" class="form-control" id="to-date" value="{{ request('to-date') }}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success w-100">Search</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
+                <table class="table table-hover table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>No</th>
+                            <th>Avatar</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Created User</th>
+                            <th>Type</th>
+                            <th>Phone</th>
+                            <th>Date of Birth</th>
+                            <th>Address</th>
+                            <th>Operation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if ($userlist->count() > 0)
+                            @foreach ($userlist as $rs)
+                                <tr>
+                                    <td class="align-middle">{{ $loop->iteration }}</td>
+                                    <td class="align-middele">
+                                        <div class="message-avatar">
+                                            <img src="{{ asset($rs->profile) }}" alt="error" class="rounded-circle" width="200" height="200">
+                                        </div>
+                                    </td>
+                                    <td class="align-middle">
+                                        <a href="#" 
+                                            class="user-name-link" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#userDetailModal"
+                                            data-name="{{ $rs->name }}"
+                                            data-type="{{ $rs->type }}"
+                                            data-email="{{ $rs->email }}"
+                                            data-phone="{{ $rs->phone }}"
+                                            data-dob="{{ $rs->dob }}"
+                                            data-address="{{ $rs->address }}"
+                                            data-created="{{ $rs->created_at }}"
+                                            data-created-user="{{ $rs->createdBy->name}}"
+                                            data-updated="{{ $rs->updated_at }}"
+                                            data-updated-user="{{ $rs->updatedBy->name }}">
+                                            {{ $rs->name }}
+                                        </a>
+                                    </td>
+                                    <td class="align-middle">{{ $rs->email }}</td>
+                                    <td class="align-middle">{{ $rs->createdBy->name}}</td>
+                                    <td class="align-middle">{{ $rs->type == 0 ? 'Admin' : 'User' }}</td>
+                                    <td class="align-middle">{{ $rs->phone }}</td>
+                                    <td class="align-middle">{{ $rs->dob }}</td>
+                                    <td class="align-middle">{{ $rs->address }}</td>
+                                    <td class="align-middle">
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
+                                                data-name="{{ $rs->name }}" data-type="{{ $rs->type }}"
+                                                data-email="{{ $rs->email }}" data-phone="{{ $rs->phone }}"
+                                                data-dob="{{ $rs->dob }}"
+                                                data-address="{{ $rs->address }}">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td class="text-center" colspan="10">User not found</td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+
+                {!! $userlist->appends(['page-size' => $pageSize])->links() !!}
             </div>
         </div>
     </div>
@@ -165,6 +179,27 @@
 </div>
 
     <script>
+        // Function to make the success message disappear after a few seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            const successMessage = document.getElementById('success-message');
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000); // 3000 milliseconds = 3 seconds
+            }
+        });
+        
+        const pageSizeSelect = document.querySelectorAll('#page-size');
+
+pageSizeSelect.forEach(select => {
+    select.addEventListener('change', function() {
+        const selectedPageSize = this.value;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('page-size', selectedPageSize);
+        window.location.href = currentUrl.href;
+    });
+});
+
         const deleteModal = document.getElementById('deleteModal');
         deleteModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
