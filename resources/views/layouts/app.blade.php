@@ -12,6 +12,7 @@
     <style>
         nav {
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .2);
+            background-color:#f08632;
         }
 
         .required:after {
@@ -27,7 +28,7 @@
             background-color: #ffffff;
         }
 
-        .card-body {
+        .postlist .card-body {
             background-color: #f8f9fa;
         }
 
@@ -87,6 +88,13 @@
 .card-body .dropdown .dropdown-menu .dropdown-item i {
     margin-right: 8px;
 }
+.postlist .card {
+    transition: transform 0.2s;
+}
+
+.postlist .card:hover {
+    transform: scale(1.05);
+}
 .userlist .card {
     transition: transform 0.2s;
 }
@@ -117,6 +125,42 @@
     background-color: #5a6268;
     border-color: #545b62;
 }
+/*---------------------
+  Post
+-----------------------*/
+
+.post__text h2 {
+  font-size: 50px;
+  color: #000000;
+  font-weight: 700;
+  font-style: italic;
+  font-family: "Playfair Display", serif;
+}
+
+.post__links {
+  text-align: right;
+  padding-top: 15px;
+}
+.post__links a {
+  font-size: 16px;
+  color: #111111;
+  margin-right: 26px;
+  display: inline-block;
+  position: relative;
+}
+.post__links a:after {
+  position: absolute;
+  right: -16px;
+  top: 0;
+  content: "|";
+  color: #888888;
+}
+.post__links span {
+  font-size: 16px;
+  color: #888888;
+  display: inline-block;
+}
+
     </style>
 </head>
 
@@ -124,7 +168,7 @@
 
     @include('layouts.navbar')
 
-    <main class="container py-5">
+    <main class="container py-3">
         @yield('body')
     </main>
 
