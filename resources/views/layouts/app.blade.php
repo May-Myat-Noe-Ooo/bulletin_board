@@ -24,7 +24,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: #C7D3C3;
+            background-color: #ffffff;
         }
 
         .card-body {
@@ -68,6 +68,55 @@
         .card:hover .icon-wrapper {
             visibility: visible;
         }
+
+        .card-body .dropdown {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.card-body .dropdown .dropdown-menu {
+    min-width: 0;
+}
+
+.card-body .dropdown .dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+}
+
+.card-body .dropdown .dropdown-menu .dropdown-item i {
+    margin-right: 8px;
+}
+.userlist .card {
+    transition: transform 0.2s;
+}
+
+.userlist .card:hover {
+    transform: scale(1.05);
+}
+
+.userlist .card img {
+    object-fit: cover;
+}
+
+.userlist .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+.userlist .modal .modal-body p {
+    margin-bottom: 10px;
+}
+
+.userlist .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.userlist .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
     </style>
 </head>
 

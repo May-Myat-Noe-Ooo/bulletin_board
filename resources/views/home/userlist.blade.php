@@ -48,74 +48,58 @@
                         </div>
                     </form>
                 </div>
-                <table class="table table-hover table-striped">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>No</th>
-                            <th>Avatar</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Created User</th>
-                            <th>Type</th>
-                            <th>Phone</th>
-                            <th>Date of Birth</th>
-                            <th>Address</th>
-                            <th>Operation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if ($userlist->count() > 0)
-                            @foreach ($userlist as $rs)
-                                <tr>
-                                    <td class="align-middle">{{ $loop->iteration }}</td>
-                                    <td class="align-middele">
-                                        <div class="message-avatar">
-                                            <img src="{{ asset($rs->profile) }}" alt="error" class="rounded-circle" width="200" height="200">
+                                <div class="row">
+                    @if ($userlist->count() > 0)
+                        @foreach ($userlist as $rs)
+                            <div class="userlist col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <span>{{ $rs->name }}</span>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#userDetailModal"
+                                                    data-name="{{ $rs->name }}"
+                                                    data-type="{{ $rs->type }}"
+                                                    data-email="{{ $rs->email }}"
+                                                    data-phone="{{ $rs->phone }}"
+                                                    data-dob="{{ $rs->dob }}"
+                                                    data-address="{{ $rs->address }}"
+                                                    data-created="{{ $rs->created_at }}"
+                                                    data-created-user="{{ $rs->createdBy->name }}"
+                                                    data-updated="{{ $rs->updated_at }}"
+                                                    data-updated-user="{{ $rs->updatedBy->name }}">
+                                                    <i class="bi bi-info-circle me-2"></i>Details</a></li>
+                                                <li><a class="dropdown-item" href="#">
+                                                <i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal"
+                                                        data-id="{{ $rs->id }}"
+                                                        data-name="{{ $rs->name }}">
+                                                        <i class="bi bi-trash me-2"></i>Delete</a></li>
+                                            </ul>
                                         </div>
-                                    </td>
-                                    <td class="align-middle">
-                                        <a href="#" 
-                                            class="user-name-link" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#userDetailModal"
-                                            data-name="{{ $rs->name }}"
-                                            data-type="{{ $rs->type }}"
-                                            data-email="{{ $rs->email }}"
-                                            data-phone="{{ $rs->phone }}"
-                                            data-dob="{{ $rs->dob }}"
-                                            data-address="{{ $rs->address }}"
-                                            data-created="{{ $rs->created_at }}"
-                                            data-created-user="{{ $rs->createdBy->name}}"
-                                            data-updated="{{ $rs->updated_at }}"
-                                            data-updated-user="{{ $rs->updatedBy->name }}">
-                                            {{ $rs->name }}
-                                        </a>
-                                    </td>
-                                    <td class="align-middle">{{ $rs->email }}</td>
-                                    <td class="align-middle">{{ $rs->createdBy->name}}</td>
-                                    <td class="align-middle">{{ $rs->type == 0 ? 'Admin' : 'User' }}</td>
-                                    <td class="align-middle">{{ $rs->phone }}</td>
-                                    <td class="align-middle">{{ $rs->dob }}</td>
-                                    <td class="align-middle">{{ $rs->address }}</td>
-                                    <td class="align-middle">
-                                        <div class="btn-group" role="group" aria-label="Basic example">
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
-                                                data-name="{{ $rs->name }}" data-type="{{ $rs->type }}"
-                                                data-email="{{ $rs->email }}" data-phone="{{ $rs->phone }}"
-                                                data-dob="{{ $rs->dob }}"
-                                                data-address="{{ $rs->address }}">Delete</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
-                            <tr>
-                                <td class="text-center" colspan="10">User not found</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <img src="{{ asset($rs->profile) }}" alt="Profile" class="rounded-circle mb-3" width="100" height="100">
+                                        <h5 class="card-title">{{ $rs->name }}</h5>
+                                        <p class="card-text">{{ $rs->email }}</p>
+                                        <p class="card-text"><small class="text-muted">{{ $rs->createdBy->name }} - {{ $rs->created_at->diffForHumans() }}</small></p>
+                                    </div>
+                                    <div class="card-footer text-muted">
+                                        <span>{{ $rs->type == 0 ? 'Admin' : 'User' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="col-12">
+                            <div class="alert alert-info">User not found</div>
+                        </div>
+                    @endif
+                </div>
 
                 {!! $userlist->appends(['page-size' => $pageSize])->links() !!}
             </div>

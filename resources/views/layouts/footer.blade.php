@@ -1,5 +1,5 @@
 <!-- resources/views/layouts/footer.blade.php -->
-<footer class="footer-light footer-shadow content bg-light text-success ">
+<footer class="footer-light footer-shadow content bg-light text-success">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">

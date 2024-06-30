@@ -42,56 +42,64 @@
                 <div class="row mt-3">
                     @if ($postlist->count() > 0)
                         @foreach ($postlist as $rs)
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-100" style="background-color: #f8f9fa; ">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><a href="#" 
-                                            class="post-title-link" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#postDetailModal"
-                                            data-title="{{ $rs->title }}"
-                                            data-description="{{ $rs->description }}"
-                                            data-status="{{ $rs->status }}"
-                                            data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
-                                            data-created="{{ $rs->created_at }}"
-                                            data-updated="{{ $rs->updated_at }}"
-                                            data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}">
-                                            {{ $rs->title }}
-                                         </a></h5>
-                                        <p class="card-text">{{ $rs->description }}</p>
-                                    </div>
-                                    <div class="card-footer text-muted">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small>
-                                                <div class="message-avatar">
-                                                    <img src="{{ asset($rs->user->profile) }}" alt="error" class="rounded-circle" width="200" height="200">
-                                                </div>Posted by 
-                                                @if ($rs->user)
-                                                    @if ($rs->user->type == 0)
-                                                        admin
-                                                    @elseif ($rs->user->type == 1)
-                                                        user
-                                                    @endif
-                                                @else
-                                                    N/A
-                                                @endif
-                                                on {{ $rs->created_at }}
-                                            </small>
-                                            <div class="icon-wrapper">
-                                                <a href="{{ route('postlist.edit', $rs->id) }}" class="btn btn-link p-0">
-                                                    <i class="bi bi-pencil-square text-primary"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-link p-0" data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
-                                                        data-title="{{ $rs->title }}" data-description="{{ $rs->description }}"
-                                                        data-status="{{ $rs->status }}">
-                                                    <i class="bi bi-trash-fill text-danger"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<div class="col-md-4 mb-4">
+    <div class="card h-100">
+        <div class="card-body position-relative">
+            <div class="d-flex justify-content-between align-items-start">
+                <h5 class="card-title">
+                    <a href="#" 
+                       class="post-title-link" 
+                       data-bs-toggle="modal" 
+                       data-bs-target="#postDetailModal"
+                       data-title="{{ $rs->title }}"
+                       data-description="{{ $rs->description }}"
+                       data-status="{{ $rs->status }}"
+                       data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                       data-created="{{ $rs->created_at }}"
+                       data-updated="{{ $rs->updated_at }}"
+                       data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}">
+                       {{ $rs->title }}
+                    </a>
+                </h5>
+                <div class="dropdown">
+                    <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li>
+                            <a href="{{ route('postlist.edit', $rs->id) }}" class="dropdown-item">
+                                <i class="bi bi-pencil-square text-primary"></i> Edit
+                            </a>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
+                                    data-title="{{ $rs->title }}" data-description="{{ $rs->description }}"
+                                    data-status="{{ $rs->status }}">
+                                <i class="bi bi-trash-fill text-danger"></i> Delete
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <p class="card-text">{{ $rs->description }}</p>
+        </div>
+        <div class="card-footer text-muted d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="{{ asset($rs->user->profile) }}" alt="error" class="rounded-circle me-2" width="30" height="30">
+                <div>
+                    <div>{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}</div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clock me-1"></i>
+                        <span>{{ $rs->created_at->diffForHumans() }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
                         @endforeach
                     @else
                         <div class="col-12">
@@ -103,7 +111,7 @@
                 </div>
 
                 <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         {!! $postlist->appends(['page-size' => $pageSize])->links() !!}
                     </div>
                 </div>
