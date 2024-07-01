@@ -10,9 +10,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        /* Styles for navigation */
         nav {
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .2);
             background-color:#f08632;
+        }
+
+        .nav-item:hover {
+            background-color: #000000;
         }
 
         .required:after {
@@ -94,7 +99,13 @@
 
 .postlist .card:hover {
     transform: scale(1.05);
+    .post-title-link {
+    color: #fd7e14;
+    border-bottom: 1px solid #fd7e14;
 }
+}
+/* Styles for user list */
+
 .userlist .card {
     transition: transform 0.2s;
 }
@@ -124,6 +135,46 @@
 .userlist .btn-secondary:hover {
     background-color: #5a6268;
     border-color: #545b62;
+}
+
+.userlist {
+    .card-body {
+    position: relative;
+    padding-top: 28%; /* Adjust as needed */
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 30%; /* 30% of the card-body height */
+    overflow: hidden;
+}
+
+.background-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-img {
+    position: absolute;
+    top: 28%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust to center exactly */
+    width: 100px;
+    height: 100px;
+    border: 5px solid #fff; /* Optional: border to make the profile image stand out */
+}
+
+.card-body h5,
+.card-body p {
+    position: relative;
+    z-index: 1; /* Ensure text is above the background image */
+    margin-top: 3%; /* Adjust as needed to position below the profile image */
+}
+
 }
 /*---------------------
   Post
@@ -160,6 +211,50 @@
   color: #888888;
   display: inline-block;
 }
+/* Default styles for the Like button */
+.btn-like {
+    color: #111111;
+    border: 1px solid #111111;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.btn-like:hover {
+    color: #ffffff;
+    border: 1px solid #fd7e14;
+    background-color: #fd7e14;
+}
+
+/* Styles for the three dots dropdown menu */
+.custom-dot {
+    color: #000000;
+}
+
+/*  Style for post title*/
+.post-title-link {
+    color: #111111;
+}
+
+
+/* Styles for Pagination link */
+.pagination > li > a,
+.pagination > li > span{
+    z-index: 3;
+    color: #111111;
+    background-color:#f8f9fa ;
+    border-color: #ddd;
+}
+.pagination > li > a:focus,
+.pagination > li > a:hover,
+.pagination > li > span:focus,
+.pagination > li > span:hover,
+.active>.page-link {
+    z-index: 3;
+    color: #f8f9fa;
+    background-color: #111111;
+    border-color: #ddd;
+}
+
 
     </style>
 </head>

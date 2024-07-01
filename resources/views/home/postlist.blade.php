@@ -47,11 +47,11 @@
                             <label class="mr-2">Keyword:</label>
                             <input class="search btn border border-secondary" type="text" name="search-keyword"
                                 placeholder="Type Something" value="{{ request('search-keyword') }}">
-                            <button type="submit" class="btn btn-primary">Search</button>
-                            <a href="{{ route('createpost') }}" class="btn btn-primary">Create</a>
-                            <a href="{{ route('upload_file') }}" class="btn btn-primary">Upload</a>
+                            <button type="submit" class="btn btn-dark">Search</button>
+                            <a href="{{ route('createpost') }}" class="btn btn-dark">Create</a>
+                            <a href="{{ route('upload_file') }}" class="btn btn-dark">Upload</a>
                             <a href="{{ route('postlists.export', ['search-keyword' => request('search-keyword')]) }}"
-                                class="btn btn-primary">Download</a>
+                                class="btn btn-dark">Download</a>
                         </form>
                     </div>
                 </div>
@@ -75,9 +75,9 @@
                                             </div>
                                         </div>
                                         <div class="dropdown">
-                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton"
+                                            <button class="btn btn-link p-0 " type="button" id="dropdownMenuButton"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="bi bi-three-dots"></i>
+                                                <i class="bi bi-three-dots custom-dot"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end"
                                                 aria-labelledby="dropdownMenuButton">
@@ -129,7 +129,7 @@
                                         </p>
                                     </div>
                                     <div class="card-footer text-end">
-                                        <button class="btn btn-outline-primary"><i class="bi bi-hand-thumbs-up"></i>
+                                        <button class="btn btn-like"><i class="bi bi-hand-thumbs-up"></i>
                                             Like</button>
                                     </div>
                                 </div>
@@ -144,7 +144,7 @@
                     @endif
                 </div>
 
-                <div class="row mt-3">
+                <div class="row mt-3 float-start">
                     <div class="col-md-1">
                         {!! $postlist->appends(['page-size' => $pageSize])->links() !!}
                     </div>

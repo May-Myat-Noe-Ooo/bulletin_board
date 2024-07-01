@@ -3,18 +3,34 @@
 @section('body')
 
     <div class="col float-middle mb-5 mt-5">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                User List
+        <!-- Postlist Begin -->
+        <div class="post-option">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="post__text">
+                            <h2>Userlist</h2>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="post__links">
+                            <a href="./index.html">Home</a>
+                            <span>User</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            @if (Session::has('success'))
-        <div id="success-message" class="alert alert-success" role="alert">
-            {{ Session::get('success') }}
         </div>
-    @endif
+        <!-- Postlist End -->
+        <div class="card">
+            @if (Session::has('success'))
+                <div id="success-message" class="alert alert-success" role="alert">
+                    {{ Session::get('success') }}
+                </div>
+            @endif
             <div class="card-body">
                 <div class="row mb-4">
-                    
+
                     <form class="search-form col-md-2 text-start mb-3" method="GET" action="{{ route('displayuser') }}">
                         <label for="page-size">Page Size:</label>
                         <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
@@ -28,27 +44,31 @@
                         <div class="row d-flex justify-content-between align-items-center">
                             <div class="col-md-2 d-flex">
                                 <label for="name" class="form-label col-sm-4">Name:</label>
-                                <input type="text" name="name" class="form-control" id="name" value="{{ request('name') }}">
+                                <input type="text" name="name" class="form-control" id="name"
+                                    value="{{ request('name') }}">
                             </div>
                             <div class="col-md-2 d-flex">
                                 <label for="email" class="form-label col-sm-4">Email:</label>
-                                <input type="text" name="mailaddr" class="form-control" id="email" value="{{ request('mailaddr') }}">
+                                <input type="text" name="mailaddr" class="form-control" id="email"
+                                    value="{{ request('mailaddr') }}">
                             </div>
                             <div class="col-md-3 d-flex">
                                 <label for="from-date" class="form-label col-sm-3">From:</label>
-                                <input type="date" name="from-date" class="form-control" id="from-date" value="{{ request('from-date') }}">
+                                <input type="date" name="from-date" class="form-control" id="from-date"
+                                    value="{{ request('from-date') }}">
                             </div>
                             <div class="col-md-3 d-flex">
                                 <label for="to-date" class="form-label col-sm-2">To:</label>
-                                <input type="date" name="to-date" class="form-control" id="to-date" value="{{ request('to-date') }}">
+                                <input type="date" name="to-date" class="form-control" id="to-date"
+                                    value="{{ request('to-date') }}">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-success w-100">Search</button>
+                                <button type="submit" class="btn btn-dark w-100">Search</button>
                             </div>
                         </div>
                     </form>
                 </div>
-                                <div class="row">
+                <div class="row">
                     @if ($userlist->count() > 0)
                         @foreach ($userlist as $rs)
                             <div class="userlist col-md-4 mb-4">
@@ -56,38 +76,49 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <span>{{ $rs->name }}</span>
                                         <div class="dropdown">
-                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots"></i>
-                    </button>
-                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#userDetailModal"
-                                                    data-name="{{ $rs->name }}"
-                                                    data-type="{{ $rs->type }}"
-                                                    data-email="{{ $rs->email }}"
-                                                    data-phone="{{ $rs->phone }}"
-                                                    data-dob="{{ $rs->dob }}"
-                                                    data-address="{{ $rs->address }}"
-                                                    data-created="{{ $rs->created_at }}"
-                                                    data-created-user="{{ $rs->createdBy->name }}"
-                                                    data-updated="{{ $rs->updated_at }}"
-                                                    data-updated-user="{{ $rs->updatedBy->name }}">
-                                                    <i class="bi bi-info-circle me-2"></i>Details</a></li>
+                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby="dropdownMenuButton">
+                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#userDetailModal" data-name="{{ $rs->name }}"
+                                                        data-type="{{ $rs->type }}" data-email="{{ $rs->email }}"
+                                                        data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}"
+                                                        data-address="{{ $rs->address }}"
+                                                        data-created="{{ $rs->created_at }}"
+                                                        data-created-user="{{ $rs->createdBy->name }}"
+                                                        data-updated="{{ $rs->updated_at }}"
+                                                        data-updated-user="{{ $rs->updatedBy->name }}">
+                                                        <i class="bi bi-info-circle me-2"></i>Details</a></li>
                                                 <li><a class="dropdown-item" href="#">
-                                                <i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                                <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal"
-                                                        data-id="{{ $rs->id }}"
-                                                        data-name="{{ $rs->name }}">
+                                                        <i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                        data-id="{{ $rs->id }}" data-name="{{ $rs->name }}">
                                                         <i class="bi bi-trash me-2"></i>Delete</a></li>
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="card-body text-center">
-                                        <img src="{{ asset($rs->profile) }}" alt="Profile" class="rounded-circle mb-3" width="100" height="100">
+                                    <div class="card-body text-center position-relative">
+                                        <!-- Default background image -->
+                                        <div class="background-image">
+                                            <img src="{{ asset('img/orangy.png') }}" alt="Background"
+                                                class="background-img">
+                                        </div>
+
+                                        <!-- User profile image -->
+                                        <img src="{{ asset($rs->profile) }}" alt="Profile"
+                                            class="profile-img rounded-circle">
+
+                                        <!-- User details -->
                                         <h5 class="card-title">{{ $rs->name }}</h5>
                                         <p class="card-text">{{ $rs->email }}</p>
-                                        <p class="card-text"><small class="text-muted">{{ $rs->createdBy->name }} - {{ $rs->created_at->diffForHumans() }}</small></p>
+                                        <p class="card-text"><small class="text-muted">{{ $rs->createdBy->name }} -
+                                                {{ $rs->created_at->diffForHumans() }}</small></p>
                                     </div>
+
                                     <div class="card-footer text-muted">
                                         <span>{{ $rs->type == 0 ? 'Admin' : 'User' }}</span>
                                     </div>
@@ -100,8 +131,11 @@
                         </div>
                     @endif
                 </div>
-
-                {!! $userlist->appends(['page-size' => $pageSize])->links() !!}
+                <div class="row mt-3 float-start">
+                    <div class="col-md-1">
+                        {!! $userlist->appends(['page-size' => $pageSize])->links() !!}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -136,15 +170,16 @@
     </div>
 
     <!-- User Detail Modal -->
-<div class="modal fade" id="userDetailModal" tabindex="-1" aria-labelledby="userDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="userDetailModalLabel">User Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Name:</strong> <span id="userName"></span></p>
+    <div class="modal fade" id="userDetailModal" tabindex="-1" aria-labelledby="userDetailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userDetailModalLabel">User Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="userName"></span></p>
                     <p><strong>Type:</strong> <span id="userType"></span></p>
                     <p><strong>Email:</strong> <span id="userEmail"></span></p>
                     <p><strong>Phone:</strong> <span id="userPhone"></span></p>
@@ -154,17 +189,17 @@
                     <p><strong>Created User:</strong> <span id="userCreatedUser"></span></p>
                     <p><strong>Updated Date:</strong> <span id="userUpdatedDate"></span></p>
                     <p><strong>Updated User:</strong> <span id="userUpdatedUser"></span></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script>
         // Function to make the success message disappear after a few seconds
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const successMessage = document.getElementById('success-message');
             if (successMessage) {
                 setTimeout(() => {
@@ -172,17 +207,17 @@
                 }, 3000); // 3000 milliseconds = 3 seconds
             }
         });
-        
+
         const pageSizeSelect = document.querySelectorAll('#page-size');
 
-pageSizeSelect.forEach(select => {
-    select.addEventListener('change', function() {
-        const selectedPageSize = this.value;
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('page-size', selectedPageSize);
-        window.location.href = currentUrl.href;
-    });
-});
+        pageSizeSelect.forEach(select => {
+            select.addEventListener('change', function() {
+                const selectedPageSize = this.value;
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('page-size', selectedPageSize);
+                window.location.href = currentUrl.href;
+            });
+        });
 
         const deleteModal = document.getElementById('deleteModal');
         deleteModal.addEventListener('show.bs.modal', function(event) {
@@ -217,42 +252,41 @@ pageSizeSelect.forEach(select => {
         });
 
         const userDetailModal = document.getElementById('userDetailModal');
-    userDetailModal.addEventListener('show.bs.modal', function(event) {
-        const button = event.relatedTarget;
-        const userName = button.getAttribute('data-name');
-        const userType = button.getAttribute('data-type');
-        const userEmail = button.getAttribute('data-email');
-        const userPhone = button.getAttribute('data-phone');
-        const userDob = button.getAttribute('data-dob');
-        const userAddress = button.getAttribute('data-address');
-        const userCreatedDate = button.getAttribute('data-created');
-        const userCreatedUser = button.getAttribute('data-created-user');
-        const userUpdatedDate = button.getAttribute('data-updated');
-        const userUpdatedUser = button.getAttribute('data-updated-user');
+        userDetailModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const userName = button.getAttribute('data-name');
+            const userType = button.getAttribute('data-type');
+            const userEmail = button.getAttribute('data-email');
+            const userPhone = button.getAttribute('data-phone');
+            const userDob = button.getAttribute('data-dob');
+            const userAddress = button.getAttribute('data-address');
+            const userCreatedDate = button.getAttribute('data-created');
+            const userCreatedUser = button.getAttribute('data-created-user');
+            const userUpdatedDate = button.getAttribute('data-updated');
+            const userUpdatedUser = button.getAttribute('data-updated-user');
 
-        const modalBodyName = userDetailModal.querySelector('#userName');
-        const modalBodyType = userDetailModal.querySelector('#userType');
-        const modalBodyEmail = userDetailModal.querySelector('#userEmail');
-        const modalBodyPhone = userDetailModal.querySelector('#userPhone');
-        const modalBodyDob = userDetailModal.querySelector('#userDob');
-        const modalBodyAddress = userDetailModal.querySelector('#userAddress');
-        const modalCreatedDate = userDetailModal.querySelector('#userCreatedDate');
-        const modalCreatedUser = userDetailModal.querySelector('#userCreatedUser');
-        const modalUpdatedDate = userDetailModal.querySelector('#userUpdatedDate');
-        const modalUpdatedUser = userDetailModal.querySelector('#userUpdatedUser');
+            const modalBodyName = userDetailModal.querySelector('#userName');
+            const modalBodyType = userDetailModal.querySelector('#userType');
+            const modalBodyEmail = userDetailModal.querySelector('#userEmail');
+            const modalBodyPhone = userDetailModal.querySelector('#userPhone');
+            const modalBodyDob = userDetailModal.querySelector('#userDob');
+            const modalBodyAddress = userDetailModal.querySelector('#userAddress');
+            const modalCreatedDate = userDetailModal.querySelector('#userCreatedDate');
+            const modalCreatedUser = userDetailModal.querySelector('#userCreatedUser');
+            const modalUpdatedDate = userDetailModal.querySelector('#userUpdatedDate');
+            const modalUpdatedUser = userDetailModal.querySelector('#userUpdatedUser');
 
-        modalBodyName.textContent = userName;
-        modalBodyType.textContent = userType == 0 ? 'Admin' : 'User';;
-        modalBodyEmail.textContent = userEmail;
-        modalBodyPhone.textContent = userPhone;
-        modalBodyDob.textContent = userDob;
-        modalBodyAddress.textContent = userAddress;
-        modalCreatedDate.textContent = userCreatedDate;
-        modalCreatedUser.textContent = userCreatedUser;
-        modalUpdatedDate.textContent = userUpdatedDate;
-        modalUpdatedUser.textContent = userUpdatedUser;
-    });
-
+            modalBodyName.textContent = userName;
+            modalBodyType.textContent = userType == 0 ? 'Admin' : 'User';;
+            modalBodyEmail.textContent = userEmail;
+            modalBodyPhone.textContent = userPhone;
+            modalBodyDob.textContent = userDob;
+            modalBodyAddress.textContent = userAddress;
+            modalCreatedDate.textContent = userCreatedDate;
+            modalCreatedUser.textContent = userCreatedUser;
+            modalUpdatedDate.textContent = userUpdatedDate;
+            modalUpdatedUser.textContent = userUpdatedUser;
+        });
     </script>
 
 @endsection
