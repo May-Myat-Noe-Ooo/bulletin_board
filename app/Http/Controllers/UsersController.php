@@ -353,7 +353,7 @@ class UsersController extends Controller
         $email = $request->input('mailaddr');
         $fromDate = $request->input('from-date');
         $toDate = $request->input('to-date');
-        $pageSize = $request->input('page-size', 5); // Default page size is 5
+        $pageSize = $request->input('page-size', 4); // Default page size is 5
 
         // Get the authenticated user's type
         //$userType = Auth::user()->type;

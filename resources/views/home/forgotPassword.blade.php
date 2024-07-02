@@ -3,7 +3,7 @@
 @section('body')
     <div class="container-md col-sm-7 mt-5">
         <div class="card">
-            <div class="card-header bg-success text-white">
+            <div class="card-header bg-light text-black">
                 Forgot Password
             </div>
             <div class="card-body d-flex justify-content-center">
@@ -23,7 +23,7 @@
                         <div class="row d-flex justify-content-center align-content-center">
                             <div class="col-sm-8 offset-sm-3">
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init
-                                    class="btn btn-success btn-block col-sm-7">Reset Password</button>
+                                    class="btn btn-dark reset-btn btn-block col-sm-7">Reset Password</button>
                             </div>
                         </div>
                     </div>

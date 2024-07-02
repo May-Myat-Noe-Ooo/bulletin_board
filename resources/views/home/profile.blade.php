@@ -2,16 +2,32 @@
 
 @section('body')
     <div class="container-md col-sm-7 mt-5">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                Profile
+        <!-- Profile Begin -->
+        <div class="post-option">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="post__text">
+                            <h2>Profile</h2>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="post__links">
+                            <a href="./index.html">Home</a>
+                            <span>Profile</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+        <!-- Profile End -->
+        <div class="card">
             <div class="card-body d-flex justify-content-center">
                 <form class="form-horizontal" action="{{ route('editprofile',$user->id) }}" method="POST" enctype="multipart/form-data"
                     style="max-width: 600px; width: 100%;">
                     @csrf
                     <div class="d-flex">
-                        <div class="flex-grow-1">
+                        <div class="flex-grow-1 border-right">
                             <img src="{{ asset($user->profile) }}" alt="error" class="img-thumbnail" width="200" height="200">
                             <input type="hidden" name="profile_path" value="{{ $user->profile }}">
                         </div>
@@ -67,7 +83,7 @@
                             <div class="row mb-3">
                                 <div class="row d-flex justify-content-around align-item-center">
                                     <div class="col-sm-8 offset-sm-4">
-                                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-success btn-block col-sm-8">Edit Profile</button>
+                                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-block col-sm-8">Edit Profile</button>
                                     </div>
                                 </div>
                             </div>

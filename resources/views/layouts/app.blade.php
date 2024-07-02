@@ -15,8 +15,11 @@
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .2);
             background-color:#f08632;
         }
+        .nav-item {
+            height: 50px;
+        }
 
-        .nav-item:hover {
+        .nav-item:hover{
             background-color: #000000;
         }
 
@@ -34,6 +37,9 @@
         }
 
         .postlist .card-body {
+            background-color: #f8f9fa;
+        }
+        .userlist .card-body {
             background-color: #f8f9fa;
         }
 
@@ -112,6 +118,14 @@
 
 .userlist .card:hover {
     transform: scale(1.05);
+    .user-name-link {
+        color: #111111;
+        border-bottom: 1px solid #111111;
+}
+.card-body {
+            background-color: #f08632;
+            color:#ffffff;
+        }
 }
 
 .userlist .card img {
@@ -140,7 +154,7 @@
 .userlist {
     .card-body {
     position: relative;
-    padding-top: 28%; /* Adjust as needed */
+    padding-top: 100%; /* Adjust as needed */
 }
 
 .background-image {
@@ -148,7 +162,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 30%; /* 30% of the card-body height */
+    height: 31%; /* 30% of the card-body height */
     overflow: hidden;
 }
 
@@ -160,12 +174,12 @@
 
 .profile-img {
     position: absolute;
-    top: 28%; /* Center vertically */
+    top: 45%; /* Center vertically */
     left: 50%; /* Center horizontally */
     transform: translate(-50%, -50%); /* Adjust to center exactly */
-    width: 100px;
-    height: 100px;
-    border: 5px solid #fff; /* Optional: border to make the profile image stand out */
+    width: 200px;
+    height: 200px;
+    border: 5px solid #ddd; /* Optional: border to make the profile image stand out */
 }
 
 .card-body h5,
@@ -175,6 +189,9 @@
     margin-top: 3%; /* Adjust as needed to position below the profile image */
 }
 
+}
+.user-name-link {
+    color: #111111;
 }
 /*---------------------
   Post
@@ -255,6 +272,29 @@
     border-color: #ddd;
 }
 
+/* Style for edit profile */
+.save-btn:hover,
+.search-btn:hover,
+.update-btn:hover,
+.login-btn:hover,
+.create-btn:hover,
+.confirm-btn:hover,
+.edit-btn:hover,
+.reset-btn:hover,
+.upload-btn:hover,
+.register-btn:hover{
+    color: #ffffff;
+    border: 1px solid #fd7e14;
+    background-color: #fd7e14;
+}
+.change-pw-link {
+    font-size: 16px;
+    color: #fd7e14;
+    font-weight: 600;
+}
+.change-pw-link:hover {
+    color: #f08632;
+}
 
     </style>
 </head>
@@ -268,7 +308,7 @@
     </main>
 
     @include('layouts.footer')
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
     </script>

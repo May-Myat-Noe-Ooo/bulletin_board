@@ -3,7 +3,7 @@
 @section('body')
     <div class="container-md col-sm-7 mt-5">
         <div class="card">
-            <div class="card-header bg-success text-white">
+            <div class="card-header bg-light text-black">
                 Sign Up
             </div>
             <div class="card-body d-flex justify-content-center">
@@ -56,7 +56,7 @@
                         <div class="col d-flex  justify-content-around align-item-center">
                             <div class="col-sm-8 offset-sm-6">
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init
-                                    class="btn btn-success btn-block col-sm-4">Create</button>
+                                    class="btn btn-dark create-btn btn-block col-sm-4">Create</button>
                                 <button type="button" data-mdb-button-init data-mdb-ripple-init
                                     class="btn btn-secondary btn-block col-sm-3">Clear</button>
                             </div>

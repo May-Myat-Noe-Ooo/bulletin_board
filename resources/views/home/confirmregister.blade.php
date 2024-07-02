@@ -2,10 +2,26 @@
 
 @section('body')
     <div class="container-md col-sm-7 mt-5">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                Register Confirm
+        <!-- Register Confirm Begin -->
+        <div class="post-option">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="post__text">
+                            <h2 class="text-nowrap mb-0">Register Confirm</h2>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="post__links">
+                            <a href="./index.html">Home</a>
+                            <span>Register Confirim</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+        <!-- Register Confirm End -->
+        <div class="card">
             <div class="card-body d-flex justify-content-center">
                 <form class="form-horizontal" action="{{ route('storeRegisterUser') }}" method="POST" style="max-width: 500px; width: 100%;">
                     @csrf
@@ -82,7 +98,7 @@
                     <div class="row mb-3">
                         <div class="col d-flex  justify-content-around align-item-center">
                             <div class="col-sm-8 offset-sm-6">
-                                <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-success btn-block col-sm-4">Confirm</button>
+                                <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-dark confirm-btn btn-block col-sm-4">Confirm</button>
                                 <button type="button" data-mdb-button-init data-mdb-ripple-init
                                     class="btn btn-secondary btn-block col-sm-4" onclick="window.history.back();">Cancel</button>
                             </div>

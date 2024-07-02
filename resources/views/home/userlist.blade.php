@@ -3,7 +3,7 @@
 @section('body')
 
     <div class="col float-middle mb-5 mt-5">
-        <!-- Postlist Begin -->
+        <!-- Userlist Begin -->
         <div class="post-option">
             <div class="container">
                 <div class="row">
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <!-- Postlist End -->
+        <!-- Userlist End -->
         <div class="card">
             @if (Session::has('success'))
                 <div id="success-message" class="alert alert-success" role="alert">
@@ -34,10 +34,10 @@
                     <form class="search-form col-md-2 text-start mb-3" method="GET" action="{{ route('displayuser') }}">
                         <label for="page-size">Page Size:</label>
                         <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
-                            <option value="5" {{ $pageSize == 5 ? 'selected' : '' }}>5</option>
-                            <option value="10" {{ $pageSize == 10 ? 'selected' : '' }}>10</option>
-                            <option value="15" {{ $pageSize == 15 ? 'selected' : '' }}>15</option>
-                            <option value="20" {{ $pageSize == 20 ? 'selected' : '' }}>20</option>
+                            <option value="4" {{ $pageSize == 4 ? 'selected' : '' }}>4</option>
+                            <option value="8" {{ $pageSize == 8 ? 'selected' : '' }}>8</option>
+                            <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
+                            <option value="16" {{ $pageSize == 16 ? 'selected' : '' }}>16</option>
                         </select>
                     </form>
                     <form class="search-form col-md-10 text-end mb-3" method="GET" action="{{ route('displayuser') }}">
@@ -63,7 +63,7 @@
                                     value="{{ request('to-date') }}">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-dark w-100">Search</button>
+                                <button type="submit" class="btn btn-dark w-100 search-btn">Search</button>
                             </div>
                         </div>
                     </form>
@@ -71,57 +71,70 @@
                 <div class="row">
                     @if ($userlist->count() > 0)
                         @foreach ($userlist as $rs)
-                            <div class="userlist col-md-4 mb-4">
+                            <div class="userlist col-md-3 mb-4">
                                 <div class="card h-100">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <span>{{ $rs->name }}</span>
-                                        <div class="dropdown">
-                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="bi bi-three-dots"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end"
-                                                aria-labelledby="dropdownMenuButton">
-                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#userDetailModal" data-name="{{ $rs->name }}"
-                                                        data-type="{{ $rs->type }}" data-email="{{ $rs->email }}"
-                                                        data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}"
-                                                        data-address="{{ $rs->address }}"
-                                                        data-created="{{ $rs->created_at }}"
-                                                        data-created-user="{{ $rs->createdBy->name }}"
-                                                        data-updated="{{ $rs->updated_at }}"
-                                                        data-updated-user="{{ $rs->updatedBy->name }}">
-                                                        <i class="bi bi-info-circle me-2"></i>Details</a></li>
-                                                <li><a class="dropdown-item" href="#">
-                                                        <i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                                <li><a class="dropdown-item text-danger" href="#"
-                                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                        data-id="{{ $rs->id }}" data-name="{{ $rs->name }}">
-                                                        <i class="bi bi-trash me-2"></i>Delete</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    
                                     <div class="card-body text-center position-relative">
-                                        <!-- Default background image -->
+                                        <!-- Three dots icon in top right corner -->
+                    <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
+                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots custom-dot"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                   data-bs-target="#userDetailModal" data-name="{{ $rs->name }}"
+                                   data-type="{{ $rs->type }}" data-email="{{ $rs->email }}"
+                                   data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}"
+                                   data-address="{{ $rs->address }}"
+                                   data-created="{{ $rs->created_at }}"
+                                   data-created-user="{{ $rs->createdBy->name }}"
+                                   data-updated="{{ $rs->updated_at }}"
+                                   data-updated-user="{{ $rs->updatedBy->name }}">
+                                    <i class="bi bi-info-circle me-2"></i>Details</a></li>
+                            <li><a class="dropdown-item" href="#">
+                                    <i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                            <li><a class="dropdown-item text-danger" href="#"
+                                   data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                   data-id="{{ $rs->id }}" data-name="{{ $rs->name }}">
+                                    <i class="bi bi-trash me-2"></i>Delete</a></li>
+                        </ul>
+                    </div>
+                                        {{--<!-- Default background image -->
                                         <div class="background-image">
-                                            <img src="{{ asset('img/orangy.png') }}" alt="Background"
+                                            <img src="{{ asset('img/light.png') }}" alt="Background"
                                                 class="background-img">
-                                        </div>
+                                        </div>--}}
 
                                         <!-- User profile image -->
                                         <img src="{{ asset($rs->profile) }}" alt="Profile"
                                             class="profile-img rounded-circle">
 
                                         <!-- User details -->
-                                        <h5 class="card-title">{{ $rs->name }}</h5>
+                                        <h5 class="card-title"><a href="#" 
+                                            class="user-name-link" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#userDetailModal"
+                                            data-name="{{ $rs->name }}"
+                                            data-type="{{ $rs->type }}"
+                                            data-email="{{ $rs->email }}"
+                                            data-phone="{{ $rs->phone }}"
+                                            data-dob="{{ $rs->dob }}"
+                                            data-address="{{ $rs->address }}"
+                                            data-created="{{ $rs->created_at }}"
+                                            data-created-user="{{ $rs->createdBy->name}}"
+                                            data-updated="{{ $rs->updated_at }}"
+                                            data-updated-user="{{ $rs->updatedBy->name }}">
+                                            {{ $rs->name }}
+                                         </a></h5>
                                         <p class="card-text">{{ $rs->email }}</p>
                                         <p class="card-text"><small class="text-muted">{{ $rs->createdBy->name }} -
                                                 {{ $rs->created_at->diffForHumans() }}</small></p>
                                     </div>
 
-                                    <div class="card-footer text-muted">
+                                    {{--<div class="card-footer text-muted">
                                         <span>{{ $rs->type == 0 ? 'Admin' : 'User' }}</span>
-                                    </div>
+                                    </div>--}}
                                 </div>
                             </div>
                         @endforeach

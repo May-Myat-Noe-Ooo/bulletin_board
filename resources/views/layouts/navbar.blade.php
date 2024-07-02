@@ -1,15 +1,15 @@
-<nav class="navbar navbar-light navbar-expand-lg py-0">
+<nav class="navbar navbar-light navbar-expand-lg  py-0">
     <div class="container-fluid">
         <a class="navbar-brand text-white d-flex align-items-center" href="#">Bulletinboard</a>
         
-        <ul class="navbar-nav me-auto flex-row mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto flex-row mb-2 mb-lg-0" >
             @auth
             <li class="nav-item d-flex align-items-center">
-                <a class="nav-link text-white d-flex align-items-center" href="{{ route('displayuser') }}">Users</a>
+                <a class="nav-link text-white" href="{{ route('displayuser') }}">Users</a>
             </li>
             @endauth
             <li class="nav-item d-flex align-items-center">
-                <a class="nav-link text-white d-flex align-items-center" href="{{ route('postlist.index') }}">Posts</a>
+                <a class="nav-link text-white active" href="{{ route('postlist.index') }}">Posts</a>
             </li>
         </ul>
         @auth
