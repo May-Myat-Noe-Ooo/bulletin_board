@@ -23,6 +23,10 @@
             background-color: #000000;
         }
 
+        .nav-item.active {
+        background-color: #343a40; /* Highlight color */
+    }
+
         .required:after {
             content: " *";
             color: red;
@@ -51,6 +55,7 @@
             /* Vertically center the content */
         }
 
+        /* Styles for footer */
         footer {
             width: 100%;
             background-color: #343a40;
@@ -197,7 +202,7 @@
   Post
 -----------------------*/
 
-.post__text h2 {
+.post__text h2 ,h1{
   font-size: 50px;
   color: #000000;
   font-weight: 700;
@@ -300,17 +305,57 @@
 </head>
 
 <body>
+    <!-- New header section -->
+<header class="bg-white py-2">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <a href="{{ route('home') }}">
+        <div class="d-flex align-items-center">
+            <img src="../img/mtmLogo.png" alt="Company Logo" height="70" class="d-inline-block align-middle">
+            <h1 class="ms-3 mb-0 align-middle">MTM Bulletinboard</h1>
+        </div>
+    </a>
+        <div>
+            @guest
+            <a href="{{ route('signup.form') }}" class="btn btn-outline-dark me-2">Sign Up</a>
+            <a href="{{ route('login.index') }}" class="btn btn-outline-dark">Log In</a>
+            @endguest
+            @auth
+            <div class="dropdown">
+                <button class="btn btn-outline-dark dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    ENG
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                    <li><a class="dropdown-item" href="#">English</a></li>
+                    <li><a class="dropdown-item" href="#">日本語</a></li>
+                </ul>
+            </div>
+        @endauth
+        </div>
+    </div>
+</header>
 
     @include('layouts.navbar')
 
     <main class="container py-3">
         @yield('body')
     </main>
-
+    
     @include('layouts.footer')
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navItems = document.querySelectorAll('.nav-item');
+    
+            navItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
     </script>
 </body>
 

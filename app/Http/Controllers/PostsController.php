@@ -176,61 +176,60 @@ class PostsController extends Controller
     }
 
     //Download CSV file
-    public function export(Request $request)
-    {
-        $keyword = $request->input('search-keyword');
-
+public function export(Request $request)
+{
+    $keyword = $request->input('search-keyword');
+    $currentRoute = $request->input('current-route'); // Get the previous current route name
+    //dd($currentRoute);
+    if (Auth::check()) {
         if (Auth::user()->type == 0) {
-            // Admin user: can search all posts
-
-            //dd($keyword);
-            $postlist = Post::when($keyword, function ($query, $keyword) {
-                    return $query
-                        ->where('title', 'LIKE', "%{$keyword}%")
-                        ->orWhere('description', 'LIKE', "%{$keyword}%")
-                        ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })
-                ->get();
-            return new StreamedResponse(
-                function () use ($postlist) {
-                    $handle = fopen('php://output', 'w');
-                    fputcsv($handle, ['id', 'title', 'description', 'status', 'create_user_id', 'updated_user_id', 'deleted_user_id', 'created_at', 'updated_at', 'deleted_at']);
-                    foreach ($postlist as $postlist) {
-                        fputcsv($handle, [$postlist->id, $postlist->title, $postlist->description, $postlist->status, $postlist->create_user_id, $postlist->updated_user_id, $postlist->deleted_user_id, $postlist->created_at, $postlist->updated_at, $postlist->deleted_at]);
-                    }
-                    fclose($handle);
-                },
-                200,
-                [
-                    'Content-Type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename="posts.csv"',
-                ],
-            );
+            // Admin user: can search all posts if on 'postlist', or only all active posts on 'home'
+            $postlist = Post::when($currentRoute == 'home', function ($query) {
+                return $query->where('status', 1);
+            })->when($keyword, function ($query, $keyword) {
+                return $query->where('title', 'LIKE', "%{$keyword}%")
+                             ->orWhere('description', 'LIKE', "%{$keyword}%")
+                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+            })
+            ->get();
         } else {
-            // Regular user: can only search their own posts
-            $postlist = Post::where('create_user_id', Auth::id())
-                ->when($keyword, function ($query, $keyword) {
-                    return $query
-                        ->where('title', 'LIKE', "%{$keyword}%")
-                        ->orWhere('description', 'LIKE', "%{$keyword}%")
-                        ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })
-                ->get();
-            return new StreamedResponse(
-                function () use ($postlist) {
-                    $handle = fopen('php://output', 'w');
-                    fputcsv($handle, ['id', 'title', 'description', 'status', 'create_user_id', 'updated_user_id', 'deleted_user_id', 'created_at', 'updated_at', 'deleted_at']);
-                    foreach ($postlist as $postlist) {
-                        fputcsv($handle, [$postlist->id, $postlist->title, $postlist->description, $postlist->status, $postlist->create_user_id, $postlist->updated_user_id, $postlist->deleted_user_id, $postlist->created_at, $postlist->updated_at, $postlist->deleted_at]);
-                    }
-                    fclose($handle);
-                },
-                200,
-                [
-                    'Content-Type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename="posts.csv"',
-                ],
-            );
+            // Regular user: can only search their own posts if on 'postlist', or all active posts on 'home'
+            $postlist = Post::when($currentRoute == 'postlist.index', function ($query) {
+                return $query->where('create_user_id', Auth::id());
+            }, function ($query) {
+                return $query->where('status', 1);
+            })->when($keyword, function ($query, $keyword) {
+                return $query->where('title', 'LIKE', "%{$keyword}%")
+                             ->orWhere('description', 'LIKE', "%{$keyword}%")
+                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+            })
+            ->get();
         }
+    } else {
+        // Unauthenticated users: can view all posts with status 1
+        $postlist = Post::where('status', 1)
+            ->when($keyword, function ($query, $keyword) {
+                return $query->where('title', 'LIKE', "%{$keyword}%")
+                             ->orWhere('description', 'LIKE', "%{$keyword}%")
+                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+            })->get();
     }
+
+    return new StreamedResponse(
+        function () use ($postlist) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['id', 'title', 'description', 'status', 'create_user_id', 'updated_user_id', 'deleted_user_id', 'created_at', 'updated_at', 'deleted_at']);
+            foreach ($postlist as $post) {
+                fputcsv($handle, [$post->id, $post->title, $post->description, $post->status, $post->create_user_id, $post->updated_user_id, $post->deleted_user_id, $post->created_at, $post->updated_at, $post->deleted_at]);
+            }
+            fclose($handle);
+        },
+        200,
+        [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="posts.csv"',
+        ],
+    );
+}
+
 }

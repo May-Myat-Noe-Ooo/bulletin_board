@@ -1,16 +1,18 @@
-<nav class="navbar navbar-light navbar-expand-lg  py-0">
+<nav class="navbar navbar-light navbar-expand-lg py-0">
     <div class="container-fluid">
-        <a class="navbar-brand text-white d-flex align-items-center" href="#">Bulletinboard</a>
         
-        <ul class="navbar-nav me-auto flex-row mb-2 mb-lg-0" >
+        <ul class="navbar-nav me-auto flex-row mb-2 mb-lg-0">
+            <li class="nav-item d-flex align-items-center {{ request()->routeIs('home') ? 'active' : '' }}">
+                <a class="nav-link text-white" href="{{ route('home') }}">Home</a>
+            </li>
             @auth
-            <li class="nav-item d-flex align-items-center">
+            <li class="nav-item d-flex align-items-center {{ request()->routeIs('displayuser') ? 'active' : '' }}">
                 <a class="nav-link text-white" href="{{ route('displayuser') }}">Users</a>
             </li>
-            @endauth
-            <li class="nav-item d-flex align-items-center">
-                <a class="nav-link text-white active" href="{{ route('postlist.index') }}">Posts</a>
+            <li class="nav-item d-flex align-items-center {{ request()->routeIs('postlist.index') ? 'active' : '' }}">
+                <a class="nav-link text-white" href="{{ route('postlist.index') }}">Posts</a>
             </li>
+            @endauth
         </ul>
         @auth
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -19,7 +21,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item d-flex align-items-center">
+                <li class="nav-item d-flex align-items-center {{ request()->routeIs('registeruser') ? 'active' : '' }}">
                     <a class="nav-link text-white" href="{{ route('registeruser') }}">Create User</a>
                 </li>
                 <li class="nav-item dropdown d-flex align-items-center">

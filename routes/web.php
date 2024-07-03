@@ -19,10 +19,11 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home.login');
 });
 // Route for viewing posts (accessible by both authenticated and unauthenticated users)
 Route::get('/postlist', [PostlistController::class, 'index'])->name('postlist.index');
+Route::get('/home', [PostlistController::class, 'index'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('postlist', PostlistController::class)->except(['index']);

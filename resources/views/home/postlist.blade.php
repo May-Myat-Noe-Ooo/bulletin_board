@@ -15,7 +15,7 @@
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6">
                         <div class="post__links">
-                            <a href="./index.html">Home</a>
+                            <a href="{{ route('home') }}">Home</a>
                             <span>Post</span>
                         </div>
                     </div>
@@ -35,25 +35,26 @@
                         <form class="search-form" method="GET" action="{{ route('postlist.index') }}">
                             <label for="page-size">Page Size:</label>
                             <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
-                                <option value="5" {{ $pageSize == 5 ? 'selected' : '' }}>5</option>
-                                <option value="10" {{ $pageSize == 10 ? 'selected' : '' }}>10</option>
-                                <option value="15" {{ $pageSize == 15 ? 'selected' : '' }}>15</option>
-                                <option value="20" {{ $pageSize == 20 ? 'selected' : '' }}>20</option>
+                                <option value="6" {{ $pageSize == 6 ? 'selected' : '' }}>6</option>
+                                <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
+                                <option value="18" {{ $pageSize == 18 ? 'selected' : '' }}>18</option>
+                                <option value="24" {{ $pageSize == 24 ? 'selected' : '' }}>24</option>
                             </select>
                         </form>
                     </div>
                     <div class="col-md-8 text-end">
-                        <form class="search-form" method="GET" action="{{ route('postlist.index') }}">
+                        <form class="search-form" method="GET" action="{{ request()->route()->getName() == 'home' ? route('home') : route('postlist.index') }}">
                             <label class="mr-2">Keyword:</label>
-                            <input class="search btn border border-secondary" type="text" name="search-keyword"
-                                placeholder="Type Something" value="{{ request('search-keyword') }}">
+                            <input class="search btn border border-secondary" type="text" name="search-keyword" placeholder="Type Something" value="{{ request('search-keyword') }}">
+                            <input type="hidden" name="current-route" value="{{ request()->route()->getName() }}">
                             <button type="submit" class="btn btn-dark">Search</button>
                             <a href="{{ route('createpost') }}" class="btn btn-dark">Create</a>
                             <a href="{{ route('upload_file') }}" class="btn btn-dark">Upload</a>
-                            <a href="{{ route('postlists.export', ['search-keyword' => request('search-keyword')]) }}"
-                                class="btn btn-dark">Download</a>
+                            <a href="{{ route('postlists.export', ['search-keyword' => request('search-keyword'), 'current-route' => request()->route()->getName()]) }}" class="btn btn-dark">Download</a>
                         </form>
+                        
                     </div>
+                    
                 </div>
 
                 <div class="row mt-3">
@@ -66,7 +67,7 @@
                                             <img src="{{ asset($rs->user->profile) }}" alt="error"
                                                 class="rounded-circle me-2" width="30" height="30">
                                             <div>
-                                                <div>{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}
+                                                <div>{{ $rs->user->name }}
                                                 </div>
                                                 <div class="d-flex align-items-center">
                                                     <i class="bi bi-clock me-1"></i>
@@ -74,6 +75,8 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        @auth
+                                        @if(($route == 'postlist.index' && Auth::user()->type == 0) || ($route == 'postlist.index' && Auth::user()->type == 1))
                                         <div class="dropdown">
                                             <button class="btn btn-link p-0 " type="button" id="dropdownMenuButton"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -97,6 +100,8 @@
                                                 </li>
                                             </ul>
                                         </div>
+                                        @endif
+                                        @endauth
                                     </div>
                                     <div class="card-body position-relative">
                                         <h5 class="card-title">

@@ -15,24 +15,30 @@ class PostlistController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->input('search-keyword');
-        $pageSize = $request->input('page-size', 5); // Default page size is 5
+        $pageSize = $request->input('page-size', 6); // Default page size is 5
+        $route = $request->route()->getName(); // Get the route name to determine if it's 'home' or 'postlist'
     
         if (Auth::check()) {
             if (Auth::user()->type == 0) {
-                // Admin user: can search all posts
-                $postlist = Post::when($keyword, function ($query, $keyword) {
+                // Admin user: can search all posts if on 'postlist', or only all active posts on 'home'
+                $postlist = Post::when($route == 'home', function ($query) {
+                    return $query->where('status', 1);
+                })->when($keyword, function ($query, $keyword) {
                     return $query->where('title', 'LIKE', "%{$keyword}%")
                                  ->orWhere('description', 'LIKE', "%{$keyword}%")
                                  ->orWhere('created_at', 'LIKE', "%{$keyword}%");
                 })->orderBy('id', 'DESC')->paginate($pageSize);
             } else {
-                // Regular user: can only search their own posts
-                $postlist = Post::where('create_user_id', Auth::id())
-                    ->when($keyword, function ($query, $keyword) {
-                        return $query->where('title', 'LIKE', "%{$keyword}%")
-                                     ->orWhere('description', 'LIKE', "%{$keyword}%")
-                                     ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                    })->orderBy('id', 'DESC')->paginate($pageSize);
+                // Regular user: can only search their own posts if on 'postlist', or all active posts on 'home'
+                $postlist = Post::when($route == 'postlist.index', function ($query) {
+                    return $query->where('create_user_id', Auth::id());
+                }, function ($query) {
+                    return $query->where('status', 1);
+                })->when($keyword, function ($query, $keyword) {
+                    return $query->where('title', 'LIKE', "%{$keyword}%")
+                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
+                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
+                })->orderBy('id', 'DESC')->paginate($pageSize);
             }
         } else {
             // Unauthenticated users: can view all posts with status 1
@@ -47,8 +53,9 @@ class PostlistController extends Controller
         // Pass additional data to the view
         $postlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
     
-        return view('home.postlist', compact('postlist', 'pageSize'));
+        return view('home.postlist', compact('postlist', 'pageSize', 'route'));
     }
+    
     
 
     /**
