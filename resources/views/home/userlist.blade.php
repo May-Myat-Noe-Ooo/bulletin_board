@@ -146,7 +146,7 @@
                 </div>
                 <div class="row mt-3 float-start">
                     <div class="col-md-1">
-                        {!! $userlist->appends(['page-size' => $pageSize])->links() !!}
+                        {!! $userlist->appends(['page-size' => $pageSize,'name' => request('name'),'mailaddr' => request('mailaddr'),'from-date' => request('from-date'),'to-date' => request('to-date')])->links() !!}
                     </div>
                 </div>
             </div>

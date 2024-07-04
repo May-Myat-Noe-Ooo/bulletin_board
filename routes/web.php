@@ -5,6 +5,7 @@ use App\Http\Controllers;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\PostlistController;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -31,6 +32,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
     });
 });
+//Route::post('/posts/{post}/like', [LikeController::class, 'toggleLike'])->middleware('auth')->name('posts.like');
+// routes/web.php
+
+Route::post('/posts/{post}/like', [LikeController::class, 'toggleLike'])->middleware('auth');
+Route::get('/posts/{post}/likes', [LikeController::class, 'getPostLikes'])->middleware('auth');
 
 //Route::resource('/login', UsersController::class);
 

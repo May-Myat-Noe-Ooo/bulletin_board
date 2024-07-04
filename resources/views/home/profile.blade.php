@@ -83,7 +83,7 @@
                             <div class="row mb-3">
                                 <div class="row d-flex justify-content-around align-item-center">
                                     <div class="col-sm-8 offset-sm-4">
-                                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-block col-sm-8">Edit Profile</button>
+                                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-block edit-btn col-sm-8">Edit Profile</button>
                                     </div>
                                 </div>
                             </div>

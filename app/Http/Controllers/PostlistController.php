@@ -17,7 +17,7 @@ class PostlistController extends Controller
         $keyword = $request->input('search-keyword');
         $pageSize = $request->input('page-size', 6); // Default page size is 5
         $route = $request->route()->getName(); // Get the route name to determine if it's 'home' or 'postlist'
-    
+        
         if (Auth::check()) {
             if (Auth::user()->type == 0) {
                 // Admin user: can search all posts if on 'postlist', or only all active posts on 'home'

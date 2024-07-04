@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'updated_user_id');
     }
+
+    public function likes()
+{
+    return $this->hasMany(Like::class);
+}
 }
