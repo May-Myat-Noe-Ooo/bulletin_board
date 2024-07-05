@@ -96,7 +96,12 @@
                                     <i class="bi bi-pencil-square me-2"></i>Edit</a></li>
                             <li><a class="dropdown-item text-danger" href="#"
                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                   data-id="{{ $rs->id }}" data-name="{{ $rs->name }}">
+                                   data-id="{{ $rs->id }}" data-name="{{ $rs->name }}"
+                                   data-type="{{ $rs->type }}"
+                                            data-email="{{ $rs->email }}"
+                                            data-phone="{{ $rs->phone }}"
+                                            data-dob="{{ $rs->dob }}"
+                                            data-address="{{ $rs->address }}">
                                     <i class="bi bi-trash me-2"></i>Delete</a></li>
                         </ul>
                     </div>
@@ -162,13 +167,62 @@
                 </div>
                 <div class="modal-body">
                     <p>Are you sure you want to delete the user?</p>
-                    <p><strong>ID:</strong> <span id="userId"></span></p>
-                    <p><strong>Name:</strong> <span id="userName"></span></p>
-                    <p><strong>Type:</strong> <span id="userType"></span></p>
-                    <p><strong>Email:</strong> <span id="userEmail"></span></p>
-                    <p><strong>Phone:</strong> <span id="userPhone"></span></p>
-                    <p><strong>Date of Birth:</strong> <span id="userDob"></span></p>
-                    <p><strong>Address:</strong> <span id="userAddress"></span></p>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-hash me-2"></i><strong>ID:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userId"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-person me-2"></i><strong>Name:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userName"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-award me-2"></i><strong>Type:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userType"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-envelope me-2"></i><strong>Email:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userEmail"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-telephone me-2"></i><strong>Phone:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userPhone"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-calendar me-2"></i><strong>Date of Birth:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userDob"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-geo-alt me-2"></i><strong>Address:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userAddress"></span></p>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -192,17 +246,88 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Name:</strong> <span id="userName"></span></p>
-                    <p><strong>Type:</strong> <span id="userType"></span></p>
-                    <p><strong>Email:</strong> <span id="userEmail"></span></p>
-                    <p><strong>Phone:</strong> <span id="userPhone"></span></p>
-                    <p><strong>Date of Birth:</strong> <span id="userDob"></span></p>
-                    <p><strong>Address:</strong> <span id="userAddress"></span></p>
-                    <p><strong>Created Date:</strong> <span id="userCreatedDate"></span></p>
-                    <p><strong>Created User:</strong> <span id="userCreatedUser"></span></p>
-                    <p><strong>Updated Date:</strong> <span id="userUpdatedDate"></span></p>
-                    <p><strong>Updated User:</strong> <span id="userUpdatedUser"></span></p>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-person me-2"></i><strong>Name:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userName"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-award me-2"></i><strong>Type:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userType"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-envelope me-2"></i><strong>Email:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userEmail"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-telephone me-2"></i><strong>Phone:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userPhone"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-calendar me-2"></i><strong>Date of Birth:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userDob"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-geo-alt me-2"></i><strong>Address:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userAddress"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-calendar-event me-2"></i><strong>Created Date:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userCreatedDate"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-person-check me-2"></i><strong>Created User:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userCreatedUser"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-calendar-check me-2"></i><strong>Updated Date:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userUpdatedDate"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-person-lines-fill me-2"></i><strong>Updated User:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="userUpdatedUser"></span></p>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>

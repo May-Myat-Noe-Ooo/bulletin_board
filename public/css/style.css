@@ -315,10 +315,17 @@ h1 {
 .edit-btn:hover,
 .reset-btn:hover,
 .upload-btn:hover,
-.register-btn:hover {
+.register-btn:hover,
+.dashboard-card:hover {
     color: #ffffff;
     border: 1px solid #fd7e14;
     background-color: #fd7e14;
+    transform: scale(1.05);
+}
+.dashboard-card {
+    background-color: #f8f9fa;
+    transition: transform 0.2s;
+
 }
 
 .change-pw-link {
@@ -329,5 +336,10 @@ h1 {
 
 .change-pw-link:hover {
     color: #f08632;
+}
+
+/* Styles for dashboard */
+.dashboard .card {
+    margin-bottom: 20px;
 }
 

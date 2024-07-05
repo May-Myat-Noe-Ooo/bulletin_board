@@ -6,6 +6,8 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\PostlistController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ChartController;
 use App\Http\Controllers\AuthController;
 
 /*
@@ -22,6 +24,9 @@ use App\Http\Controllers\AuthController;
 Route::get('/', function () {
     return view('home.login');
 });
+//Route for admin dashboard
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
 // Route for viewing posts (accessible by both authenticated and unauthenticated users)
 Route::get('/postlist', [PostlistController::class, 'index'])->name('postlist.index');
 Route::get('/home', [PostlistController::class, 'index'])->name('home');
@@ -89,4 +94,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::get('/upload_file', 'PostsController@uploadFile')->name('upload_file');
     Route::post('/upload-csv', 'PostsController@uploadCsv')->name('upload_csv');
     Route::get('/postlists/export', 'PostsController@export')->name('postlists.export');
+
+    //Pie Chart
+    Route::get('/pie', 'ChartController@pieChart')->name('piechart');
 });

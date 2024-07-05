@@ -178,10 +178,38 @@
                 </div>
                 <div class="modal-body">
                     <p>Are you sure you want to delete the post?</p>
-                    <p><strong>ID:</strong> <span id="postId"></span></p>
-                    <p><strong>Title:</strong> <span id="postTitle"></span></p>
-                    <p><strong>Description:</strong> <span id="postDescription"></span></p>
-                    <p><strong>Status:</strong> <span id="postStatus"></span></p>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-hash me-2"></i><strong>ID:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="postId"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-file-earmark-text me-2"></i><strong>Title:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="postTitle"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-card-text me-2"></i><strong>Description:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="postDescription"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-check-circle me-2"></i><strong>Status:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="postStatus"></span></p>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -209,7 +237,7 @@
                         <i class="bi bi-file-earmark-text me-2"></i><strong>Title:</strong>
                     </div>
                     <div class="col-7">
-                        <p class="mb-0"><span id="modalPostTitle"></span></p>
+                        <p class="mb-0 mt-2"><span id="modalPostTitle"></span></p>
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -217,7 +245,7 @@
                         <i class="bi bi-card-text me-2"></i><strong>Description:</strong>
                     </div>
                     <div class="col-7">
-                        <p class="mb-0"><span id="modalPostDescription"></span></p>
+                        <p class="mb-0 mt-2"><span id="modalPostDescription"></span></p>
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -225,15 +253,15 @@
                         <i class="bi bi-check-circle me-2"></i><strong>Status:</strong>
                     </div>
                     <div class="col-7">
-                        <p class="mb-0"><span id="modalPostStatus"></span></p>
+                        <p class="mb-0 mt-2"><span id="modalPostStatus"></span></p>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-person me-2"></i><strong>Posted User:</strong>
+                        <i class="bi bi-person-check me-2"></i><strong>Posted User:</strong>
                     </div>
                     <div class="col-7">
-                        <p class="mb-0"><span id="modalPostedUser"></span></p>
+                        <p class="mb-0 mt-2"><span id="modalPostedUser"></span></p>
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -241,7 +269,7 @@
                         <i class="bi bi-calendar-event me-2"></i><strong>Posted Date:</strong>
                     </div>
                     <div class="col-7">
-                        <p class="mb-0"><span id="modalPostedDate"></span></p>
+                        <p class="mb-0 mt-2"><span id="modalPostedDate"></span></p>
                     </div>
                 </div>
                 <div class="row mb-2">
@@ -249,15 +277,15 @@
                         <i class="bi bi-calendar-check me-2"></i><strong>Updated Date:</strong>
                     </div>
                     <div class="col-7">
-                        <p class="mb-0"><span id="modalUpdatedDate"></span></p>
+                        <p class="mb-0 mt-2"><span id="modalUpdatedDate"></span></p>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-pencil me-2"></i><strong>Updated User:</strong>
+                        <i class="bi bi-person-lines-fill me-2"></i><strong>Updated User:</strong>
                     </div>
                     <div class="col-7">
-                        <p class="mb-0"><span id="modalUpdatedUser"></span></p>
+                        <p class="mb-0 mt-2"><span id="modalUpdatedUser"></span></p>
                     </div>
                 </div>
             </div>

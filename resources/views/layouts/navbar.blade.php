@@ -6,6 +6,11 @@
                 <a class="nav-link text-white" href="{{ route('home') }}">Home</a>
             </li>
             @auth
+            @if(auth()->user()->type == 0)
+                    <li class="nav-item d-flex align-items-center {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <a class="nav-link text-white" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                    </li>
+                @endif
             <li class="nav-item d-flex align-items-center {{ request()->routeIs('displayuser') ? 'active' : '' }}">
                 <a class="nav-link text-white" href="{{ route('displayuser') }}">Users</a>
             </li>
