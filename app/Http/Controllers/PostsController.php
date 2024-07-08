@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use League\Csv\Reader;
-use League\Csv\Statement;
+//use League\Csv\Reader;
+//use League\Csv\Statement;
 use Illuminate\Http\Request;
+use App\Services\PostService;
 use App\Models\Postlist;
 use App\Models\Post;
 use Carbon\Carbon;
@@ -15,9 +16,12 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PostsController extends Controller
 {
-    public function __construct()
+    protected $postService;
+
+    public function __construct(PostService $postService)
     {
         $this->middleware('auth'); // Ensure user is authenticated
+        $this->postService = $postService;
     }
 
     public function createPost()
@@ -28,7 +32,7 @@ class PostsController extends Controller
     public function confirmPost(\Illuminate\Http\Request $request)
     {
         //Validate the request
-        $request->validate(
+        $validatedData =$request->validate(
             [
                 'title' => 'required|string|max:255|unique:posts,title',
                 'description' => 'required|string',
@@ -40,44 +44,33 @@ class PostsController extends Controller
                 'description.required' => 'Description cannot be blank.',
             ],
         );
-        $title = $request->title;
-        $des = $request->description;
-        return view('home.createconfirmpost', compact('title', 'des'));
+        $data = $this->postService->confirmPost($validatedData);
+        return view('home.createconfirmpost', [
+            'title' => $data['title'],
+        'des' => $data['description'],]);
     }
 
     public function store(\Illuminate\Http\Request $request)
     {
-        $request->validate([
+        $validatedData =$request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
         ]);
-        // Create a new post
-        $post = Post::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'create_user_id' => auth()->id(),
-            'updated_user_id' => auth()->id(),
-        ]);
-        // // Add the currently logged-in user's ID
-        // $post->create_user_id = auth()->id();
-        // $post->updated_user_id = auth()->id();
-
-        // $post->save();
+        $this->postService->storePost($validatedData);
         return redirect()->route('postlist.index')->with('success', 'Post uploaded successfully');
     }
 
-    public function editPost()
-    {
-        return view('home.editpost');
-    }
+    //public function editPost()
+    //{
+    //    return view('home.editpost');
+    //}
 
     public function confirmEditPost(\Illuminate\Http\Request $request, $id)
     {
-        $postlist = $request;
         $validatedData = $request->validate(
             [
-                'title' => 'required|max:255',
-                'description' => 'required',
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
             ],
             [
                 'title.required' => 'Title cannot be blank.',
@@ -86,10 +79,14 @@ class PostsController extends Controller
                 'description.required' => 'Description cannot be blank.',
             ],
         );
-        $title = $request->title;
-        $des = $request->description;
-        $toggleStatus = $request->input('toggle_switch');
-        return view('home.editconfirmpost', compact('title', 'des', 'toggleStatus', 'postlist'));
+        $data = $this->postService->prepareDataForConfirmation($validatedData, $request);
+        $postlist = $request;
+        return view('home.editconfirmpost', [
+            'title' => $data['title'],
+            'des' => $data['description'],
+            'toggleStatus' => $data['toggleStatus'],
+            'postlist' => $postlist,
+        ]);
     }
 
     public function uploadFile()
@@ -100,136 +97,23 @@ class PostsController extends Controller
     // Upload CSV file
     public function uploadCsv(Request $request)
     {
-        // Validate the file input
-        $validator = Validator::make($request->all(), [
-            'csvfile' => 'required|file|mimes:csv|mimetypes:text/csv',
-        ]);
+        $result = $this->postService->uploadCsv($request);
 
-        if ($validator->fails()) {
-            return redirect()->back()->with('error', $validator->errors()->first())->withInput();
+        if (isset($result['error'])) {
+            return redirect()->back()->with('error', $result['error'])->withInput();
         }
 
-        // Retrieve the uploaded file
-        $file = $request->file('csvfile');
-
-        try {
-            // Read the file content
-            $content = file_get_contents($file->getRealPath());
-
-            // Normalize line endings to Unix style
-            $content = str_replace(["\r\n", "\r"], "\n", $content);
-
-            // Write the normalized content back to a temporary file
-            $tempPath = sys_get_temp_dir() . '/' . uniqid() . '.csv';
-            file_put_contents($tempPath, $content);
-
-            // Parse the CSV file using league/csv
-            $csv = Reader::createFromPath($tempPath, 'r');
-            $csv->setHeaderOffset(0); // Set the header offset
-
-            // Get the header and check its length
-            $header = $csv->getHeader();
-            // Check if the header has exactly 3 columns
-            if (count($header) !== 3) {
-                return redirect()->back()->with('error', 'CSV must have exactly 3 columns.')->withInput();
-            }
-
-            // Get the records
-            $records = Statement::create()->process($csv);
-
-            // Array to collect errors
-            $errors = [];
-
-            // Validate each row
-            foreach ($records as $index => $record) {
-                if (count($record) !== 3) {
-                    $errors[] = 'Row ' . ($index + 1) . ': Each row in the CSV must have exactly 3 columns.';
-                    continue;
-                }
-
-                // Check for unique title in the database
-                if (Post::where('title', $record['title'])->exists()) {
-                    $errors[] = 'Row ' . ($index + 1) . ": The title '{$record['title']}' has already been taken.";
-                    continue;
-                }
-
-                // Create a new postlist entry
-                Post::create([
-                    'title' => $record['title'],
-                    'description' => $record['description'],
-                    'status' => $record['status'],
-                    'create_user_id' => Auth::id(),
-                    'updated_user_id' => Auth::id(),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-            }
-
-            if (!empty($errors)) {
-                return redirect()->back()->with('error_html', $errors)->withInput();
-            }
-
-            return redirect()->route('postlist.index')->with('success', 'CSV data uploaded successfully.');
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'There was an error processing the CSV file.')->withInput();
+        if (isset($result['error_html'])) {
+            return redirect()->back()->with('error_html', $result['error_html'])->withInput();
         }
+
+        return redirect()->route('postlist.index')->with('success', $result['success']);
     }
 
     //Download CSV file
-public function export(Request $request)
+public function export(Request $request): StreamedResponse
 {
-    $keyword = $request->input('search-keyword');
-    $currentRoute = $request->input('current-route'); // Get the previous current route name
-    //dd($currentRoute);
-    if (Auth::check()) {
-        if (Auth::user()->type == 0) {
-            // Admin user: can search all posts if on 'postlist', or only all active posts on 'home'
-            $postlist = Post::when($currentRoute == 'home', function ($query) {
-                return $query->where('status', 1);
-            })->when($keyword, function ($query, $keyword) {
-                return $query->where('title', 'LIKE', "%{$keyword}%")
-                             ->orWhere('description', 'LIKE', "%{$keyword}%")
-                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-            })
-            ->get();
-        } else {
-            // Regular user: can only search their own posts if on 'postlist', or all active posts on 'home'
-            $postlist = Post::when($currentRoute == 'postlist.index', function ($query) {
-                return $query->where('create_user_id', Auth::id());
-            }, function ($query) {
-                return $query->where('status', 1);
-            })->when($keyword, function ($query, $keyword) {
-                return $query->where('title', 'LIKE', "%{$keyword}%")
-                             ->orWhere('description', 'LIKE', "%{$keyword}%")
-                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-            })
-            ->get();
-        }
-    } else {
-        // Unauthenticated users: can view all posts with status 1
-        $postlist = Post::where('status', 1)
-            ->when($keyword, function ($query, $keyword) {
-                return $query->where('title', 'LIKE', "%{$keyword}%")
-                             ->orWhere('description', 'LIKE', "%{$keyword}%")
-                             ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-            })->get();
-    }
-
-    return new StreamedResponse(
-        function () use ($postlist) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['id', 'title', 'description', 'status', 'create_user_id', 'updated_user_id', 'deleted_user_id', 'created_at', 'updated_at', 'deleted_at']);
-            foreach ($postlist as $post) {
-                fputcsv($handle, [$post->id, $post->title, $post->description, $post->status, $post->create_user_id, $post->updated_user_id, $post->deleted_user_id, $post->created_at, $post->updated_at, $post->deleted_at]);
-            }
-            fclose($handle);
-        },
-        200,
-        [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="posts.csv"',
-        ],
-    );
+    return $this->postService->export($request);
 }
 
 }

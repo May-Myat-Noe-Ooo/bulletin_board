@@ -54,46 +54,31 @@ class PostlistController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified post.
      */
     public function edit(string $id)
     {
-        $postlist = Post::findOrFail($id);
+        $postlist = $this->postService->getPostById($id);
 
         return view('home.editpost', compact('postlist'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified post in storage.
      */
     public function update(Request $request, string $id)
     {
-        $postlist = Post::findOrFail($id);
-        $postlist->status=$request->input('toggle_switch');
-        $postlist->updated_user_id=Auth::id();
-        $postlist->update($request->all());
+        $this->postService->updatePost($request,$id);
 
         return redirect()->route('postlist.index')->with('success', 'post edited successfully');
     }
-    //public function update(Request $request, string $id)
-    //{
-    //    //
-    //}
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified post from storage.
      */
     public function destroy(string $id)
 {
-    $postlist = Post::findOrFail($id);
-
-    // Update fields before deleting (soft delete)
-    //$postlist->deleted_at = Carbon::now();
-    $postlist->deleted_user_id = Auth::id();
-    $postlist->save();
-
-    // Perform the delete operation (soft delete)
-    $postlist->delete();
+    $this->postService->deletePostById($id);
 
     return redirect()->route('postlist.index')->with('success', 'Post deleted successfully');
 }

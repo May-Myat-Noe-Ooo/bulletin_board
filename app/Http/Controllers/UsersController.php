@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Models\User;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,13 @@ use App\Mail\PasswordResetMail;
 
 class UsersController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        //$this->middleware('auth')->except(['login']); // Ensure user is authenticated, except for login
+        $this->userService = $userService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -51,79 +59,17 @@ class UsersController extends Controller
                 'password_confirmation.required' => 'Password cannot be blank.',
             ],
         );
+        // Prepare data for the service
+        $data = $request->only('name', 'email', 'password', 'phone', 'dob', 'address');
 
-        // Check for a soft-deleted user with the same name or email
-        $softDeletedUser = User::onlyTrashed()
-            ->where(function ($query) use ($request) {
-                $query->where('name', $request->name)->orWhere('email', $request->email);
-            })
-            ->first();
+        // Call the signup method in UserService
+        $result = $this->userService->signup($data);
 
-        if ($softDeletedUser) {
-            // Restore the soft deleted post
-            $softDeletedUser->restore();
-
-            // Update the restored post with new description if needed
-            $softDeletedUser->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'phone' => $request->phone,
-                'dob' => $request->date,
-                'address' => $request->address,
-                'profile' => 'img/defaultprofile.png',
-                'type' => '1',
-                'create_user_id' => $softDeletedUser->id,
-                'updated_user_id' => $softDeletedUser->id,
-            ]);
-            //// Update the existing soft-deleted user
-            //$softDeletedUser->name = $request->name;
-            //$softDeletedUser->email = $request->email;
-            //$softDeletedUser->password = Hash::make($request->password);
-            //$softDeletedUser->profile = ' ';
-            //$softDeletedUser->create_user_id = $softDeletedUser->id;
-            //$softDeletedUser->updated_user_id = $softDeletedUser->id;
-            //$softDeletedUser->deleted_at = null; // Reset the deleted_at field
-            //$softDeletedUser->save();
-
-            // Redirect to the login page with a success message
-            return redirect()->route('login.index')->with('success', 'Account reactivated successfully. Log in again.');
-        } else {
-            // Check for existing active users with the same name or email
-            $activeUserExists = User::where('name', $request->name)
-                ->orWhere('email', $request->email)
-                ->exists();
-
-            if ($activeUserExists) {
-                // If an active user with the same name or email exists, show error messages
-                return redirect()
-                    ->back()
-                    ->withErrors([
-                        'name' => 'Name must be unique.',
-                        'email' => 'Email must be unique.',
-                    ])
-                    ->withInput();
-            }
-
-            // If no soft-deleted or active user exists with the same name or email, pass the data as usual
-            // Create a new user
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'profile' => 'img/defaultprofile.png',
-                'create_user_id' => 1,
-                'updated_user_id' => 1,
-            ]);
-
-            // Update the create_user_id field to be the same as the user's id
-            $user->create_user_id = $user->id;
-            $user->updated_user_id = $user->id;
-            $user->save();
-
-            // Redirect to the login page with a success message
-            return redirect()->route('login.index')->with('success', 'Account created successfully. Log in again.');
+        if (isset($result['error_html'])) {
+            return redirect()->back()->withErrors($result['error_html'])->withInput();
         }
+
+        return redirect()->route('login.index')->with('success', $result['success']);
     }
 
     public function login(\Illuminate\Http\Request $request)
@@ -143,24 +89,14 @@ class UsersController extends Controller
 
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
-        if (Auth::attempt($credentials)) {
-            // Authentication passed, redirect to post list
-            if ($remember) {
-                // Set a cookie that lasts for one week
-                cookie()->queue('remember_email', $request->email, 10080);
-                cookie()->queue('remember_password', $request->password, 10080);
-            }
-            return redirect()->route('postlist.index');
+        // Call AuthService login method
+        $loginResult = $this->userService->login($credentials, $remember);
+        if (isset($loginResult['error'])) {
+            return redirect()->back()->with('error', $loginResult['error'])->withInput();
         }
 
-        // Check if email exists in the database
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return redirect()->back()->with('error', 'There is no such account. Please sign up and create an account.');
-        }
 
-        // Check if the password is incorrect
-        return redirect()->back()->with('error', 'Incorrect password. Please try again.');
+        return redirect()->route('postlist.index');
     }
 
     public function logout(Request $request)
@@ -199,63 +135,28 @@ class UsersController extends Controller
                 'profile.required' => 'Profile cannot be blank',
             ],
         );
+        // Prepare data for the service
+        $data = $request->only('name', 'email', 'password', 'password_confirmation', 'type', 'phone', 'date', 'address', 'profile');
 
-        // Check for a soft-deleted user with the same name or email
-        $softDeletedUser = User::onlyTrashed()
-            ->where(function ($query) use ($request) {
-                $query->where('name', $request->name)->orWhere('email', $request->email);
-            })
-            ->first();
+        // Call the confirmRegister method in UserService
+        $result = $this->userService->confirmRegister($data);
 
-        // If a soft-deleted user exists, pass the data as usual
-        if ($softDeletedUser) {
-            $name = $request->name;
-            $email = $request->email;
-            $password = $request->password;
-            $cpassword = $request->password_confirmation;
-            $type = $request->type;
-            $phone = $request->phone;
-            $dob = $request->date;
-            $address = $request->address;
-            $imageName = time() . '.' . $request->profile->extension();
-            $success = $request->profile->move(public_path('img'), $imageName);
-            $imagePath = 'img/' . $imageName;
-            $profile = 'img/' . $imageName;
-
-            return view('home.confirmregister', compact('name', 'email', 'password', 'cpassword', 'type', 'phone', 'dob', 'address', 'imagePath', 'profile'));
-        } else {
-            // Check for existing active users with the same name or email
-            $activeUserExists = User::where('name', $request->name)
-                ->orWhere('email', $request->email)
-                ->exists();
-
-            if ($activeUserExists) {
-                // If an active user with the same name or email exists, show error messages
-                return redirect()
-                    ->back()
-                    ->withErrors([
-                        'name' => 'Name must be unique.',
-                        'email' => 'Email must be unique.',
-                    ])
-                    ->withInput();
-            }
-
-            // If no soft-deleted or active user exists with the same name or email, pass the data as usual
-            $name = $request->name;
-            $email = $request->email;
-            $password = $request->password;
-            $cpassword = $request->password_confirmation;
-            $type = $request->type;
-            $phone = $request->phone;
-            $dob = $request->date;
-            $address = $request->address;
-            $imageName = time() . '.' . $request->profile->extension();
-            $success = $request->profile->move(public_path('img'), $imageName);
-            $imagePath = 'img/' . $imageName;
-            $profile = 'img/' . $imageName;
-
-            return view('home.confirmregister', compact('name', 'email', 'password', 'cpassword', 'type', 'phone', 'dob', 'address', 'imagePath', 'profile'));
+        if (isset($result['error_html'])) {
+            return redirect()->back()->withErrors($result['error_html'])->withInput();
         }
+
+        return view('home.confirmregister', [
+            'name'=> $result['name'], 
+            'email'=> $result['email'], 
+            'password'=> $result['password'], 
+            'cpassword'=> $result['cpassword'],
+             'type'=> $result['type'],
+              'phone'=> $result['phone'], 
+              'dob'=> $result['dob'], 
+              'address'=> $result['address'], 
+              'imagePath'=> $result['imagePath'], 
+              'profile'=> $result['profile']
+            ]);
     }
 
     public function create()
@@ -273,74 +174,17 @@ class UsersController extends Controller
 
     public function storeRegisterUser(\Illuminate\Http\Request $request)
     {
-        // Check for a soft-deleted user with the same name or email
-        $softDeletedUser = User::onlyTrashed()
-            ->where(function ($query) use ($request) {
-                $query->where('name', $request->name)->orWhere('email', $request->email);
-            })
-            ->first();
+        // Prepare data for the service
+        $data = $request->only('name', 'email', 'password', 'password_confirmation', 'type', 'phone', 'date', 'address', 'profile_path');
+        // Call the storeRegisterUser method in UserService
+        $result = $this->userService->storeRegisterUser($data);
 
-        // If a soft-deleted user exists, pass the data as usual
-        if ($softDeletedUser) {
-            // Restore the soft deleted post
-            $softDeletedUser->restore();
-
-            // Update the restored post with new description if needed
-            $softDeletedUser->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'phone' => $request->phone,
-                'dob' => $request->date,
-                'address' => $request->address,
-                'profile' => $request->profile_path,
-                'type' => $request->type == 'Admin' ? 0 : 1,
-                'create_user_id' => Auth::id(),
-                'updated_user_id' => Auth::id(),
-            ]);
-
-            return redirect()->route('displayuser')->with('success', 'Register user added successfully');
-        } else {
-            // Check for existing active users with the same name or email
-            $activeUserExists = User::where('name', $request->name)
-                ->orWhere('email', $request->email)
-                ->exists();
-
-            if ($activeUserExists) {
-                // If an active user with the same name or email exists, show error messages
-                return redirect()
-                    ->back()
-                    ->withErrors([
-                        'name' => 'Name must be unique.',
-                        'email' => 'Email must be unique.',
-                    ])
-                    ->withInput();
-            }
-
-            // If no soft-deleted or active user exists with the same name or email, pass the data as usual
-            // Create a new user
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'phone' => $request->phone,
-                'dob' => $request->date,
-                'address' => $request->address,
-                'profile' => $request->profile_path,
-                'type' => $request->type == 'Admin' ? 0 : 1,
-                'create_user_id' => Auth::id(),
-                'updated_user_id' => Auth::id(),
-            ]);
-
-            // // Update the create_user_id and updated_user_id fields to be the same as the user's id
-            // $user->create_user_id = Auth::id();
-            // $user->updated_user_id = $user->id;
-            // $user->save();
-
-            // Redirect to the user list page with a success message
-
-            return redirect()->route('displayuser')->with('success', 'Register user added successfully');
+        if (isset($result['error_html'])) {
+            return redirect()->back()->withErrors($result['error_html'])->withInput();
         }
+
+        return redirect()->route('displayuser')->with('success', $result['success']);
+        
     }
 
     /**
@@ -400,14 +244,14 @@ class UsersController extends Controller
 
     public function showProfile(string $id)
     {
-        $user = User::findOrFail($id);
-        //dd($user->profile);
+        $user = $this->userService->getUserById($id);
         return view('home.profile', compact('user'));
     }
 
     public function editProfile(\Illuminate\Http\Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        //$user = User::findOrFail($id);
+        $user = $this->userService->getUserById($id);
         return view('home.editProfile', compact('user'));
     }
 
