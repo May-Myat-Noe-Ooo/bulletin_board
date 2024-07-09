@@ -17,7 +17,7 @@ class LikeService
     public function toggleLike(Post $post): array
     {
         $user = Auth::user();
-        $like = Like::where('user_id', $user->id)->where('post_id', $post->id)->first();
+        $like = Like::findByUserAndPost($user->id, $post->id);
         $likedByUser = false;
 
         if ($like) {
@@ -31,7 +31,7 @@ class LikeService
         }
 
         return [
-            'likes_count' => $post->likes()->count(),
+            'likes_count' => $post->likesCount(),
             'liked_by_user' => $likedByUser,
             'likers' => $this->formatLikers($post),
         ];
@@ -59,7 +59,7 @@ class LikeService
      */
     private function formatLikers(Post $post): array
     {
-        return $post->likes()->with('user')->orderBy('created_at', 'desc')->get()->map(function ($like) {
+        return $post->likers()->map(function ($like) {
             return [
                 'name' => $like->user->name,
                 'profile' => asset($like->user->profile)

@@ -3,13 +3,87 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\User;
+use App\Models\Post;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordResetMail;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserService
 {
+    /* Get post according to query and role for Postlist display UI */
+    public function getUsers(Request $request): LengthAwarePaginator
+    {
+        // Get search parameters
+        $name = $request->input('name');
+        $email = $request->input('mailaddr');
+        $fromDate = $request->input('from-date');
+        $toDate = $request->input('to-date');
+        $pageSize = $request->input('page-size', 4); // Default page size is 5
+        //// Fetch the filtered users using the model method
+        //$userlist = User::getFilteredUsers($name, $email, $fromDate, $toDate, $pageSize);
+        // Get the authenticated user's type
+        //$userType = Auth::user()->type;
+        if (Auth::user()->type == 0) {
+            // Base query for users, excluding soft-deleted users
+            $userlist = User::whereNull('deleted_at')
+                ->when($name, function ($query, $name) {
+                    return $query->where('name', 'LIKE', "%{$name}%");
+                })
+                ->when($email, function ($query, $email) {
+                    return $query->where('email', 'LIKE', "%{$email}%");
+                })
+                ->when($fromDate, function ($query, $fromDate) {
+                    return $query->whereDate('created_at', '>=', $fromDate);
+                })
+                ->when($toDate, function ($query, $toDate) {
+                    return $query->whereDate('created_at', '<=', $toDate);
+                })
+                ->orderBy('id', 'DESC')
+                ->paginate($pageSize);
+        } else {
+            $userlist = User::where('create_user_id', Auth::id())
+                ->whereNull('deleted_at')
+                ->when($name, function ($query, $name) {
+                    return $query->where('name', 'LIKE', "%{$name}%");
+                })
+                ->when($email, function ($query, $email) {
+                    return $query->where('email', 'LIKE', "%{$email}%");
+                })
+                ->when($fromDate, function ($query, $fromDate) {
+                    return $query->whereDate('created_at', '>=', $fromDate);
+                })
+                ->when($toDate, function ($query, $toDate) {
+                    return $query->whereDate('created_at', '<=', $toDate);
+                })
+                ->orderBy('id', 'DESC')
+                ->paginate($pageSize);
+        }
+        // Pass additional data to the view
+    $userlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
+
+        return $userlist;
+    }
+    /* Delete user according to specific id */
+    public function deleteUserById(string $id): void
+    {
+        $user = User::findOrFail($id);
+
+        // Update fields before deleting (soft delete)
+        $user->deleted_at = Carbon::now();
+        $user->deleted_user_id = Auth::id();
+        $user->save();
+
+        // Hard delete all posts related to the user
+        Post::where('create_user_id', $user->id)->forceDelete();
+    }
     /**
      * Handle user login.
      *
@@ -262,4 +336,103 @@ class UserService
 
         return $user;
     }
+    /**
+     * Update user profile.
+     *
+     * @param Request $request
+     * @param string $id
+     * @return array
+     */
+    public function updateProfile(Request $request, string $id): array
+    {
+        $user = User::findOrFail($id);
+
+        $user->name = $request->input('name');
+        $user->type = $request->input('type');
+        $user->email = $request->input('email');
+        $user->phone = $request->input('phone');
+        $user->dob = $request->input('date');
+        $user->address = $request->input('address');
+
+        // Handle profile image upload
+        if ($request->hasFile('profile')) {
+            $imageName = time() . '.' . $request->profile->extension();
+            $request->profile->move(public_path('img'), $imageName);
+            $user->profile = 'img/' . $imageName;
+        }
+        $user->updated_user_id = Auth::id();
+
+        $user->save();
+
+        return ['success' => 'Profile updated successfully.'];
+    }
+    /* Password Section */
+    /*Update Password normal*/
+    public function updatePassword(Request $request, string $id): array
+    {
+        $user = User::find($id);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return ['error' => 'Current password is incorrect'];
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return ['success' => 'Password updated successfully.'];
+    }
+    /*Send Reset Link */
+    public function sendResetLink(Request $request): array
+    {
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return ['error' => 'Email does not exist in the system'];
+        }
+
+        $token = Str::random(60);
+
+        DB::table('password_resets')->insert([
+            'email' => $request->email,
+            'token' => $token,
+            'created_at' => now(),
+        ]);
+        // dd($user);
+        Mail::to($request->email)->send(new PasswordResetMail($user, $token));
+
+        return [
+            'success' => 'Email sent with password reset instructions.',
+        ];
+    }
+    /* Reset Password */
+    public function resetPassword(\Illuminate\Http\Request $request): array
+    {
+        $passwordReset = DB::table('password_resets')
+            ->where('token', $request->token)
+            ->first();
+
+        if (!$passwordReset) {
+            return ['error'=>['token' => 'Invalid token']];
+        }
+
+        $user = User::where('email', $passwordReset->email)->first();
+
+        if (!$user) {
+            return ['error'=>['email' => 'Email does not exist']];
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        DB::table('password_resets')
+            ->where('email', $user->email)
+            ->delete();
+
+            return [
+                'success' => 'Password has been reset.',
+            ];
+
+    }
+
 }

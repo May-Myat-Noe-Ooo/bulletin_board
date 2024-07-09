@@ -50,7 +50,7 @@
                         <div class="row d-flex justify-content-center align-content-center">
                             <div class="col-sm-8 offset-sm-6">
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init
-                                    class="btn btn-success btn-block col-sm-8">Update Password</button>
+                                    class="btn btn-dark btn-block update-btn col-sm-8">Update Password</button>
                             </div>
                         </div>
                     </div>

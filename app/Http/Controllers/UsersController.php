@@ -192,52 +192,8 @@ class UsersController extends Controller
      */
     public function displayUser(Request $request)
     {
-        // Get search parameters
-        $name = $request->input('name');
-        $email = $request->input('mailaddr');
-        $fromDate = $request->input('from-date');
-        $toDate = $request->input('to-date');
+        $userlist = $this->userService->getUsers($request);
         $pageSize = $request->input('page-size', 4); // Default page size is 5
-
-        // Get the authenticated user's type
-        //$userType = Auth::user()->type;
-        if (Auth::user()->type == 0) {
-            // Base query for users, excluding soft-deleted users
-            $userlist = User::whereNull('deleted_at')
-                ->when($name, function ($query, $name) {
-                    return $query->where('name', 'LIKE', "%{$name}%");
-                })
-                ->when($email, function ($query, $email) {
-                    return $query->where('email', 'LIKE', "%{$email}%");
-                })
-                ->when($fromDate, function ($query, $fromDate) {
-                    return $query->whereDate('created_at', '>=', $fromDate);
-                })
-                ->when($toDate, function ($query, $toDate) {
-                    return $query->whereDate('created_at', '<=', $toDate);
-                })
-                ->orderBy('id', 'DESC')
-                ->paginate($pageSize);
-        } else {
-            $userlist = User::where('create_user_id', Auth::id())
-                ->whereNull('deleted_at')
-                ->when($name, function ($query, $name) {
-                    return $query->where('name', 'LIKE', "%{$name}%");
-                })
-                ->when($email, function ($query, $email) {
-                    return $query->where('email', 'LIKE', "%{$email}%");
-                })
-                ->when($fromDate, function ($query, $fromDate) {
-                    return $query->whereDate('created_at', '>=', $fromDate);
-                })
-                ->when($toDate, function ($query, $toDate) {
-                    return $query->whereDate('created_at', '<=', $toDate);
-                })
-                ->orderBy('id', 'DESC')
-                ->paginate($pageSize);
-        }
-        // Pass additional data to the view
-    $userlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
         // Return the view with the user list
         return view('home.userlist', compact('userlist', 'pageSize'));
     }
@@ -250,7 +206,6 @@ class UsersController extends Controller
 
     public function editProfile(\Illuminate\Http\Request $request, $id)
     {
-        //$user = User::findOrFail($id);
         $user = $this->userService->getUserById($id);
         return view('home.editProfile', compact('user'));
     }
@@ -258,7 +213,7 @@ class UsersController extends Controller
     //User/Admin password control section start
     public function changePassword($id)
     {
-        $user = User::find($id);
+        $user = $this->userService->getUserById($id);
         return view('home.changepassword', compact('user'));
     }
 
@@ -270,16 +225,13 @@ class UsersController extends Controller
             'new_password_confirmation' => 'required|same:new_password',
         ]);
 
-        $user = User::find($id);
-
-        if (!Hash::check($request->current_password, $user->password)) {
+        // Call the updatePassword method in UserService
+        $result = $this->userService->updatePassword($request, $id);
+        if (isset($result['error'])) {
             return back()->withErrors(['current_password' => 'Current password is incorrect']);
         }
 
-        $user->password = Hash::make($request->new_password);
-        $user->save();
-
-        return redirect()->route('displayuser')->with('success', 'Password updated successfully');
+        return redirect()->route('displayuser')->with('success', $result['success']);
     }
     //Forgot Password session
     public function forgotPassword()
@@ -292,24 +244,13 @@ class UsersController extends Controller
         $request->validate([
             'email' => 'required|email',
         ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return back()->withErrors(['email' => 'Email does not exist in the system']);
+        // Call the sendResetLink method in UserService
+        $result = $this->userService->sendResetLink($request);
+        if (isset($result['error'])) {
+            return back()->withErrors(['email' => $result['error']]);
         }
 
-        $token = Str::random(60);
-
-        DB::table('password_resets')->insert([
-            'email' => $request->email,
-            'token' => $token,
-            'created_at' => now(),
-        ]);
-        // dd($user);
-        Mail::to($request->email)->send(new PasswordResetMail($user, $token));
-
-        return redirect()->route('login.index')->with('success', 'Email sent with password reset instructions.');
+        return redirect()->route('login.index')->with('success', $result['success']);
     }
 
     public function showResetForm($token)
@@ -332,67 +273,22 @@ class UsersController extends Controller
             ],
         );
 
-        $passwordReset = DB::table('password_resets')
-            ->where('token', $request->token)
-            ->first();
-
-        if (!$passwordReset) {
-            return back()->withErrors(['token' => 'Invalid token']);
+        // Call the resetPassword method in UserService
+        $result = $this->userService->resetPassword($request);
+        if (isset($result['error'])) {
+            return back()->withErrors($result['error'])->withInput();
         }
 
-        $user = User::where('email', $passwordReset->email)->first();
-
-        if (!$user) {
-            return back()->withErrors(['email' => 'Email does not exist']);
-        }
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        DB::table('password_resets')
-            ->where('email', $user->email)
-            ->delete();
-
-        return redirect()->route('login.index')->with('success', 'Password has been reset.');
+        return redirect()->route('login.index')->with('success', $result['success']);
     }
+//User/Admin password control section end
 
-    //User/Admin password control section end
-
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
     //update profile
     public function updateProfile(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-
-        $user->name = $request->input('name');
-        $user->type = $request->input('type');
-        $user->email = $request->input('email');
-        $user->phone = $request->input('phone');
-        $user->dob = $request->input('date');
-        $user->address = $request->input('address');
-
-        // Handle profile image upload
-        if ($request->hasFile('profile')) {
-            $imageName = time() . '.' . $request->profile->extension();
-            $request->profile->move(public_path('img'), $imageName);
-            $user->profile = 'img/' . $imageName;
-        }
-        $user->updated_user_id = Auth::id();
-
-        $user->save();
-
-        return redirect()->route('displayuser')->with('success', 'Profile updated successfully.');
+        // Call the updateProfile method in UserService
+        $result = $this->userService->updateProfile($request, $id);
+        return redirect()->route('displayuser')->with('success', $result['success']);
     }
 
     /**
@@ -400,15 +296,7 @@ class UsersController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
-
-        // Update fields before deleting (soft delete)
-        $user->deleted_at = Carbon::now();
-        $user->deleted_user_id = Auth::id();
-        $user->save();
-
-        // Hard delete all posts related to the user
-        Post::where('create_user_id', $user->id)->forceDelete();
+        $this->userService->deleteUserById($id);
 
         return redirect()->route('displayuser')->with('success', 'User deleted successfully');
     }

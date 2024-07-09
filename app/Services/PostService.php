@@ -25,37 +25,7 @@ class PostService
         $pageSize = $request->input('page-size', 6);
         $route = $request->route()->getName();
 
-        if (Auth::check()) {
-            if (Auth::user()->type == 0) {
-                // Admin user
-                $postlist = Post::when($route == 'home', function ($query) {
-                    return $query->where('status', 1);
-                })->when($keyword, function ($query, $keyword) {
-                    return $query->where('title', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })->orderBy('id', 'DESC')->paginate($pageSize);
-            } else {
-                // Regular user
-                $postlist = Post::when($route == 'postlist.index', function ($query) {
-                    return $query->where('create_user_id', Auth::id());
-                }, function ($query) {
-                    return $query->where('status', 1);
-                })->when($keyword, function ($query, $keyword) {
-                    return $query->where('title', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })->orderBy('id', 'DESC')->paginate($pageSize);
-            }
-        } else {
-            // Unauthenticated users
-            $postlist = Post::where('status', 1)
-                ->when($keyword, function ($query, $keyword) {
-                    return $query->where('title', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })->orderBy('id', 'DESC')->paginate($pageSize);
-        }
+        $postlist = Post::getFilteredPosts($keyword, $pageSize, $route);
 
         $postlist->appends(['page-size' => $pageSize]);
 
@@ -64,11 +34,7 @@ class PostService
     /* Get each post according to the id for edit */
     public function getPostById(string $id): Post
     {
-        $post = Post::find($id);
-
-        if (!$post) {
-            throw new ModelNotFoundException("Post not found");
-        }
+        $post = Post::findByIdOrFail($id);
 
         return $post;
     }
@@ -100,7 +66,7 @@ class PostService
      */
     public function updatePost(Request $request, string $id): void
     {
-        $post = Post::findOrFail($id);
+        $post = Post::findByIdOrFail($id);
         $post->status = $request->input('toggle_switch');
         $post->updated_user_id = Auth::id();
         $post->update($request->all());
@@ -108,7 +74,7 @@ class PostService
     /* Delete post according to specific id */
     public function deletePostById(string $id): void
     {
-        $post = Post::findOrFail($id);
+        $post = Post::findByIdOrFail($id);
 
     /*Update fields before deleting (soft delete)*/
     //$postlist->deleted_at = Carbon::now();
@@ -143,12 +109,14 @@ class PostService
     public function storePost(array $validatedData): void
     {
        // Create a new post
-       $post = Post::create([
+       $data = [
         'title' => $validatedData['title'],
         'description' => $validatedData['description'],
-        'create_user_id' => auth()->id(),
-        'updated_user_id' => auth()->id(),
-    ]);
+        'create_user_id' => Auth::id(),
+        'updated_user_id' => Auth::id(),
+    ];
+
+    Post::createNewPost($data);
     }
     /**
      * Upload and process the CSV file.
@@ -206,13 +174,13 @@ class PostService
                 }
 
                 // Check for unique title in the database
-                if (Post::where('title', $record['title'])->exists()) {
+                if (Post::titleExists($record['title'])) {
                     $errors[] = 'Row ' . ($index + 1) . ": The title '{$record['title']}' has already been taken.";
                     continue;
                 }
 
                 // Create a new postlist entry
-                Post::create([
+                Post::createNewPost([
                     'title' => $record['title'],
                     'description' => $record['description'],
                     'status' => $record['status'],
@@ -241,42 +209,11 @@ class PostService
     public function export($request): StreamedResponse
     {
         $keyword = $request->input('search-keyword');
-        $currentRoute = $request->input('current-route');
+        $route = $request->input('current-route');
 
-        if (Auth::check()) {
-            if (Auth::user()->type == 0) {
-                // Admin user: can search all posts if on 'postlist', or only all active posts on 'home'
-                $postlist = Post::when($currentRoute == 'home', function ($query) {
-                    return $query->where('status', 1);
-                })->when($keyword, function ($query, $keyword) {
-                    return $query->where('title', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })
-                ->get();
-            } else {
-                // Regular user: can only search their own posts if on 'postlist', or all active posts on 'home'
-                $postlist = Post::when($currentRoute == 'postlist.index', function ($query) {
-                    return $query->where('create_user_id', Auth::id());
-                }, function ($query) {
-                    return $query->where('status', 1);
-                })->when($keyword, function ($query, $keyword) {
-                    return $query->where('title', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })
-                ->get();
-            }
-        } else {
-            // Unauthenticated users: can view all posts with status 1
-            $postlist = Post::where('status', 1)
-                ->when($keyword, function ($query, $keyword) {
-                    return $query->where('title', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('description', 'LIKE', "%{$keyword}%")
-                                 ->orWhere('created_at', 'LIKE', "%{$keyword}%");
-                })->get();
-        }
-
+        // Fetch the filtered posts using the model method
+        $postlist = Post::getFilteredPostsForExport($keyword, $route);
+        // Handle the CSV export logic
         return new StreamedResponse(
             function () use ($postlist) {
                 $handle = fopen('php://output', 'w');
