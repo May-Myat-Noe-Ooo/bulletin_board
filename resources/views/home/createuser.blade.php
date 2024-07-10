@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('body')
-    <div class="container-md col-sm-7 mt-5">
+    <div class="container-md col-sm-7 mt-2 mb-2">
         <!-- Create User/Register Begin -->
         <div class="post-option">
             <div class="container">
@@ -50,7 +50,7 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-6 ">Password</label>
                             <div class="col-sm-8"><input type="password" name="password" id="password" class="form-control"
-                                    value="">
+                                    value="{{ old('password') }}">
                                     @error('password')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -61,7 +61,7 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-6 ">Password Confirmation</label>
                             <div class="col-sm-8"><input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-                                    value="">
+                                    value="{{ old('password_confirmation') }}">
                                     @error('password_confirmation')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -73,8 +73,8 @@
                             <label for="" class="form-label col-sm-6 ">Type</label>
                             <div class="col-sm-8">
                                 <select name="type" id="type" class="form-select ">
-                                    <option value="0">Admin</option>
-                                    <option value="1">User</option>
+                                    <option value="0" {{ old('type') == 0 ? 'selected' : '' }}>Admin</option>
+                                    <option value="1" {{ old('type') == 1 ? 'selected' : '' }}>User</option>
                                 </select>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-6 ">Phone</label>
-                            <div class="col-sm-8"><input type="tel" name="phone" class="form-control" value="">
+                            <div class="col-sm-8"><input type="tel" name="phone" class="form-control" value="{{ old('phone') }}">
                             </div>
                         </div>
                     </div>
@@ -90,14 +90,14 @@
                         <div class="col d-flex  justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-6 ">Date of Birth</label>
                             <div class="col-sm-8">
-                                <input class="form-control form-control-lg" id="dd" type="date" name="date" />
+                                <input class="form-control form-control-lg" id="dd" type="date" name="date" value="{{ old('date') }}">
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-6 ">Address</label>
-                            <div class="col-sm-8"><input type="text" name="address" class="form-control" value="">
+                            <div class="col-sm-8"><input type="text" name="address" class="form-control" value="{{ old('address') }}">
                             </div>
                         </div>
                     </div>
@@ -105,7 +105,7 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label class="form-label col-sm-6 required" for="customFile">Profile</label>
                             <div class="col-sm-8">
-                                <input type="file" name="profile" class="form-control" id="profile">
+                                <input type="file" name="profile" class="form-control" id="profile" value="{{ old('profile') }}">
                                 @error('profile')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror

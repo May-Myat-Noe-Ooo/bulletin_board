@@ -2,7 +2,7 @@
 
 @section('body')
 
-    <div class="col float-middle mb-5 mt-5">
+    <div class="col float-middle mb-2 mt-2">
         <!-- Userlist Begin -->
         <div class="post-option">
             <div class="container">
@@ -92,8 +92,6 @@
                                    data-updated="{{ $rs->updated_at }}"
                                    data-updated-user="{{ $rs->updatedBy->name }}">
                                     <i class="bi bi-info-circle me-2"></i>Details</a></li>
-                            <li><a class="dropdown-item" href="#">
-                                    <i class="bi bi-pencil-square me-2"></i>Edit</a></li>
                             <li><a class="dropdown-item text-danger" href="#"
                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
                                    data-id="{{ $rs->id }}" data-name="{{ $rs->name }}"

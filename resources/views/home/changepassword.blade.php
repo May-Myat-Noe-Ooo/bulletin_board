@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('body')
-    <div class="container-md col-sm-7 mt-5">
+    <div class="container-md col-sm-7 mt-2 mb-2">
         <!-- Change Password Begin -->
         <div class="post-option">
             <div class="container">
@@ -60,7 +60,7 @@
                     </div>
                     <div class="row mb-4">
                         <div class="col d-flex justify-content-around align-content-center">
-                            <div class="col-sm-8 offset-sm-6">
+                            <div class="col-sm-8 offset-sm-4">
                                 <button type="submit" data-mdb-button-init data-mdb-ripple-init
                                     class="btn btn-success btn-dark update-btn col-sm-8">Update Password</button>
                             </div>

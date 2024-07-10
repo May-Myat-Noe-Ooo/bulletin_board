@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('body')
-    <div class="container-fluid mt-5">
+    <div class="container-fluid mt-2 mb-2">
         <!-- Dashboard Begin -->
         <div class="post-option">
             <div class="container">

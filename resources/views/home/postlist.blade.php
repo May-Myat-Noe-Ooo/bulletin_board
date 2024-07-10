@@ -3,7 +3,7 @@
 @section('body')
 
 
-    <div class="container-md col-sm-12 mt-5">
+    <div class="container-md col-sm-12 mt-2 mb-2">
         <!-- Postlist Begin -->
         <div class="post-option">
             <div class="container">
@@ -83,6 +83,15 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end"
                                                     aria-labelledby="dropdownMenuButton">
+                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
+                                                        data-description="{{ $rs->description }}"
+                                                        data-status="{{ $rs->status }}"
+                                                        data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                        data-created="{{ $rs->created_at }}" data-updated="{{ $rs->updated_at }}"
+                                                        data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                        >
+                                                         <i class="bi bi-info-circle me-2"></i>Details</a></li>
                                                     <li>
                                                         <a href="{{ route('postlist.edit', $rs->id) }}" class="dropdown-item">
                                                             <i class="bi bi-pencil-square text-primary"></i> Edit
@@ -110,7 +119,8 @@
                                             data-status="{{ $rs->status }}"
                                             data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
                                             data-created="{{ $rs->created_at }}" data-updated="{{ $rs->updated_at }}"
-                                            data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}">
+                                            data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                            style="opacity: {{ $rs->status == 0 ? '0.5' : '1' }}">
                                             {{ $rs->title }}
                                         </a>
                                     </h5>
@@ -124,7 +134,8 @@
                                                 data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
                                                 data-created="{{ $rs->created_at }}"
                                                 data-updated="{{ $rs->updated_at }}"
-                                                data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}">
+                                                data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                style="opacity: {{ $rs->status == 0 ? '0.5' : '1' }}">
                                                 See more
                                             </a>
                                         @else
@@ -132,12 +143,7 @@
                                         @endif
                                     </p>
                                 </div>
-                                {{--<div class="card-footer d-flex justify-content-between align-items-center">
-                                    <span class="likes-count" data-post-id="{{ $rs->id }}">{{ $rs->likes->count() }} Likes</span>
-                                    <button class="btn btn-like" type="button" data-post-id="{{ $rs->id }}">
-                                        <i class="bi bi-hand-thumbs-up"></i> Like
-                                    </button>
-                                </div>--}}
+                                @auth
                                 <div class="card-footer d-flex justify-content-between align-items-center">
                                     <span class="likes-count" data-post-id="{{ $rs->id }}" data-bs-toggle="modal"
                                         data-bs-target="#likesModal" style="cursor:pointer;">
@@ -147,6 +153,7 @@
                                         <i class="bi bi-hand-thumbs-up"></i> Like
                                     </button>
                                 </div>
+                                @endauth
                             </div>
                         </div>
                     @endforeach

@@ -1,20 +1,25 @@
 @extends('layouts.app')
 
 @section('body')
-    <div class="container-md col-sm-7 mt-5">
+    <div class="container-md col-sm-7 mt-2 mb-2">
         <div class="card">
             <div class="card-header bg-light text-black">
                 Log in
             </div>
+            @if (Session::has('success'))
+                <div id="success-message" class="alert alert-success" role="alert">
+                    {{ Session::get('success') }}
+                </div>
+            @endif
+            @if (Session::has('error'))
+                <div id="error-message" class="alert alert-danger" role="alert">
+                    {{ Session::get('error') }}
+                </div>
+            @endif
             <div class="card-body d-flex justify-content-center">
                 <form class="form-horizontal" action="{{ route('login.store') }}" method="POST" novalidate
                     style="max-width: 400px; width: 100%;">
                     @csrf
-                    @if (session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4 ">Email:</label>
@@ -34,7 +39,8 @@
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4 ">Password:</label>
-                            <div class="col-sm-8"><input id="password" type="password" name="password"
+                            <div class="col-sm-8">
+                                <input id="password" type="password" name="password"
                                     class="form-control @error('password') is-invalid @enderror"
                                     value="{{ old('password', Cookie::get('remember_password')) }}" required
                                     autocomplete="current-password" style="max-width: 100%;">
@@ -75,13 +81,28 @@
                             </div>
                         </div>
                     </div>
-                    @if (session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
                 </form>
             </div>
         </div>
     </div>
+<script>
+    // Function to make the success message disappear after a few seconds
+    document.addEventListener('DOMContentLoaded', function() {
+            const successMessage = document.getElementById('success-message');
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000); // 3000 milliseconds = 3 seconds
+            }
+
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000); // 3000 milliseconds = 3 seconds
+            }
+        });
+    
+
+    </script>
 @endsection

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('body')
-    <div class="container-md col-sm-7 mt-5">
+    <div class="container-md col-sm-7 mt-2 mb-2">
         <!-- Register Confirm Begin -->
         <div class="post-option">
             <div class="container">
