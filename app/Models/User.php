@@ -11,6 +11,10 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
@@ -73,12 +77,13 @@ class User extends Authenticatable
     {
         return self::selectRaw('COUNT(*) as count, MONTH(created_at) as month')->groupBy('month')->get();
     }
+
     /* User Service Query */
     // Define the query method for fetching filtered users
     public static function getFilteredUsers($name = null, $email = null, $fromDate = null, $toDate = null, $pageSize = 4): LengthAwarePaginator
     {
         return self::whereNull('deleted_at')
-            ->when(Auth::user()->type !== 0, function ($query) {
+            ->when(Auth::check() && Auth::user()->type != 0, function ($query) {
                 return $query->where('create_user_id', Auth::id());
             })
             ->when($name, function ($query, $name) {
@@ -96,4 +101,126 @@ class User extends Authenticatable
             ->orderBy('id', 'DESC')
             ->paginate($pageSize);
     }
+
+    public static function findUserByIdOrFail(string $id): self
+    {
+        $user = self::findOrFail($id);
+
+        return $user;
+    }
+
+    public function softDeleteUser(): void
+    {
+        $this->deleted_at = Carbon::now();
+        $this->deleted_user_id = Auth::id();
+        $this->save();
+    }
+
+    public static function emailExists(string $email): bool
+    {
+        return self::where('email', $email)->exists();
+    }
+    
+    public static function findSoftDeletedUser(array $data)
+    {
+        return self::onlyTrashed()
+            ->where(function ($query) use ($data) {
+                $query->where('name', $data['name'])->orWhere('email', $data['email']);
+            })
+            ->first();
+    }
+
+    public static function activeUserExists(array $data): bool
+    {
+        return self::where('name', $data['name'])
+            ->orWhere('email', $data['email'])
+            ->exists();
+    }
+
+    public static function createUser(array $data): self
+    {
+        $user = self::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'profile' => 'img/defaultprofile.png',
+            'create_user_id' => 1,
+            'updated_user_id' => 1,
+        ]);
+
+        // Update the create_user_id and updated_user_id fields
+        $user->create_user_id = $user->id;
+        $user->updated_user_id = $user->id;
+        $user->save();
+
+        return $user;
+    }
+
+    public function updateRestoredUser(array $data): void
+    {
+        $this->update([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'phone' => $data['phone'] ?? null,
+            'dob' => $data['dob'] ?? null,
+            'address' => $data['address'] ?? null,
+            'profile' => 'img/defaultprofile.png',
+            'type' => '1',
+            'create_user_id' => $this->id,
+            'updated_user_id' => $this->id,
+        ]);
+    }
+
+    public static function createUserInRegister(array $data): self
+    {
+        $user = self::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'phone' => $data['phone'],
+               'dob' => $data['date'],
+               'address' => $data['address'],
+               'profile' => $data['profile_path'],
+               'type' => $data['type'] == 'Admin' ? 0 : 1,
+               'create_user_id' => Auth::id(),
+               'updated_user_id' => Auth::id(),
+        ]);
+
+        return $user;
+    }
+
+    public function updateRestoredUserInRegister(array $data): void
+    {
+        $this->update([
+            'name' => $data['name'],
+               'email' => $data['email'],
+               'password' => Hash::make($data['password']),
+               'phone' => $data['phone'],
+               'dob' => $data['date'],
+               'address' => $data['address'],
+               'profile' => $data['profile_path'],
+               'type' => $data['type'] == 'Admin' ? 0 : 1,
+               'create_user_id' => Auth::id(),
+               'updated_user_id' => Auth::id(),
+        ]);
+    }
+
+    public static function findByEmail(string $email): ?self
+    {
+        return self::where('email', $email)->first();
+    }
+
+    /**
+     * Reset the user's password.
+     *
+     * @param string $password
+     * @return void
+     */
+    public function resetPassword(string $password): void
+    {
+        $this->password = Hash::make($password);
+        $this->save();
+    }
+
 }

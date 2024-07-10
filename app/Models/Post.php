@@ -98,4 +98,14 @@ class Post extends Model
             })->get();;
     }
 
+    public static function deletePostByDeletedUserId(int $create_user_id,string $user_id): bool
+    {
+        return self::where('title', $title)->exists();
+    }
+
+    /* User Service Query */
+    public static function deletePostsByUserId(string $userId): void
+    {
+        self::where('create_user_id', $userId)->forceDelete();
+    }
 }

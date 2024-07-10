@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\User;
 use App\Models\Post;
+use App\Models\PasswordReset;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\DB;
@@ -27,62 +28,24 @@ class UserService
         $fromDate = $request->input('from-date');
         $toDate = $request->input('to-date');
         $pageSize = $request->input('page-size', 4); // Default page size is 5
-        //// Fetch the filtered users using the model method
-        //$userlist = User::getFilteredUsers($name, $email, $fromDate, $toDate, $pageSize);
-        // Get the authenticated user's type
-        //$userType = Auth::user()->type;
-        if (Auth::user()->type == 0) {
-            // Base query for users, excluding soft-deleted users
-            $userlist = User::whereNull('deleted_at')
-                ->when($name, function ($query, $name) {
-                    return $query->where('name', 'LIKE', "%{$name}%");
-                })
-                ->when($email, function ($query, $email) {
-                    return $query->where('email', 'LIKE', "%{$email}%");
-                })
-                ->when($fromDate, function ($query, $fromDate) {
-                    return $query->whereDate('created_at', '>=', $fromDate);
-                })
-                ->when($toDate, function ($query, $toDate) {
-                    return $query->whereDate('created_at', '<=', $toDate);
-                })
-                ->orderBy('id', 'DESC')
-                ->paginate($pageSize);
-        } else {
-            $userlist = User::where('create_user_id', Auth::id())
-                ->whereNull('deleted_at')
-                ->when($name, function ($query, $name) {
-                    return $query->where('name', 'LIKE', "%{$name}%");
-                })
-                ->when($email, function ($query, $email) {
-                    return $query->where('email', 'LIKE', "%{$email}%");
-                })
-                ->when($fromDate, function ($query, $fromDate) {
-                    return $query->whereDate('created_at', '>=', $fromDate);
-                })
-                ->when($toDate, function ($query, $toDate) {
-                    return $query->whereDate('created_at', '<=', $toDate);
-                })
-                ->orderBy('id', 'DESC')
-                ->paginate($pageSize);
-        }
+        // Fetch the filtered users using the model method
+        $userlist = User::getFilteredUsers($name, $email, $fromDate, $toDate, $pageSize);
+        
         // Pass additional data to the view
-    $userlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
+        $userlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
 
         return $userlist;
     }
     /* Delete user according to specific id */
     public function deleteUserById(string $id): void
     {
-        $user = User::findOrFail($id);
+        $user = User::findUserByIdOrFail($id);
 
-        // Update fields before deleting (soft delete)
-        $user->deleted_at = Carbon::now();
-        $user->deleted_user_id = Auth::id();
-        $user->save();
+        // Soft delete the user
+        $user->softDeleteUser();
 
         // Hard delete all posts related to the user
-        Post::where('create_user_id', $user->id)->forceDelete();
+        Post::deletePostsByUserId($user->id);
     }
     /**
      * Handle user login.
@@ -104,7 +67,7 @@ class UserService
         }
 
         // Check if email exists in the database
-        $user = User::where('email', $credentials['email'])->first();
+        $user = User::emailExists($credentials['email']);
         if (!$user) {
             return ['error'=> 'There is no such account. Please sign up and create an account.'];
         }
@@ -121,38 +84,20 @@ class UserService
     public function signup(array $data): array
     {
         // Check for a soft-deleted user with the same name or email
-        $softDeletedUser = User::onlyTrashed()
-            ->where(function ($query) use ($data) {
-                $query->where('name', $data['name'])->orWhere('email', $data['email']);
-            })
-            ->first();
+        $softDeletedUser = User::findSoftDeletedUser($data);
 
         if ($softDeletedUser) {
             // Restore the soft deleted user
             $softDeletedUser->restore();
 
             // Update the restored user with new data
-            $softDeletedUser->update([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'phone' => $data['phone'] ?? null,
-                'dob' => $data['dob'] ?? null,
-                'address' => $data['address'] ?? null,
-                'profile' => 'img/defaultprofile.png',
-                'type' => '1',
-                'create_user_id' => $softDeletedUser->id,
-                'updated_user_id' => $softDeletedUser->id,
-            ]);
-
+            $softDeletedUser->updateRestoredUser($data);
             return [
                 'success' => 'Account reactivated successfully. Log in again.',
             ];
         } else {
             // Check for existing active users with the same name or email
-            $activeUserExists = User::where('name', $data['name'])
-                ->orWhere('email', $data['email'])
-                ->exists();
+            $activeUserExists = User::activeUserExists($data);
 
             if ($activeUserExists) {
                 return [
@@ -164,19 +109,7 @@ class UserService
             }
 
             // Create a new user
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'profile' => 'img/defaultprofile.png',
-                'create_user_id' => 1,
-                'updated_user_id' => 1,
-            ]);
-
-            // Update the create_user_id and updated_user_id fields
-            $user->create_user_id = $user->id;
-            $user->updated_user_id = $user->id;
-            $user->save();
+            User::createUser($data);
 
             return [
                 'success' => 'Account created successfully. Log in again.',
@@ -192,11 +125,7 @@ class UserService
     public function confirmRegister(array $data): array
     {
         // Check for a soft-deleted user with the same name or email
-        $softDeletedUser = User::onlyTrashed()
-            ->where(function ($query) use ($data) {
-                $query->where('name', $data['name'])->orWhere('email', $data['email']);
-            })
-            ->first();
+        $softDeletedUser = User::findSoftDeletedUser($data);
 
         if ($softDeletedUser) {
             $imageName = time() . '.' . $data['profile']->extension();
@@ -217,9 +146,7 @@ class UserService
                 ];
         } else {
             // Check for existing active users with the same name or email
-            $activeUserExists = User::where('name', $data['name'])
-                ->orWhere('email', $data['email'])
-                ->exists();
+            $activeUserExists = User::activeUserExists($data);
 
             if ($activeUserExists) {
                 return [
@@ -258,37 +185,20 @@ class UserService
     public function storeRegisterUser(array $data): array
     {
         // Check for a soft-deleted user with the same name or email
-        $softDeletedUser = User::onlyTrashed()
-            ->where(function ($query) use ($data) {
-                $query->where('name', $data['name'])->orWhere('email', $data['email']);
-            })
-            ->first();
+        $softDeletedUser = User::findSoftDeletedUser($data);
         // If a soft-deleted user exists, pass the data as usual
         if ($softDeletedUser) {
            // Restore the soft deleted post
            $softDeletedUser->restore();
 
            // Update the restored post with new description if needed
-           $softDeletedUser->update([
-               'name' => $data['name'],
-               'email' => $data['email'],
-               'password' => Hash::make($data['password']),
-               'phone' => $data['phone'],
-               'dob' => $data['date'],
-               'address' => $data['address'],
-               'profile' => $data['profile_path'],
-               'type' => $data['type'] == 'Admin' ? 0 : 1,
-               'create_user_id' => Auth::id(),
-               'updated_user_id' => Auth::id(),
-           ]);
+           $softDeletedUser->updateRestoredUserInRegister($data);
            return [
             'success' => 'Register user added successfully',
         ];
         } else {
             // Check for existing active users with the same name or email
-            $activeUserExists = User::where('name', $data['name'])
-                ->orWhere('email', $data['email'])
-                ->exists();
+            $activeUserExists = User::activeUserExists($data);
 
             if ($activeUserExists) {
                 return [
@@ -301,18 +211,7 @@ class UserService
 
             /// If no soft-deleted or active user exists with the same name or email, pass the data as usual
             // Create a new user
-            $user = User::create([
-                'name' => $data['name'],
-               'email' => $data['email'],
-               'password' => Hash::make($data['password']),
-               'phone' => $data['phone'],
-               'dob' => $data['date'],
-               'address' => $data['address'],
-               'profile' => $data['profile_path'],
-               'type' => $data['type'] == 'Admin' ? 0 : 1,
-               'create_user_id' => Auth::id(),
-               'updated_user_id' => Auth::id(),
-            ]);
+            User::createUserInRegister($data);
 
             // // Update the create_user_id and updated_user_id fields to be the same as the user's id
             // $user->create_user_id = Auth::id();
@@ -328,11 +227,7 @@ class UserService
     /* Get each User according to the id for display profile for specific user */
     public function getUserById(string $id): User
     {
-        $user = User::find($id);
-
-        if (!$user) {
-            throw new ModelNotFoundException("User not found");
-        }
+        $user = User::findUserByIdOrFail($id);
 
         return $user;
     }
@@ -345,7 +240,7 @@ class UserService
      */
     public function updateProfile(Request $request, string $id): array
     {
-        $user = User::findOrFail($id);
+        $user = User::findUserByIdOrFail($id);
 
         $user->name = $request->input('name');
         $user->type = $request->input('type');
@@ -370,35 +265,27 @@ class UserService
     /*Update Password normal*/
     public function updatePassword(Request $request, string $id): array
     {
-        $user = User::find($id);
+        $user = User::findUserByIdOrFail($id);
 
         if (!Hash::check($request->current_password, $user->password)) {
             return ['error' => 'Current password is incorrect'];
         }
 
-        $user->password = Hash::make($request->new_password);
-        $user->save();
+        $user->resetPassword($request->new_password);
 
         return ['success' => 'Password updated successfully.'];
     }
     /*Send Reset Link */
     public function sendResetLink(Request $request): array
     {
-
-        $user = User::where('email', $request->email)->first();
+        // Check if email exists in the database
+        $user = User::findByEmail($request->email);       
 
         if (!$user) {
             return ['error' => 'Email does not exist in the system'];
         }
 
-        $token = Str::random(60);
-
-        DB::table('password_resets')->insert([
-            'email' => $request->email,
-            'token' => $token,
-            'created_at' => now(),
-        ]);
-        // dd($user);
+        $token = PasswordReset::createPasswordResetToken($request->email);
         Mail::to($request->email)->send(new PasswordResetMail($user, $token));
 
         return [
@@ -408,26 +295,24 @@ class UserService
     /* Reset Password */
     public function resetPassword(\Illuminate\Http\Request $request): array
     {
-        $passwordReset = DB::table('password_resets')
-            ->where('token', $request->token)
-            ->first();
+        // Query to find the password reset entry by token
+        $passwordReset = PasswordReset::findByToken($request->token);
 
         if (!$passwordReset) {
             return ['error'=>['token' => 'Invalid token']];
         }
 
-        $user = User::where('email', $passwordReset->email)->first();
-
+        // Query to find the user by email
+        $user = User::findByEmail($passwordReset->email);
         if (!$user) {
             return ['error'=>['email' => 'Email does not exist']];
         }
 
-        $user->password = Hash::make($request->password);
-        $user->save();
+        // Reset the user's password
+        $user->resetPassword($request->password);
 
-        DB::table('password_resets')
-            ->where('email', $user->email)
-            ->delete();
+        // Delete the password reset entry by email
+        PasswordReset::deleteByEmail($user->email);
 
             return [
                 'success' => 'Password has been reset.',
