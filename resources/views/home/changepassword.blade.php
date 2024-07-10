@@ -29,7 +29,9 @@
                     <div class="row mb-4">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4">Current Password</label>
-                            <div class="col-sm-8"><input type="password" name="current_password" class="form-control" value="{{ old('current_password') }}">
+                            <div class="col-sm-8 position-relative">
+                            <input id="password" type="password" name="current_password" class="form-control" value="{{ old('current_password') }}">
+                                <i id="togglePassword" class="bi bi-eye position-absolute"></i>
                                 @error('current_password')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -39,8 +41,9 @@
                     <div class="row mb-4">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4">New Password</label>
-                            <div class="col-sm-8">
-                                <input type="password" name="new_password" class="form-control" value="{{ old('new_password') }}">
+                            <div class="col-sm-8 position-relative">
+                                <input id="new_password" type="password" name="new_password" class="form-control" value="{{ old('new_password') }}">
+                                <i id="new_togglePassword" class="bi bi-eye position-absolute"></i>
                                 @error('new_password')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -50,8 +53,9 @@
                     <div class="row mb-4">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4">New Confirm Password</label>
-                            <div class="col-sm-8">
-                                <input type="password" name="new_password_confirmation" class="form-control" value="{{ old('new_password_confirmation') }}">
+                            <div class="col-sm-8 position-relative">
+                                <input id="new_confirm_password" type="password" name="new_password_confirmation" class="form-control" value="{{ old('new_password_confirmation') }}">
+                                <i id="new_confrim_togglePassword" class="bi bi-eye position-absolute"></i>
                                 @error('new_password_confirmation')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -69,6 +73,47 @@
                 </form>
             </div>
         </div>
-
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                // Toggle the type attribute using getAttribute and setAttribute
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                
+                // Toggle the icon
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+
+            const newTogglePassword = document.getElementById('new_togglePassword');
+            const newPassword = document.getElementById('new_password');
+            
+            newTogglePassword.addEventListener('click', function() {
+                // Toggle the type attribute using getAttribute and setAttribute
+                const type = newPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                newPassword.setAttribute('type', type);
+                
+                // Toggle the icon
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+
+            const confirmTogglePassword = document.getElementById('new_confrim_togglePassword');
+            const confirmPassword = document.getElementById('new_confirm_password');
+            
+            confirmTogglePassword.addEventListener('click', function() {
+                // Toggle the type attribute using getAttribute and setAttribute
+                const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPassword.setAttribute('type', type);
+                
+                // Toggle the icon
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+        });
+    </script>
 @endsection

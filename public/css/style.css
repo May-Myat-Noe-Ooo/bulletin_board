@@ -343,3 +343,11 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* Styles for login eye */
+.bi-eye,
+.bi-eye-slash {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}

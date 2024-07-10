@@ -38,12 +38,13 @@
 
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
-                            <label for="" class="form-label required col-sm-4 ">Password:</label>
-                            <div class="col-sm-8">
+                            <label for="" class="form-label required col-sm-4">Password:</label>
+                            <div class="col-sm-8 position-relative">
                                 <input id="password" type="password" name="password"
                                     class="form-control @error('password') is-invalid @enderror"
                                     value="{{ old('password', Cookie::get('remember_password')) }}" required
                                     autocomplete="current-password" style="max-width: 100%;">
+                                <i id="togglePassword" class="bi bi-eye position-absolute"></i>
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -103,6 +104,18 @@
             }
         });
     
+     const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            // Toggle the type attribute using getAttribute and setAttribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // Toggle the icon
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
 
     </script>
 @endsection

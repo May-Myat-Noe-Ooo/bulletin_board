@@ -42,15 +42,18 @@
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-6 ">Password</label>
-                            <div class="col-sm-8"><input type="password" name="password" class="form-control"
-                                    value="{{ $password }}"></div>
+                            <div class="col-sm-8 position-relative">
+                            <input id="password" type="password" name="password" class="form-control"
+                                    value="{{ $password }}">
+                                     <i id="togglePassword" class="bi bi-eye position-absolute"></i></div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-6 ">Password Confirmation</label>
-                            <div class="col-sm-8"><input type="password" name="password_confirmation" class="form-control"
-                                    value="{{ $cpassword }}"></div>
+                            <div class="col-sm-8 position-relative"><input id="password_confirmation" type="password" name="password_confirmation" class="form-control"
+                                    value="{{ $cpassword }}">
+                                    <i id="confirm_togglePassword" class="bi bi-eye position-absolute"></i></div>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -108,4 +111,33 @@
             </div>
         </div>
     </div>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+            
+            togglePassword.addEventListener('click', function() {
+                // Toggle the type attribute using getAttribute and setAttribute
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                
+                // Toggle the icon
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+
+            const confirmTogglePassword = document.getElementById('confirm_togglePassword');
+            const confirmPassword = document.getElementById('password_confirmation');
+            
+            confirmTogglePassword.addEventListener('click', function() {
+                // Toggle the type attribute using getAttribute and setAttribute
+                const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPassword.setAttribute('type', type);
+                
+                // Toggle the icon
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+        });
+    </script>
 @endsection

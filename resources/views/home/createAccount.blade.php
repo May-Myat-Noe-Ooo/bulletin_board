@@ -32,21 +32,23 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
-                            <label for="" class="form-label required col-sm-6 ">Password</label>
-                            <div class="col-sm-8"><input type="password" name="password" class="form-control"
-                                    value="">
-                                    @error('password')
+                            <label for="" class="form-label required col-sm-6">Password</label>
+                            <div class="col-sm-8 position-relative">
+                                <input id="password" type="password" name="password" class="form-control" value="">
+                                <i id="togglePassword" class="bi bi-eye position-absolute"></i>
+                                @error('password')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                    </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
-                            <label for="" class="form-label required col-sm-6 ">Password Confirmation</label>
-                            <div class="col-sm-8"><input type="password" name="password_confirmation" class="form-control"
-                                    value="">
-                                    @error('password_confirmation')
+                            <label for="" class="form-label required col-sm-6">Password Confirmation</label>
+                            <div class="col-sm-8 position-relative">
+                                <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" value="">
+                                <i id="confirm_togglePassword" class="bi bi-eye position-absolute"></i>
+                                @error('password_confirmation')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -66,4 +68,29 @@
             </div>
         </div>
     </div>
+    <script>
+    const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            // Toggle the type attribute using getAttribute and setAttribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // Toggle the icon
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+        const confirm_password = document.getElementById('password_confirmation');
+
+        confirm_togglePassword.addEventListener('click', function() {
+            // Toggle the type attribute using getAttribute and setAttribute
+            const type = confirm_password.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirm_password.setAttribute('type', type);
+            
+            // Toggle the icon
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+    </script>
 @endsection
