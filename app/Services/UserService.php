@@ -19,7 +19,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserService
 {
-    /* Get post according to query and role for Postlist display UI */
+    /* Get post according to query and role for Userlist display UI */
     public function getUsers(Request $request): LengthAwarePaginator
     {
         // Get search parameters
@@ -28,11 +28,16 @@ class UserService
         $fromDate = $request->input('from-date');
         $toDate = $request->input('to-date');
         $pageSize = $request->input('page-size', 4); // Default page size is 5
+        //dd($name);
+        // Check if the page size has changed and reset the page parameter to 1
+        if ($request->input('page-size-changed')) {
+            $request->merge(['page' => 1]);
+        }
         // Fetch the filtered users using the model method
         $userlist = User::getFilteredUsers($name, $email, $fromDate, $toDate, $pageSize);
-        
+        //dd($email);
         // Pass additional data to the view
-        $userlist->appends(['page-size' => $pageSize]); // Ensure page size is appended to pagination links
+        $userlist->appends(['page-size' => $pageSize, 'name' => $name, 'mailaddr' => $email, 'from-date' => $fromDate, 'to-date' => $toDate]); // Ensure page size is appended to pagination links
 
         return $userlist;
     }
@@ -69,7 +74,7 @@ class UserService
         // Check if email exists in the database
         $user = User::emailExists($credentials['email']);
         if (!$user) {
-            return ['error'=> 'There is no such account. Please sign up and create an account.'];
+            return ['error' => 'There is no such account. Please sign up and create an account.'];
         }
 
         // Check if the password is incorrect
@@ -133,17 +138,17 @@ class UserService
             $profilePath = 'img/' . $imageName;
 
             return [
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'password' => $data['password'],
-                    'cpassword' => $data['password_confirmation'],
-                    'type' => $data['type'],
-                    'phone' => $data['phone'],
-                    'dob' => $data['date'],
-                    'address' => $data['address'],
-                    'imagePath' => $profilePath,
-                    'profile' => $profilePath,
-                ];
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'cpassword' => $data['password_confirmation'],
+                'type' => $data['type'],
+                'phone' => $data['phone'],
+                'dob' => $data['date'],
+                'address' => $data['address'],
+                'imagePath' => $profilePath,
+                'profile' => $profilePath,
+            ];
         } else {
             // Check for existing active users with the same name or email
             $activeUserExists = User::activeUserExists($data);
@@ -163,17 +168,17 @@ class UserService
             $profilePath = 'img/' . $imageName;
 
             return [
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'password' => $data['password'],
-                    'cpassword' => $data['password_confirmation'],
-                    'type' => $data['type'],
-                    'phone' => $data['phone'],
-                    'dob' => $data['date'],
-                    'address' => $data['address'],
-                    'imagePath' => $profilePath,
-                    'profile' => $profilePath,
-                ];
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'cpassword' => $data['password_confirmation'],
+                'type' => $data['type'],
+                'phone' => $data['phone'],
+                'dob' => $data['date'],
+                'address' => $data['address'],
+                'imagePath' => $profilePath,
+                'profile' => $profilePath,
+            ];
         }
     }
     /**
@@ -188,14 +193,14 @@ class UserService
         $softDeletedUser = User::findSoftDeletedUser($data);
         // If a soft-deleted user exists, pass the data as usual
         if ($softDeletedUser) {
-           // Restore the soft deleted post
-           $softDeletedUser->restore();
+            // Restore the soft deleted post
+            $softDeletedUser->restore();
 
-           // Update the restored post with new description if needed
-           $softDeletedUser->updateRestoredUserInRegister($data);
-           return [
-            'success' => 'Register user added successfully',
-        ];
+            // Update the restored post with new description if needed
+            $softDeletedUser->updateRestoredUserInRegister($data);
+            return [
+                'success' => 'Register user added successfully',
+            ];
         } else {
             // Check for existing active users with the same name or email
             $activeUserExists = User::activeUserExists($data);
@@ -279,7 +284,7 @@ class UserService
     public function sendResetLink(Request $request): array
     {
         // Check if email exists in the database
-        $user = User::findByEmail($request->email);       
+        $user = User::findByEmail($request->email);
 
         if (!$user) {
             return ['error' => 'Email does not exist in the system'];
@@ -299,13 +304,13 @@ class UserService
         $passwordReset = PasswordReset::findByToken($request->token);
 
         if (!$passwordReset) {
-            return ['error'=>['token' => 'Invalid token']];
+            return ['error' => ['token' => 'Invalid token']];
         }
 
         // Query to find the user by email
         $user = User::findByEmail($passwordReset->email);
         if (!$user) {
-            return ['error'=>['email' => 'Email does not exist']];
+            return ['error' => ['email' => 'Email does not exist']];
         }
 
         // Reset the user's password
@@ -314,10 +319,8 @@ class UserService
         // Delete the password reset entry by email
         PasswordReset::deleteByEmail($user->email);
 
-            return [
-                'success' => 'Password has been reset.',
-            ];
-
+        return [
+            'success' => 'Password has been reset.',
+        ];
     }
-
 }

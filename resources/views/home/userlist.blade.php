@@ -31,7 +31,7 @@
             <div class="card-body">
                 <div class="row mb-4">
 
-                    <form class="search-form col-md-2 text-start mb-3" method="GET" action="{{ route('displayuser') }}">
+                    <form class="search-form col-md-2 text-start mb-3" method="GET" action="{{ route('displayuser') }}" id="pageSizeForm">
                         <label for="page-size">Page Size:</label>
                         <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
                             <option value="4" {{ $pageSize == 4 ? 'selected' : '' }}>4</option>
@@ -39,6 +39,11 @@
                             <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
                             <option value="16" {{ $pageSize == 16 ? 'selected' : '' }}>16</option>
                         </select>
+                        <input type="hidden" name="page-size-changed" id="page-size-changed" value="0">
+                        <input type="hidden" name="name" value="{{ request('name') }}">
+                        <input type="hidden" name="email" value="{{ request('mailaddr') }}">
+                        <input type="hidden" name="fromDate" value="{{ request('from-date') }}">
+                        <input type="hidden" name="toDate" value="{{ request('to-date') }}">
                     </form>
                     <form class="search-form col-md-10 text-end mb-3" method="GET" action="{{ route('displayuser') }}">
                         <div class="row d-flex justify-content-between align-items-center">
@@ -149,7 +154,8 @@
                 </div>
                 <div class="row mt-3 float-start">
                     <div class="col-md-1">
-                        {!! $userlist->appends(['page-size' => $pageSize,'name' => request('name'),'mailaddr' => request('mailaddr'),'from-date' => request('from-date'),'to-date' => request('to-date')])->links() !!}
+                        {{ $userlist->appends(request()->except('page'))->links() }}
+                        {{--{!! $userlist->appends(['page-size' => $pageSize,'name' => request('name'),'mailaddr' => request('mailaddr'),'from-date' => request('from-date'),'to-date' => request('to-date')])->links() !!}--}}
                     </div>
                 </div>
             </div>
@@ -336,6 +342,11 @@
     <script>
         // Function to make the success message disappear after a few seconds
         document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('page-size').addEventListener('change', function() {
+                document.getElementById('page-size-changed').value = '1';
+                document.getElementById('pageSizeForm').submit();
+            });
+
             const successMessage = document.getElementById('success-message');
             if (successMessage) {
                 setTimeout(() => {

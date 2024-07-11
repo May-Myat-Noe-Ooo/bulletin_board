@@ -21,13 +21,14 @@ class PostlistController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $postlist = $this->postService->getPosts($request);
-        $pageSize = $request->input('page-size', 6);
-        $route = $request->route()->getName();
-
-        return view('home.postlist', compact('postlist', 'pageSize', 'route'));
-    }
+{
+   //dd($request->input('search-keyword'));
+    $postlist = $this->postService->getPosts($request);
+    $pageSize = $request->input('page-size', 6);
+    $route = $request->route()->getName();
+    
+    return view('home.postlist', compact('postlist', 'pageSize', 'route'));
+}
 
     /**
      * Show the form for editing the specified post.

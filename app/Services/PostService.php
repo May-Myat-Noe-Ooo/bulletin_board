@@ -20,17 +20,24 @@ class PostService
 {
     /* Get post according to query and role for Postlist display UI */
     public function getPosts(Request $request): LengthAwarePaginator
-    {
-        $keyword = $request->input('search-keyword');
-        $pageSize = $request->input('page-size', 6);
-        $route = $request->route()->getName();
-
-        $postlist = Post::getFilteredPosts($keyword, $pageSize, $route);
-
-        $postlist->appends(['page-size' => $pageSize]);
-
-        return $postlist;
+{
+    $keyword = $request->input('search-keyword');
+    $pageSize = $request->input('page-size', 6);
+    $route = $request->route()->getName();
+    //dd($request->input('page-size-changed'));
+    // Check if the page size has changed and reset the page parameter to 1
+    if ($request->input('page-size-changed')) {
+        $request->merge(['page' => 1]);
     }
+
+    $postlist = Post::getFilteredPosts($keyword, $pageSize, $route);
+    $postlist->appends([
+        'page-size' => $pageSize,
+        'search-keyword' => $keyword,
+    ]);
+
+    return $postlist;
+}
     /* Get each post according to the id for edit */
     public function getPostById(string $id): Post
     {

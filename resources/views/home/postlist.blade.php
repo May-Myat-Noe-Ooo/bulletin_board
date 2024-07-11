@@ -32,15 +32,18 @@
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-md-4">
-                        <form class="search-form" method="GET" action="{{ route('postlist.index') }}">
-                            <label for="page-size">Page Size:</label>
-                            <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
-                                <option value="6" {{ $pageSize == 6 ? 'selected' : '' }}>6</option>
-                                <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
-                                <option value="18" {{ $pageSize == 18 ? 'selected' : '' }}>18</option>
-                                <option value="24" {{ $pageSize == 24 ? 'selected' : '' }}>24</option>
-                            </select>
-                        </form>
+        {{-- Page size selection form --}}
+        <form class="search-form" method="GET" action="{{ route('postlist.index') }}" id="pageSizeForm">
+            <label for="page-size">Page Size:</label>
+            <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
+                <option value="6" {{ $pageSize == 6 ? 'selected' : '' }}>6</option>
+                <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
+                <option value="18" {{ $pageSize == 18 ? 'selected' : '' }}>18</option>
+                <option value="24" {{ $pageSize == 24 ? 'selected' : '' }}>24</option>
+            </select>
+            <input type="hidden" name="page-size-changed" id="page-size-changed" value="0">
+            <input type="hidden" name="search-keyword" value="{{ request('search-keyword') }}">
+        </form>
                     </div>
                     <div class="col-md-8 text-end">
                         <form class="search-form" method="GET" action="{{ request()->route()->getName() == 'home' ? route('home') : route('postlist.index') }}">
@@ -324,8 +327,14 @@
     </div>
 </div>
     <script>
+        
         // Function to make the success message disappear after a few seconds
         document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('page-size').addEventListener('change', function() {
+                document.getElementById('page-size-changed').value = '1';
+                document.getElementById('pageSizeForm').submit();
+            });
+
             const successMessage = document.getElementById('success-message');
             if (successMessage) {
                 setTimeout(() => {

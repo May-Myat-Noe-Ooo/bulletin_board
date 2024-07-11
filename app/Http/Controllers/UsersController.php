@@ -192,8 +192,9 @@ class UsersController extends Controller
      */
     public function displayUser(Request $request)
     {
+        //dd( $request->input('mailaddr'));
         $userlist = $this->userService->getUsers($request);
-        $pageSize = $request->input('page-size', 4); // Default page size is 5
+        $pageSize = $request->input('page-size', 4); // Default page size is 4
         // Return the view with the user list
         return view('home.userlist', compact('userlist', 'pageSize'));
     }

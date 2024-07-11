@@ -49,6 +49,7 @@ class Post extends Model
     /* Post Service Query*/
     public static function getFilteredPosts($keyword = null, $pageSize = 6, $route = null): LengthAwarePaginator
     {
+       //dd($pageSize);
         return self::when($route == 'home', function ($query) {
                 return $query->where('status', 1);
             })->when($route == 'postlist.index' && Auth::check() && Auth::user()->type != 0, function ($query) {
