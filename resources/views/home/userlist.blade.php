@@ -30,47 +30,38 @@
             @endif
             <div class="card-body">
                 <div class="row mb-4">
-
-                    <form class="search-form col-md-2 text-start mb-3" method="GET" action="{{ route('displayuser') }}" id="pageSizeForm">
-                        <label for="page-size">Page Size:</label>
-                        <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
-                            <option value="4" {{ $pageSize == 4 ? 'selected' : '' }}>4</option>
-                            <option value="8" {{ $pageSize == 8 ? 'selected' : '' }}>8</option>
-                            <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
-                            <option value="16" {{ $pageSize == 16 ? 'selected' : '' }}>16</option>
-                        </select>
-                        <input type="hidden" name="page-size-changed" id="page-size-changed" value="0">
-                        <input type="hidden" name="name" value="{{ request('name') }}">
-                        <input type="hidden" name="email" value="{{ request('mailaddr') }}">
-                        <input type="hidden" name="fromDate" value="{{ request('from-date') }}">
-                        <input type="hidden" name="toDate" value="{{ request('to-date') }}">
-                    </form>
-                    <form class="search-form col-md-10 text-end mb-3" method="GET" action="{{ route('displayuser') }}">
+                    <form method="GET" action="{{ route('displayuser') }}" id="searchForm">
                         <div class="row d-flex justify-content-between align-items-center">
-                            <div class="col-md-2 d-flex">
-                                <label for="name" class="form-label col-sm-4">Name:</label>
-                                <input type="text" name="name" class="form-control" id="name"
-                                    value="{{ request('name') }}">
+                            <div class="col-md-2 text-start">
+                                <label for="page-size" class="form-label">Page Size:</label>
+                                <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
+                                    <option value="4" {{ request('page-size') == 4 ? 'selected' : '' }}>4</option>
+                                    <option value="8" {{ request('page-size') == 8 ? 'selected' : '' }}>8</option>
+                                    <option value="12" {{ request('page-size') == 12 ? 'selected' : '' }}>12</option>
+                                    <option value="16" {{ request('page-size') == 16 ? 'selected' : '' }}>16</option>
+                                </select>
                             </div>
                             <div class="col-md-2 d-flex">
-                                <label for="email" class="form-label col-sm-4">Email:</label>
-                                <input type="text" name="mailaddr" class="form-control" id="email"
-                                    value="{{ request('mailaddr') }}">
+                                <label for="name" class="form-label col-sm-3">Name:</label>
+                                <input type="text" name="name" id="name" class="form-control" value="{{ request('name') }}">
                             </div>
-                            <div class="col-md-3 d-flex">
+                            <div class="col-md-2 d-flex">
+                                <label for="mailaddr" class="form-label col-sm-3 ">Email:</label>
+                                <input type="text" name="mailaddr" id="mailaddr" class="form-control" value="{{ request('mailaddr') }}">
+                            </div>
+                            <div class="col-md-2 d-flex">
                                 <label for="from-date" class="form-label col-sm-3">From:</label>
-                                <input type="date" name="from-date" class="form-control" id="from-date"
-                                    value="{{ request('from-date') }}">
+                                <input type="date" name="from-date" id="from-date" class="form-control" value="{{ request('from-date') }}">
                             </div>
-                            <div class="col-md-3 d-flex">
-                                <label for="to-date" class="form-label col-sm-2">To:</label>
-                                <input type="date" name="to-date" class="form-control" id="to-date"
-                                    value="{{ request('to-date') }}">
+                            <div class="col-md-2 d-flex">
+                                <label for="to-date" class="form-label col-sm-3">To:</label>
+                                <input type="date" name="to-date" id="to-date" class="form-control" value="{{ request('to-date') }}">
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
+                            <div class="col-md-1 text-end">
                                 <button type="submit" class="btn btn-dark w-100 search-btn">Search</button>
                             </div>
                         </div>
+                        <input type="hidden" name="page-size-changed" id="page-size-changed" value="0">
                     </form>
                 </div>
                 <div class="row">
@@ -78,71 +69,65 @@
                         @foreach ($userlist as $rs)
                             <div class="userlist col-md-3 mb-4">
                                 <div class="card h-100">
-                                    
+
                                     <div class="card-body text-center position-relative">
                                         <!-- Three dots icon in top right corner -->
-                    <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                        <button class="btn btn-link p-0" type="button" id="dropdownMenuButton"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-three-dots custom-dot"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                   data-bs-target="#userDetailModal" data-name="{{ $rs->name }}"
-                                   data-type="{{ $rs->type }}" data-email="{{ $rs->email }}"
-                                   data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}"
-                                   data-address="{{ $rs->address }}"
-                                   data-created="{{ $rs->created_at }}"
-                                   data-created-user="{{ $rs->createdBy->name }}"
-                                   data-updated="{{ $rs->updated_at }}"
-                                   data-updated-user="{{ $rs->updatedBy->name }}">
-                                    <i class="bi bi-info-circle me-2"></i>Details</a></li>
-                            <li><a class="dropdown-item text-danger" href="#"
-                                   data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                   data-id="{{ $rs->id }}" data-name="{{ $rs->name }}"
-                                   data-type="{{ $rs->type }}"
-                                            data-email="{{ $rs->email }}"
-                                            data-phone="{{ $rs->phone }}"
-                                            data-dob="{{ $rs->dob }}"
-                                            data-address="{{ $rs->address }}">
-                                    <i class="bi bi-trash me-2"></i>Delete</a></li>
-                        </ul>
-                    </div>
-                                        {{--<!-- Default background image -->
+                                        <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
+                                            <button class="btn btn-link p-0" type="button" id="dropdownMenuButton"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots custom-dot"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby="dropdownMenuButton">
+                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#userDetailModal" data-name="{{ $rs->name }}"
+                                                        data-type="{{ $rs->type }}" data-email="{{ $rs->email }}"
+                                                        data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}"
+                                                        data-address="{{ $rs->address }}"
+                                                        data-created="{{ $rs->created_at }}"
+                                                        data-created-user="{{ $rs->createdBy->name }}"
+                                                        data-updated="{{ $rs->updated_at }}"
+                                                        data-updated-user="{{ $rs->updatedBy->name }}">
+                                                        <i class="bi bi-info-circle me-2"></i>Details</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                        data-id="{{ $rs->id }}" data-name="{{ $rs->name }}"
+                                                        data-type="{{ $rs->type }}" data-email="{{ $rs->email }}"
+                                                        data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}"
+                                                        data-address="{{ $rs->address }}">
+                                                        <i class="bi bi-trash me-2"></i>Delete</a></li>
+                                            </ul>
+                                        </div>
+                                        {{-- <!-- Default background image -->
                                         <div class="background-image">
                                             <img src="{{ asset('img/light.png') }}" alt="Background"
                                                 class="background-img">
-                                        </div>--}}
+                                        </div> --}}
 
                                         <!-- User profile image -->
                                         <img src="{{ asset($rs->profile) }}" alt="Profile"
                                             class="profile-img rounded-circle">
 
                                         <!-- User details -->
-                                        <h5 class="card-title"><a href="#" 
-                                            class="user-name-link" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#userDetailModal"
-                                            data-name="{{ $rs->name }}"
-                                            data-type="{{ $rs->type }}"
-                                            data-email="{{ $rs->email }}"
-                                            data-phone="{{ $rs->phone }}"
-                                            data-dob="{{ $rs->dob }}"
-                                            data-address="{{ $rs->address }}"
-                                            data-created="{{ $rs->created_at }}"
-                                            data-created-user="{{ $rs->createdBy->name}}"
-                                            data-updated="{{ $rs->updated_at }}"
-                                            data-updated-user="{{ $rs->updatedBy->name }}">
-                                            {{ $rs->name }}
-                                         </a></h5>
+                                        <h5 class="card-title"><a href="#" class="user-name-link"
+                                                data-bs-toggle="modal" data-bs-target="#userDetailModal"
+                                                data-name="{{ $rs->name }}" data-type="{{ $rs->type }}"
+                                                data-email="{{ $rs->email }}" data-phone="{{ $rs->phone }}"
+                                                data-dob="{{ $rs->dob }}" data-address="{{ $rs->address }}"
+                                                data-created="{{ $rs->created_at }}"
+                                                data-created-user="{{ $rs->createdBy->name }}"
+                                                data-updated="{{ $rs->updated_at }}"
+                                                data-updated-user="{{ $rs->updatedBy->name }}">
+                                                {{ $rs->name }}
+                                            </a></h5>
                                         <p class="card-text">{{ $rs->email }}</p>
                                         <p class="card-text"><small class="text-muted">{{ $rs->createdBy->name }} -
                                                 {{ $rs->created_at->diffForHumans() }}</small></p>
                                     </div>
 
-                                    {{--<div class="card-footer text-muted">
+                                    {{-- <div class="card-footer text-muted">
                                         <span>{{ $rs->type == 0 ? 'Admin' : 'User' }}</span>
-                                    </div>--}}
+                                    </div> --}}
                                 </div>
                             </div>
                         @endforeach
@@ -155,7 +140,7 @@
                 <div class="row mt-3 float-start">
                     <div class="col-md-1">
                         {{ $userlist->appends(request()->except('page'))->links() }}
-                        {{--{!! $userlist->appends(['page-size' => $pageSize,'name' => request('name'),'mailaddr' => request('mailaddr'),'from-date' => request('from-date'),'to-date' => request('to-date')])->links() !!}--}}
+                        {{-- {!! $userlist->appends(['page-size' => $pageSize,'name' => request('name'),'mailaddr' => request('mailaddr'),'from-date' => request('from-date'),'to-date' => request('to-date')])->links() !!} --}}
                     </div>
                 </div>
             </div>
@@ -331,7 +316,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
@@ -344,7 +329,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('page-size').addEventListener('change', function() {
                 document.getElementById('page-size-changed').value = '1';
-                document.getElementById('pageSizeForm').submit();
+                document.getElementById('searchForm').submit();
             });
 
             const successMessage = document.getElementById('success-message');

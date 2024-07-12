@@ -21,26 +21,33 @@ class UserService
 {
     /* Get post according to query and role for Userlist display UI */
     public function getUsers(Request $request): LengthAwarePaginator
-    {
-        // Get search parameters
-        $name = $request->input('name');
-        $email = $request->input('mailaddr');
-        $fromDate = $request->input('from-date');
-        $toDate = $request->input('to-date');
-        $pageSize = $request->input('page-size', 4); // Default page size is 5
-        //dd($name);
-        // Check if the page size has changed and reset the page parameter to 1
-        if ($request->input('page-size-changed')) {
-            $request->merge(['page' => 1]);
-        }
-        // Fetch the filtered users using the model method
-        $userlist = User::getFilteredUsers($name, $email, $fromDate, $toDate, $pageSize);
-        //dd($email);
-        // Pass additional data to the view
-        $userlist->appends(['page-size' => $pageSize, 'name' => $name, 'mailaddr' => $email, 'from-date' => $fromDate, 'to-date' => $toDate]); // Ensure page size is appended to pagination links
+{
+    // Get search parameters
+    $name = $request->input('name');
+    $email = $request->input('mailaddr');
+    $fromDate = $request->input('from-date');
+    $toDate = $request->input('to-date');
+    $pageSize = $request->input('page-size', 4); // Default page size is 4
 
-        return $userlist;
+    // Check if the page size has changed and reset the page parameter to 1
+    if ($request->input('page-size-changed')) {
+        $request->merge(['page' => 1]);
     }
+
+    // Fetch the filtered users using the model method
+    $userlist = User::getFilteredUsers($name, $email, $fromDate, $toDate, $pageSize);
+
+    // Pass additional data to the view
+    $userlist->appends([
+        'page-size' => $pageSize,
+        'name' => $name,
+        'mailaddr' => $email,
+        'from-date' => $fromDate,
+        'to-date' => $toDate,
+    ]); // Ensure page size is appended to pagination links
+
+    return $userlist;
+}
     /* Delete user according to specific id */
     public function deleteUserById(string $id): void
     {
