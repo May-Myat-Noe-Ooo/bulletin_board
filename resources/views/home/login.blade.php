@@ -40,12 +40,12 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4">Password:</label>
                             <div class="col-sm-8 position-relative">
-                                <input id="password" type="password" name="password"
+                                <input id="password" type="password" name="pw"
                                     class="form-control @error('password') is-invalid @enderror"
-                                    value="{{ old('password', Cookie::get('remember_password')) }}" required
+                                    value="{{ old('pw', Cookie::get('remember_password')) }}" required
                                     autocomplete="current-password" style="max-width: 100%;">
                                 <i id="togglePassword" class="bi bi-eye position-absolute"></i>
-                                @error('password')
+                                @error('pw')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

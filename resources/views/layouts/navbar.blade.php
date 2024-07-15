@@ -37,9 +37,13 @@
                         
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end text-success" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{{ route('showprofile', auth()->user()->id) }}">Profile</a></li>
+                        <li class="dropdown-item {{ request()->routeIs('showprofile', auth()->user()->id) ? 'active' : '' }}">
+                            <a class="dropdown-link" href="{{ route('showprofile', auth()->user()->id) }}">Profile</a>
+                        </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
+                        <li class="dropdown-item {{ request()->routeIs('logout') ? 'active' : '' }}">
+                            <a class="dropdown-link" href="{{ route('logout') }}">Logout</a>
+                        </li>
                     </ul>
                 </li>
                 

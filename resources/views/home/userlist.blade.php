@@ -69,7 +69,6 @@
                         @foreach ($userlist as $rs)
                             <div class="userlist col-md-3 mb-4">
                                 <div class="card h-100">
-
                                     <div class="card-body text-center position-relative">
                                         <!-- Three dots icon in top right corner -->
                                         <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
@@ -121,7 +120,7 @@
                                                 {{ $rs->name }}
                                             </a></h5>
                                         <p class="card-text">{{ $rs->email }}</p>
-                                        <p class="card-text"><small class="text-muted">{{ $rs->createdBy->name }} -
+                                        <p class="card-text"><small class="text-muted">Created by {{ $rs->createdBy->name }} -
                                                 {{ $rs->created_at->diffForHumans() }}</small></p>
                                     </div>
 
@@ -138,7 +137,7 @@
                     @endif
                 </div>
                 <div class="row mt-3 float-start">
-                    <div class="col-md-1">
+                    <div class="reset-nav">
                         {{ $userlist->appends(request()->except('page'))->links() }}
                         {{-- {!! $userlist->appends(['page-size' => $pageSize,'name' => request('name'),'mailaddr' => request('mailaddr'),'from-date' => request('from-date'),'to-date' => request('to-date')])->links() !!} --}}
                     </div>

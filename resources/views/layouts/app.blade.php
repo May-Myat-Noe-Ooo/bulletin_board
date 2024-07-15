@@ -72,6 +72,18 @@
                     this.classList.add('active');
                 });
             });
+
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function () {
+                // Remove active class from all dropdown items
+                dropdownItems.forEach(i => i.classList.remove('active'));
+
+                // Add active class to the clicked item
+                this.classList.add('active');
+            });
+        });
         });
     </script>
 </body>

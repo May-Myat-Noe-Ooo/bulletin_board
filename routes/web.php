@@ -94,7 +94,4 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::get('/upload_file', 'PostsController@uploadFile')->name('upload_file');
     Route::post('/upload-csv', 'PostsController@uploadCsv')->name('upload_csv');
     Route::get('/postlists/export', 'PostsController@export')->name('postlists.export');
-
-    //Pie Chart
-    Route::get('/pie', 'ChartController@pieChart')->name('piechart');
 });

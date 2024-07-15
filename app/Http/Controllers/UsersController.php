@@ -45,8 +45,10 @@ class UsersController extends Controller
             [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
-                'password' => 'required|string|min:8|confirmed',
-                'password_confirmation' => 'required|string|min:8',
+                //'spw' => 'required|string|min:8|confirmed',
+                'spw' => 'required|min:8',
+            //'new_password_confirmation' => 'required|same:new_password',
+                'scpw' => 'required|same:spw',
             ],
             [
                 'name.required' => 'Name cannot be blank.',
@@ -54,13 +56,13 @@ class UsersController extends Controller
                 'email.required' => 'Email cannot be blank.',
                 'email.email' => 'Email format is invalid.',
                 //'email.unique' => 'Email has already taken.',
-                'password.required' => 'Password cannot be blank.',
-                'password.confirmed' => 'Password and password confirmation do not match.',
-                'password_confirmation.required' => 'Password cannot be blank.',
+                'spw.required' => 'Password cannot be blank.',
+                'scpw.same' => 'Password and password confirmation do not match.',
+                'scpw.required' => 'Password cannot be blank.',
             ],
         );
         // Prepare data for the service
-        $data = $request->only('name', 'email', 'password', 'phone', 'dob', 'address');
+        $data = $request->only('name', 'email', 'spw', 'phone', 'dob', 'address');
 
         // Call the signup method in UserService
         $result = $this->userService->signup($data);
@@ -78,16 +80,16 @@ class UsersController extends Controller
         $request->validate(
             [
                 'email' => 'required|email',
-                'password' => 'required',
+                'pw' => 'required',
             ],
             [
                 'email.required' => 'Email cannot be blank.',
                 'email.email' => 'Email format is invalid.',
-                'password.required' => 'Password cannot be blank.',
+                'pw.required' => 'Password cannot be blank.',
             ],
         );
 
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'pw');
         $remember = $request->has('remember');
         // Call AuthService login method
         $loginResult = $this->userService->login($credentials, $remember);
@@ -123,20 +125,22 @@ class UsersController extends Controller
             [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
-                'password' => 'required|string|min:8|confirmed',
+                'pw' => 'required|min:8',
+                'cpw' => 'required|same:pw',
                 'profile' => 'required|file',
             ],
             [
                 'name.required' => 'Name cannot be blank.',
                 'email.required' => 'Email cannot be blank.',
                 'email.email' => 'Email format is invalid.',
-                'password.required' => 'Password cannot be blank.',
-                'password.confirmed' => 'Password and password confirmation do not match.',
+                'pw.required' => 'Password cannot be blank.',
+                'cpw.required' => 'Password confirmation cannot be blank.',
+                'cpw.same' => 'Password and password confirmation do not match.',
                 'profile.required' => 'Profile cannot be blank',
             ],
         );
         // Prepare data for the service
-        $data = $request->only('name', 'email', 'password', 'password_confirmation', 'type', 'phone', 'date', 'address', 'profile');
+        $data = $request->only('name', 'email', 'pw', 'cpw', 'type', 'phone', 'date', 'address', 'profile');
 
         // Call the confirmRegister method in UserService
         $result = $this->userService->confirmRegister($data);
@@ -221,15 +225,16 @@ class UsersController extends Controller
     public function updatePassword(Request $request, $id)
     {
         $request->validate([
-            'current_password' => 'required',
-            'new_password' => 'required|min:6',
+            'cp' => 'required',
+            'new_password' => 'required|min:8',
             'new_password_confirmation' => 'required|same:new_password',
         ]);
 
         // Call the updatePassword method in UserService
         $result = $this->userService->updatePassword($request, $id);
+        //dd($result['error']);
         if (isset($result['error'])) {
-            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+            return back()->withErrors(['cp' => $result['error']])->withInput();
         }
 
         return redirect()->route('displayuser')->with('success', $result['success']);
@@ -248,7 +253,7 @@ class UsersController extends Controller
         // Call the sendResetLink method in UserService
         $result = $this->userService->sendResetLink($request);
         if (isset($result['error'])) {
-            return back()->withErrors(['email' => $result['error']]);
+            return redirect()->back()->with('error', $result['error'])->withInput();
         }
 
         return redirect()->route('login.index')->with('success', $result['success']);

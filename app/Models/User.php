@@ -161,7 +161,7 @@ class User extends Authenticatable
         $this->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make($data['spw']),
             'phone' => $data['phone'] ?? null,
             'dob' => $data['dob'] ?? null,
             'address' => $data['address'] ?? null,

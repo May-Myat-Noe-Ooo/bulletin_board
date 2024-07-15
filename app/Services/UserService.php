@@ -73,7 +73,7 @@ class UserService
             if ($remember) {
                 // Set a cookie that lasts for one week
                 cookie()->queue('remember_email', $credentials['email'], 10080);
-                cookie()->queue('remember_password', $credentials['password'], 10080);
+                cookie()->queue('remember_password', $credentials['pw'], 10080);
             }
             return ['success'];
         }
@@ -147,8 +147,8 @@ class UserService
             return [
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => $data['password'],
-                'cpassword' => $data['password_confirmation'],
+                'password' => $data['pw'],
+                'cpassword' => $data['cpw'],
                 'type' => $data['type'],
                 'phone' => $data['phone'],
                 'dob' => $data['date'],
@@ -177,8 +177,8 @@ class UserService
             return [
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => $data['password'],
-                'cpassword' => $data['password_confirmation'],
+                'password' => $data['pw'],
+                'cpassword' => $data['cpw'],
                 'type' => $data['type'],
                 'phone' => $data['phone'],
                 'dob' => $data['date'],
@@ -277,12 +277,13 @@ class UserService
     /*Update Password normal*/
     public function updatePassword(Request $request, string $id): array
     {
+        
         $user = User::findUserByIdOrFail($id);
-
-        if (!Hash::check($request->current_password, $user->password)) {
+        
+        if (!Hash::check($request->cp, $user->password)) {
             return ['error' => 'Current password is incorrect'];
         }
-
+        
         $user->resetPassword($request->new_password);
 
         return ['success' => 'Password updated successfully.'];

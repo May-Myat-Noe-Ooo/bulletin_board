@@ -32,105 +32,96 @@
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-md-4">
-        {{-- Page size selection form --}}
-        <form class="search-form" method="GET" action="{{ route('postlist.index') }}" id="pageSizeForm">
-            <label for="page-size">Page Size:</label>
-            <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
-                <option value="6" {{ $pageSize == 6 ? 'selected' : '' }}>6</option>
-                <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
-                <option value="18" {{ $pageSize == 18 ? 'selected' : '' }}>18</option>
-                <option value="24" {{ $pageSize == 24 ? 'selected' : '' }}>24</option>
-            </select>
-            <input type="hidden" name="page-size-changed" id="page-size-changed" value="0">
-            <input type="hidden" name="search-keyword" value="{{ request('search-keyword') }}">
-        </form>
+                        {{-- Page size selection form --}}
+                        <form class="search-form" method="GET" action="{{ route('postlist.index') }}" id="pageSizeForm">
+                            <label for="page-size">Page Size:</label>
+                            <select name="page-size" id="page-size" class="form-select d-inline-block w-auto">
+                                <option value="6" {{ $pageSize == 6 ? 'selected' : '' }}>6</option>
+                                <option value="12" {{ $pageSize == 12 ? 'selected' : '' }}>12</option>
+                                <option value="18" {{ $pageSize == 18 ? 'selected' : '' }}>18</option>
+                                <option value="24" {{ $pageSize == 24 ? 'selected' : '' }}>24</option>
+                            </select>
+                            <input type="hidden" name="page-size-changed" id="page-size-changed" value="0">
+                            <input type="hidden" name="search-keyword" value="{{ request('search-keyword') }}">
+                        </form>
                     </div>
                     <div class="col-md-8 text-end">
-                        <form class="search-form" method="GET" action="{{ request()->route()->getName() == 'home' ? route('home') : route('postlist.index') }}">
+                        <form class="search-form" method="GET"
+                            action="{{ request()->route()->getName() == 'home' ? route('home') : route('postlist.index') }}">
                             <label class="mr-2">Keyword:</label>
-                            <input class="search btn border border-secondary" type="text" name="search-keyword" placeholder="Type Something" value="{{ request('search-keyword') }}">
+                            <input class="search btn border border-secondary" type="text" name="search-keyword"
+                                placeholder="Type Something" value="{{ request('search-keyword') }}">
                             <input type="hidden" name="current-route" value="{{ request()->route()->getName() }}">
                             <button type="submit" class="btn btn-dark">Search</button>
                             <a href="{{ route('createpost') }}" class="btn btn-dark">Create</a>
                             <a href="{{ route('upload_file') }}" class="btn btn-dark">Upload</a>
-                            <a href="{{ route('postlists.export', ['search-keyword' => request('search-keyword'), 'current-route' => request()->route()->getName()]) }}" class="btn btn-dark">Download</a>
+                            <a href="{{ route('postlists.export', ['search-keyword' => request('search-keyword'), 'current-route' => request()->route()->getName()]) }}"
+                                class="btn btn-dark">Download</a>
                         </form>
-                        
+
                     </div>
-                    
+
                 </div>
 
                 <div class="row mt-3">
                     @if ($postlist->count() > 0)
-                    @foreach ($postlist as $rs)
-                        <div class="postlist col-md-4 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ asset($rs->user->profile) }}" alt="error"
-                                            class="rounded-circle me-2" width="30" height="30">
-                                        <div>
-                                            <div>{{ $rs->user->name }}</div>
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-clock me-1"></i>
-                                                <span>{{ $rs->created_at->diffForHumans() }}</span>
+                        @foreach ($postlist as $rs)
+                            <div class="postlist col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ asset($rs->user->profile) }}" alt="error"
+                                                class="rounded-circle me-2" width="30" height="30">
+                                            <div>
+                                                <div>{{ $rs->user->name }}</div>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    <span>{{ $rs->created_at->diffForHumans() }}</span>
+                                                </div>
                                             </div>
                                         </div>
+                                        @auth
+                                            @if (($route == 'postlist.index' && Auth::user()->type == 0) || ($route == 'postlist.index' && Auth::user()->type == 1))
+                                                <div class="dropdown">
+                                                    <button class="btn btn-link p-0 " type="button" id="dropdownMenuButton"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots custom-dot"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end"
+                                                        aria-labelledby="dropdownMenuButton">
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                                data-bs-target="#postDetailModal"
+                                                                data-title="{{ $rs->title }}"
+                                                                data-description="{{ $rs->description }}"
+                                                                data-status="{{ $rs->status }}"
+                                                                data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                                data-created="{{ $rs->created_at }}"
+                                                                data-updated="{{ $rs->updated_at }}"
+                                                                data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}">
+                                                                <i class="bi bi-info-circle me-2"></i>Details</a></li>
+                                                        <li>
+                                                            <a href="{{ route('postlist.edit', $rs->id) }}"
+                                                                class="dropdown-item">
+                                                                <i class="bi bi-pencil-square text-primary"></i> Edit
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                                                data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
+                                                                data-title="{{ $rs->title }}"
+                                                                data-description="{{ $rs->description }}"
+                                                                data-status="{{ $rs->status }}">
+                                                                <i class="bi bi-trash-fill text-danger"></i> Delete
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            @endif
+                                        @endauth
                                     </div>
-                                    @auth
-                                        @if(($route == 'postlist.index' && Auth::user()->type == 0) || ($route == 'postlist.index' && Auth::user()->type == 1))
-                                            <div class="dropdown">
-                                                <button class="btn btn-link p-0 " type="button" id="dropdownMenuButton"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="bi bi-three-dots custom-dot"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end"
-                                                    aria-labelledby="dropdownMenuButton">
-                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                        data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
-                                                        data-description="{{ $rs->description }}"
-                                                        data-status="{{ $rs->status }}"
-                                                        data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
-                                                        data-created="{{ $rs->created_at }}" data-updated="{{ $rs->updated_at }}"
-                                                        data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
-                                                        >
-                                                         <i class="bi bi-info-circle me-2"></i>Details</a></li>
-                                                    <li>
-                                                        <a href="{{ route('postlist.edit', $rs->id) }}" class="dropdown-item">
-                                                            <i class="bi bi-pencil-square text-primary"></i> Edit
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal" data-id="{{ $rs->id }}"
-                                                            data-title="{{ $rs->title }}"
-                                                            data-description="{{ $rs->description }}"
-                                                            data-status="{{ $rs->status }}">
-                                                            <i class="bi bi-trash-fill text-danger"></i> Delete
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        @endif
-                                    @endauth
-                                </div>
-                                <div class="card-body position-relative">
-                                    <h5 class="card-title">
-                                        <a href="#" class="post-title-link" data-bs-toggle="modal"
-                                            data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
-                                            data-description="{{ $rs->description }}"
-                                            data-status="{{ $rs->status }}"
-                                            data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
-                                            data-created="{{ $rs->created_at }}" data-updated="{{ $rs->updated_at }}"
-                                            data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
-                                            style="opacity: {{ $rs->status == 0 ? '0.5' : '1' }}">
-                                            {{ $rs->title }}
-                                        </a>
-                                    </h5>
-                                    <p class="card-text">
-                                        @if (strlen($rs->description) > 100)
-                                            {{ substr($rs->description, 0, 100) }}...
-                                            <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                    <div class="card-body position-relative">
+                                        <h5 class="card-title">
+                                            <a href="#" class="post-title-link" data-bs-toggle="modal"
                                                 data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
                                                 data-description="{{ $rs->description }}"
                                                 data-status="{{ $rs->status }}"
@@ -139,39 +130,56 @@
                                                 data-updated="{{ $rs->updated_at }}"
                                                 data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
                                                 style="opacity: {{ $rs->status == 0 ? '0.5' : '1' }}">
-                                                See more
+                                                {{ $rs->title }}
                                             </a>
-                                        @else
-                                            {{ $rs->description }}
-                                        @endif
-                                    </p>
+                                        </h5>
+                                        <p class="card-text">
+                                            @if (strlen($rs->description) > 100)
+                                                {{ substr($rs->description, 0, 100) }}...
+                                                <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                                    data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
+                                                    data-description="{{ $rs->description }}"
+                                                    data-status="{{ $rs->status }}"
+                                                    data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                    data-created="{{ $rs->created_at }}"
+                                                    data-updated="{{ $rs->updated_at }}"
+                                                    data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                    style="opacity: {{ $rs->status == 0 ? '0.5' : '1' }}">
+                                                    See more
+                                                </a>
+                                            @else
+                                                {{ $rs->description }}
+                                            @endif
+                                        </p>
+                                    </div>
+                                    @auth
+                                        <div class="card-footer d-flex justify-content-between align-items-center">
+                                            <span class="likes-count" data-post-id="{{ $rs->id }}"
+                                                data-bs-toggle="modal" data-bs-target="#likesModal" style="cursor:pointer;">
+                                                {{ $rs->likes->count() }} Likes
+                                            </span>
+                                            <button
+                                                class="btn btn-like {{ $rs->likes->contains('user_id', Auth::id()) ? 'liked' : '' }}"
+                                                type="button" data-post-id="{{ $rs->id }}">
+                                                <i class="bi bi-hand-thumbs-up"></i> Like
+                                            </button>
+                                        </div>
+                                    @endauth
                                 </div>
-                                @auth
-                                <div class="card-footer d-flex justify-content-between align-items-center">
-                                    <span class="likes-count" data-post-id="{{ $rs->id }}" data-bs-toggle="modal"
-                                        data-bs-target="#likesModal" style="cursor:pointer;">
-                                        {{ $rs->likes->count() }} Likes
-                                    </span>
-                                    <button class="btn btn-like {{ $rs->likes->contains('user_id', Auth::id()) ? 'liked' : '' }}" type="button" data-post-id="{{ $rs->id }}">
-                                        <i class="bi bi-hand-thumbs-up"></i> Like
-                                    </button>
-                                </div>
-                                @endauth
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="col-12">
+                            <div class="alert alert-warning text-center" role="alert">
+                                Post not found
                             </div>
                         </div>
-                    @endforeach
-                @else
-                    <div class="col-12">
-                        <div class="alert alert-warning text-center" role="alert">
-                            Post not found
-                        </div>
-                    </div>
-                @endif
+                    @endif
                 </div>
 
                 <div class="row mt-3 float-start">
-                    <div class="col-md-1">
-                        {!! $postlist->appends(['page-size' => $pageSize,'search-keyword' => request('search-keyword')])->links() !!}
+                    <div class="reset-nav">
+                        {!! $postlist->appends(['page-size' => $pageSize, 'search-keyword' => request('search-keyword')])->links() !!}
                     </div>
                 </div>
             </div>
@@ -233,101 +241,101 @@
         </div>
     </div>
 
-   <!-- Post Detail Modal -->
-<div class="modal fade" id="postDetailModal" tabindex="-1" aria-labelledby="postDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="postDetailModalLabel">Post Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row mb-2">
-                    <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-file-earmark-text me-2"></i><strong>Title:</strong>
+    <!-- Post Detail Modal -->
+    <div class="modal fade" id="postDetailModal" tabindex="-1" aria-labelledby="postDetailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postDetailModalLabel">Post Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-file-earmark-text me-2"></i><strong>Title:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="modalPostTitle"></span></p>
+                        </div>
                     </div>
-                    <div class="col-7">
-                        <p class="mb-0 mt-2"><span id="modalPostTitle"></span></p>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-card-text me-2"></i><strong>Description:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="modalPostDescription"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-check-circle me-2"></i><strong>Status:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="modalPostStatus"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-person-check me-2"></i><strong>Posted User:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="modalPostedUser"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-calendar-event me-2"></i><strong>Posted Date:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="modalPostedDate"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-calendar-check me-2"></i><strong>Updated Date:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="modalUpdatedDate"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 d-flex align-items-center">
+                            <i class="bi bi-person-lines-fill me-2"></i><strong>Updated User:</strong>
+                        </div>
+                        <div class="col-7">
+                            <p class="mb-0 mt-2"><span id="modalUpdatedUser"></span></p>
+                        </div>
                     </div>
                 </div>
-                <div class="row mb-2">
-                    <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-card-text me-2"></i><strong>Description:</strong>
-                    </div>
-                    <div class="col-7">
-                        <p class="mb-0 mt-2"><span id="modalPostDescription"></span></p>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
-                <div class="row mb-2">
-                    <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-check-circle me-2"></i><strong>Status:</strong>
-                    </div>
-                    <div class="col-7">
-                        <p class="mb-0 mt-2"><span id="modalPostStatus"></span></p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-person-check me-2"></i><strong>Posted User:</strong>
-                    </div>
-                    <div class="col-7">
-                        <p class="mb-0 mt-2"><span id="modalPostedUser"></span></p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-calendar-event me-2"></i><strong>Posted Date:</strong>
-                    </div>
-                    <div class="col-7">
-                        <p class="mb-0 mt-2"><span id="modalPostedDate"></span></p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-calendar-check me-2"></i><strong>Updated Date:</strong>
-                    </div>
-                    <div class="col-7">
-                        <p class="mb-0 mt-2"><span id="modalUpdatedDate"></span></p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col-5 d-flex align-items-center">
-                        <i class="bi bi-person-lines-fill me-2"></i><strong>Updated User:</strong>
-                    </div>
-                    <div class="col-7">
-                        <p class="mb-0 mt-2"><span id="modalUpdatedUser"></span></p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
-</div>
 
 
 
 
     <!-- Likes Modal -->
-<div class="modal fade" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="likesModalLabel">Like Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="likesList"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <div class="modal fade" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="likesModalLabel">Like Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="likesList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
     <script>
-        
         // Function to make the success message disappear after a few seconds
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('page-size').addEventListener('change', function() {
@@ -404,65 +412,66 @@
             modalUpdatedUser.textContent = updatedUser;
         });
 
-// resources/js/likes.js
-document.addEventListener('DOMContentLoaded', function() {
-    const likeButtons = document.querySelectorAll('.btn-like');
-    const likesCounts = document.querySelectorAll('.likes-count');
+        // resources/js/likes.js
+        document.addEventListener('DOMContentLoaded', function() {
+            const likeButtons = document.querySelectorAll('.btn-like');
+            const likesCounts = document.querySelectorAll('.likes-count');
 
-    likeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const postId = this.getAttribute('data-post-id');
-            const likeButton = this;
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
+                    const likeButton = this;
 
-            fetch(`/posts/${postId}/like`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const likesCount = document.querySelector(`.likes-count[data-post-id="${postId}"]`);
-                likesCount.textContent = `${data.likes_count} Likes`;
+                    fetch(`/posts/${postId}/like`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const likesCount = document.querySelector(
+                                `.likes-count[data-post-id="${postId}"]`);
+                            likesCount.textContent = `${data.likes_count} Likes`;
 
-                if (data.liked_by_user) {
-                    likeButton.classList.add('liked');
-                } else {
-                    likeButton.classList.remove('liked');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    });
+                            if (data.liked_by_user) {
+                                likeButton.classList.add('liked');
+                            } else {
+                                likeButton.classList.remove('liked');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            });
 
-    likesCounts.forEach(span => {
-        span.addEventListener('click', function() {
-            const postId = this.getAttribute('data-post-id');
+            likesCounts.forEach(span => {
+                span.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
 
-            fetch(`/posts/${postId}/likes`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const likesList = document.getElementById('likesList');
-                likesList.innerHTML = '';
-                data.likers.forEach(liker => {
-                    likesList.innerHTML += `<div class="d-flex align-items-center mb-2">
+                    fetch(`/posts/${postId}/likes`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const likesList = document.getElementById('likesList');
+                            likesList.innerHTML = '';
+                            data.likers.forEach(liker => {
+                                likesList.innerHTML += `<div class="d-flex align-items-center mb-2">
                         <img src="${liker.profile}" alt="Profile" class="rounded-circle me-2" width="30" height="30">
                         <span>${liker.name}</span>
                     </div>`;
+                            });
+                        })
+                        .catch(error => console.error('Error:', error));
                 });
-            })
-            .catch(error => console.error('Error:', error));
+            });
         });
-    });
-});
-
-
     </script>
 @endsection

@@ -30,9 +30,9 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-4">Current Password</label>
                             <div class="col-sm-8 position-relative">
-                            <input id="password" type="password" name="current_password" class="form-control" value="{{ old('current_password') }}">
+                            <input id="password" type="password" name="cp" class="form-control" value="{{ old('cp') }}">
                                 <i id="togglePassword" class="bi bi-eye position-absolute"></i>
-                                @error('current_password')
+                                @error('cp')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                             </div>

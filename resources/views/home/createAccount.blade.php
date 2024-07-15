@@ -34,9 +34,9 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-6">Password</label>
                             <div class="col-sm-8 position-relative">
-                                <input id="password" type="password" name="password" class="form-control" value="">
+                                <input id="password" type="password" name="spw" class="form-control" value="{{ old('spw') }}">
                                 <i id="togglePassword" class="bi bi-eye position-absolute"></i>
-                                @error('password')
+                                @error('spw')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -46,9 +46,9 @@
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label required col-sm-6">Password Confirmation</label>
                             <div class="col-sm-8 position-relative">
-                                <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" value="">
+                                <input id="password_confirmation" type="password" name="scpw" class="form-control" value="{{ old('scpw') }}">
                                 <i id="confirm_togglePassword" class="bi bi-eye position-absolute"></i>
-                                @error('password_confirmation')
+                                @error('scpw')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
