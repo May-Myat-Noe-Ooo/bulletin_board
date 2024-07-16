@@ -130,6 +130,12 @@ class User extends Authenticatable
             ->first();
     }
 
+    // Method to find all soft-deleted users
+    public static function findAllSoftDeletedUsers()
+    {
+        return self::onlyTrashed()->get();
+    }
+
     public static function activeUserExists(array $data): bool
     {
         return self::where('name', $data['name'])

@@ -138,7 +138,6 @@ class UserService
     {
         // Check for a soft-deleted user with the same name or email
         $softDeletedUser = User::findSoftDeletedUser($data);
-
         if ($softDeletedUser) {
             $imageName = time() . '.' . $data['profile']->extension();
             $data['profile']->move(public_path('img'), $imageName);
