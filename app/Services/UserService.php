@@ -73,7 +73,7 @@ class UserService
             if ($remember) {
                 // Set a cookie that lasts for one week
                 cookie()->queue('remember_email', $credentials['email'], 10080);
-                cookie()->queue('remember_password', $credentials['pw'], 10080);
+                cookie()->queue('remember_password', $credentials['password'], 10080);
             }
             return ['success'];
         }
@@ -322,7 +322,7 @@ class UserService
         }
 
         // Reset the user's password
-        $user->resetPassword($request->password);
+        $user->resetPassword($request->rpw);
 
         // Delete the password reset entry by email
         PasswordReset::deleteByEmail($user->email);

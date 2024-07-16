@@ -48,7 +48,7 @@ class UsersController extends Controller
                 //'spw' => 'required|string|min:8|confirmed',
                 'spw' => 'required|min:8',
             //'new_password_confirmation' => 'required|same:new_password',
-                'scpw' => 'required|same:spw',
+                'scpw' => 'required|min:8|same:spw',
             ],
             [
                 'name.required' => 'Name cannot be blank.',
@@ -57,8 +57,10 @@ class UsersController extends Controller
                 'email.email' => 'Email format is invalid.',
                 //'email.unique' => 'Email has already taken.',
                 'spw.required' => 'Password cannot be blank.',
-                'scpw.same' => 'Password and password confirmation do not match.',
                 'scpw.required' => 'Password cannot be blank.',
+                'spw.min' => 'Password must be at least 8 characters.',
+                'scpw.min' => 'Password must be at least 8 characters.',
+                'scpw.same' => 'Password and password confirmation do not match.', 
             ],
         );
         // Prepare data for the service
@@ -80,16 +82,16 @@ class UsersController extends Controller
         $request->validate(
             [
                 'email' => 'required|email',
-                'pw' => 'required',
+                'password' => 'required',
             ],
             [
                 'email.required' => 'Email cannot be blank.',
                 'email.email' => 'Email format is invalid.',
-                'pw.required' => 'Password cannot be blank.',
+                'password.required' => 'Password cannot be blank.',
             ],
         );
 
-        $credentials = $request->only('email', 'pw');
+        $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
         // Call AuthService login method
         $loginResult = $this->userService->login($credentials, $remember);
@@ -228,7 +230,14 @@ class UsersController extends Controller
             'cp' => 'required',
             'new_password' => 'required|min:8',
             'new_password_confirmation' => 'required|same:new_password',
-        ]);
+        ],
+        [
+            'cp.required' => 'Current Password cannot be blank.',
+            'new_password.required' => 'New Password cannot be blank.',
+            'new_password_confirmation.required' => 'New Confirm Password cannot be blank.',
+            'new_password_confirmation.same' => 'New Password and New Confirm Password do not match.',
+        ],
+    );
 
         // Call the updatePassword method in UserService
         $result = $this->userService->updatePassword($request, $id);
@@ -237,7 +246,14 @@ class UsersController extends Controller
             return back()->withErrors(['cp' => $result['error']])->withInput();
         }
 
-        return redirect()->route('displayuser')->with('success', $result['success']);
+        // Log out the user
+    Auth::logout();
+
+    // Flash the success message to the session
+    session()->flash('success', $result['success']);
+
+    // Redirect to the login page
+    return redirect()->route('login.index');
     }
     //Forgot Password session
     public function forgotPassword()
@@ -269,13 +285,18 @@ class UsersController extends Controller
         $request->validate(
             [
                 'token' => 'required',
-                'password' => 'required|string|min:8|confirmed',
-                'password_confirmation' => 'required|string|min:8',
+                'rpw' => 'required|min:8',
+            'crpw' => 'required|min:8|same:rpw',
+                //'password' => 'required|string|min:8|confirmed',
+                //'password_confirmation' => 'required|string|min:8',
             ],
             [
-                'password.required' => 'Password cannot be blank.',
-                'password_confirmation.required' => 'Password confirmation cannot be blank.',
-                'password.confirmed' => 'Password and password confirmation do not match.',
+                'rpw.required' => 'Password cannot be blank.',
+                'crpw.required' => 'Password confirmation cannot be blank.',
+                'rpw.min' => 'Password must be at least 8 characters.',
+                'crpw.min' => 'Password Confirmation must be at least 8 characters.',
+                //'password.confirmed' => 'Password and password confirmation do not match.',
+                'crpw.same' => 'Password and password confirmation do not match.',
             ],
         );
 

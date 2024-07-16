@@ -142,7 +142,7 @@ class User extends Authenticatable
         $user = self::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make($data['spw']),
             'profile' => 'img/defaultprofile.png',
             'create_user_id' => 1,
             'updated_user_id' => 1,
@@ -214,7 +214,7 @@ class User extends Authenticatable
     /**
      * Reset the user's password.
      *
-     * @param string $password
+     * @param string $passwordf
      * @return void
      */
     public function resetPassword(string $password): void

@@ -29,9 +29,9 @@
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-5">Password:</label>
-                            <div class="col-sm-8 position-relative"><input id="password" type="password" name="password" class="form-control" >
+                            <div class="col-sm-8 position-relative"><input id="password" type="password" name="rpw" class="form-control" value="{{ old('rpw') }}">
                                 <i id="togglePassword" class="bi bi-eye position-absolute"></i>
-                                @error('password')
+                                @error('rpw')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -40,9 +40,9 @@
                     <div class="row mb-3">
                         <div class="col d-flex justify-content-around align-item-center">
                             <label for="" class="form-label col-sm-5">Password Confirmation:</label>
-                            <div class="col-sm-8 position-relative"><input id="password_confirmation" type="password" name="password_confirmation" class="form-control" >
+                            <div class="col-sm-8 position-relative"><input id="password_confirmation" type="password" name="crpw" class="form-control" value="{{ old('crpw') }}">
                                 <i id="confirm_togglePassword" class="bi bi-eye position-absolute"></i>
-                                @error('password_confirmation')
+                                @error('crpw')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
