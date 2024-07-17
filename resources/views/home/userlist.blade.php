@@ -84,9 +84,9 @@
                                                         data-phone="{{ $rs->phone }}" data-dob="{{ $rs->dob }}"
                                                         data-address="{{ $rs->address }}"
                                                         data-created="{{ $rs->created_at }}"
-                                                        data-created-user="{{ $rs->createdBy->name }}"
+                                                        data-created-user="{{ $rs->createdBy->name ?? 'N/A' }}"
                                                         data-updated="{{ $rs->updated_at }}"
-                                                        data-updated-user="{{ $rs->updatedBy->name }}">
+                                                        data-updated-user="{{ $rs->updatedBy->name ?? 'N/A' }}">
                                                         <i class="bi bi-info-circle me-2"></i>Details</a></li>
                                                 <li><a class="dropdown-item text-danger" href="#"
                                                         data-bs-toggle="modal" data-bs-target="#deleteModal"
@@ -114,13 +114,13 @@
                                                 data-email="{{ $rs->email }}" data-phone="{{ $rs->phone }}"
                                                 data-dob="{{ $rs->dob }}" data-address="{{ $rs->address }}"
                                                 data-created="{{ $rs->created_at }}"
-                                                data-created-user="{{ $rs->createdBy->name }}"
+                                                data-created-user="{{ $rs->createdBy->name ?? 'N/A'}}"
                                                 data-updated="{{ $rs->updated_at }}"
-                                                data-updated-user="{{ $rs->updatedBy->name }}">
+                                                data-updated-user="{{ $rs->updatedBy->name ?? 'N/A'}}">
                                                 {{ $rs->name }}
                                             </a></h5>
                                         <p class="card-text">{{ $rs->email }}</p>
-                                        <p class="card-text"><small class="text-muted">Created by {{ $rs->createdBy->name }} -
+                                        <p class="card-text"><small class="text-muted">Created by {{ $rs->createdBy->name ?? 'N/A' }} -
                                                 {{ $rs->created_at->diffForHumans() }}</small></p>
                                     </div>
 
