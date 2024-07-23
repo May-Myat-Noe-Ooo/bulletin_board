@@ -4,12 +4,16 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
-    //protected $commands = [
-    //    Commands\SendDailyPostsReport::class,
-    //];
+    protected $commands = [
+        \App\Console\Commands\SendDailyPostsReport::class,
+        \App\Console\Commands\DeleteOldPasswordResets::class,
+        \App\Console\Commands\SendFridayEmail::class,
+        \App\Console\Commands\SendMonthlyDashboardData::class,
+    ];
     /**
      * Define the application's command schedule.
      */
