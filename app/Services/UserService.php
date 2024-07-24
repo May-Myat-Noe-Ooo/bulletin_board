@@ -67,26 +67,31 @@ class UserService
      * @return array
      */
     public function login(array $credentials, bool $remember): array
-    {
-        if (Auth::attempt($credentials)) {
-            // Authentication passed, redirect to post list
-            if ($remember) {
-                // Set a cookie that lasts for one week
-                cookie()->queue('remember_email', $credentials['email'], 10080);
-                cookie()->queue('remember_password', $credentials['password'], 10080);
-            }
-            return ['success'];
+{
+    if (Auth::attempt($credentials)) {
+        // Authentication passed, redirect to post list
+        if ($remember) {
+            // Set cookies that last for one week (10080 minutes)
+            cookie()->queue('remember_email', $credentials['email'], 10080);
+            cookie()->queue('remember_password', $credentials['password'], 10080);
+        } else {
+            // Clear cookies if remember me is not checked
+            cookie()->queue(cookie()->forget('remember_email'));
+            cookie()->queue(cookie()->forget('remember_password'));
         }
-
-        // Check if email exists in the database
-        $user = User::emailExists($credentials['email']);
-        if (!$user) {
-            return ['error' => 'There is no such account. Please sign up and create an account.'];
-        }
-
-        // Check if the password is incorrect
-        return ['error' => 'Incorrect password. Please try again.'];
+        return ['success'];
     }
+
+    // Check if email exists in the database
+    $user = User::where('email', $credentials['email'])->first();
+    if (!$user) {
+        return ['error' => 'There is no such account. Please sign up and create an account.'];
+    }
+
+    // Check if the password is incorrect
+    return ['error' => 'Incorrect password. Please try again.'];
+}
+
     /**
      * Handle user signup and reactivation.
      *
