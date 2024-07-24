@@ -94,10 +94,10 @@
                                                                 data-title="{{ $rs->title }}"
                                                                 data-description="{{ $rs->description }}"
                                                                 data-status="{{ $rs->status }}"
-                                                                data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                                data-user="{{ $rs->user ? $rs->user->name : 'N/A' }}"
                                                                 data-created="{{ $rs->created_at }}"
                                                                 data-updated="{{ $rs->updated_at }}"
-                                                                data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}">
+                                                                data-updated-user="{{ $rs->updatedUser ? $rs->updatedUser->name : 'N/A' }}">
                                                                 <i class="bi bi-info-circle me-2"></i>Details</a></li>
                                                         <li>
                                                             <a href="{{ route('postlist.edit', $rs->id) }}"
@@ -125,10 +125,10 @@
                                                 data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
                                                 data-description="{{ $rs->description }}"
                                                 data-status="{{ $rs->status }}"
-                                                data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                data-user="{{ $rs->user ? $rs->user->name : 'N/A' }}"
                                                 data-created="{{ $rs->created_at }}"
                                                 data-updated="{{ $rs->updated_at }}"
-                                                data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                data-updated-user="{{ $rs->updatedUser ? $rs->updatedUser->name : 'N/A' }}"
                                                 style="opacity: {{ $rs->status == 0 ? '0.5' : '1' }}">
                                                 {{ $rs->title }}
                                             </a>
@@ -140,10 +140,10 @@
                                                     data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
                                                     data-description="{{ $rs->description }}"
                                                     data-status="{{ $rs->status }}"
-                                                    data-user="{{ $rs->user ? ($rs->user->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                    data-user="{{ $rs->user ? $rs->user->name: 'N/A' }}"
                                                     data-created="{{ $rs->created_at }}"
                                                     data-updated="{{ $rs->updated_at }}"
-                                                    data-updated-user="{{ $rs->updatedUser ? ($rs->updatedUser->type == 0 ? 'admin' : 'user') : 'N/A' }}"
+                                                    data-updated-user="{{ $rs->updatedUser ? $rs->updatedUser->name : 'N/A' }}"
                                                     style="opacity: {{ $rs->status == 0 ? '0.5' : '1' }}">
                                                     See more
                                                 </a>
