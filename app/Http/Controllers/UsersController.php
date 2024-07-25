@@ -1,18 +1,115 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Models\User;
+use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
+use App\Mail\PasswordResetMail;
 
 class UsersController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        //$this->middleware('auth')->except(['login']); // Ensure user is authenticated, except for login
+        $this->userService = $userService;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         return view('home.login');
+    }
+
+    public function signup()
+    {
+        return view('home.createAccount');
+    }
+
+    public function signupSave(Request $request)
+    {
+        // Validate the request
+        $request->validate(
+            [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                //'spw' => 'required|string|min:8|confirmed',
+                'spw' => 'required|min:8',
+            //'new_password_confirmation' => 'required|same:new_password',
+                'scpw' => 'required|min:8|same:spw',
+            ],
+            [
+                'name.required' => 'Name cannot be blank.',
+                //'name.unique' => 'Name has already taken.',
+                'email.required' => 'Email cannot be blank.',
+                'email.email' => 'Email format is invalid.',
+                //'email.unique' => 'Email has already taken.',
+                'spw.required' => 'Password cannot be blank.',
+                'scpw.required' => 'Password cannot be blank.',
+                'spw.min' => 'Password must be at least 8 characters.',
+                'scpw.min' => 'Password must be at least 8 characters.',
+                'scpw.same' => 'Password and password confirmation do not match.', 
+            ],
+        );
+        // Prepare data for the service
+        $data = $request->only('name', 'email', 'spw', 'phone', 'dob', 'address');
+
+        // Call the signup method in UserService
+        $result = $this->userService->signup($data);
+
+        if (isset($result['error_html'])) {
+            return redirect()->back()->withErrors($result['error_html'])->withInput();
+        }
+
+        return redirect()->route('login.index')->with('success', $result['success']);
+    }
+
+    public function login(\Illuminate\Http\Request $request)
+    {
+        // Validate the request
+        $request->validate(
+            [
+                'email' => 'required|email',
+                'password' => 'required',
+            ],
+            [
+                'email.required' => 'Email cannot be blank.',
+                'email.email' => 'Email format is invalid.',
+                'password.required' => 'Password cannot be blank.',
+            ],
+        );
+
+        $credentials = $request->only('email', 'password');
+        $remember = $request->has('remember');
+        // Call AuthService login method
+        $loginResult = $this->userService->login($credentials, $remember);
+        if (isset($loginResult['error'])) {
+            return redirect()->back()->with('error', $loginResult['error'])->withInput();
+        }
+
+
+        return redirect()->route('postlist.index');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        // Clear the cookies
+        cookie()->queue(cookie()->forget('remember_email'));
+        cookie()->queue(cookie()->forget('remember_password'));
+        return redirect()->route('login.index');
     }
 
     /**
@@ -25,19 +122,47 @@ class UsersController extends Controller
 
     public function confirmRegister(\Illuminate\Http\Request $request)
     {
-        $name = $request->name;
-        $email = $request->email;
-        $password = $request->password;
-        $cpassword = $request->confirmpassword;
-        $type = $request->type;
-        $phone = $request->phone;
-        $dob = $request->date;
-        $address = $request->address;
-        $imageName = time() . '.' . $request->profile->extension();
-        $success = $request->profile->move(public_path('img'), $imageName);
-        $imagePath = 'img/' . $imageName;
-        $profile = 'img/' . $imageName;
-        return view('home.confirmregister', compact('name', 'email', 'password', 'cpassword', 'type', 'phone', 'dob', 'address', 'imagePath', 'profile'));
+        // Validate the request
+        $request->validate(
+            [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'pw' => 'required|min:8',
+                'cpw' => 'required|same:pw',
+                'profile' => 'required|file',
+            ],
+            [
+                'name.required' => 'Name cannot be blank.',
+                'email.required' => 'Email cannot be blank.',
+                'email.email' => 'Email format is invalid.',
+                'pw.required' => 'Password cannot be blank.',
+                'cpw.required' => 'Password confirmation cannot be blank.',
+                'cpw.same' => 'Password and password confirmation do not match.',
+                'profile.required' => 'Profile cannot be blank',
+            ],
+        );
+        // Prepare data for the service
+        $data = $request->only('name', 'email', 'pw', 'cpw', 'type', 'phone', 'date', 'address', 'profile');
+
+        // Call the confirmRegister method in UserService
+        $result = $this->userService->confirmRegister($data);
+
+        if (isset($result['error_html'])) {
+            return redirect()->back()->withErrors($result['error_html'])->withInput();
+        }
+
+        return view('home.confirmregister', [
+            'name'=> $result['name'], 
+            'email'=> $result['email'], 
+            'password'=> $result['password'], 
+            'cpassword'=> $result['cpassword'],
+             'type'=> $result['type'],
+              'phone'=> $result['phone'], 
+              'dob'=> $result['dob'], 
+              'address'=> $result['address'], 
+              'imagePath'=> $result['imagePath'], 
+              'profile'=> $result['profile']
+            ]);
     }
 
     public function create()
@@ -55,52 +180,142 @@ class UsersController extends Controller
 
     public function storeRegisterUser(\Illuminate\Http\Request $request)
     {
-        //dd ('$request->profile');
-        User::create($request->all());
+        // Prepare data for the service
+        $data = $request->only('name', 'email', 'password', 'password_confirmation', 'type', 'phone', 'date', 'address', 'profile_path');
+        // Call the storeRegisterUser method in UserService
+        $result = $this->userService->storeRegisterUser($data);
 
-        return redirect()->route('displayuser')->with('success', 'Register user added successfully');
+        if (isset($result['error_html'])) {
+            return redirect()->back()->withErrors($result['error_html'])->withInput();
+        }
+
+        return redirect()->route('displayuser')->with('success', $result['success']);
+        
     }
 
     /**
      * Display the specified resource.
      */
-    public function displayUser()
+    public function displayUser(Request $request)
+{
+    $userlist = $this->userService->getUsers($request);
+    $pageSize = $request->input('page-size', 4); // Default page size is 4
+
+    // Return the view with the user list
+    return view('home.userlist', compact('userlist', 'pageSize'));
+}
+
+    public function showProfile(string $id)
     {
-        $userlist = User::Paginate(5);
-        // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
-        return view('home.userlist', compact('userlist'));
+        $user = $this->userService->getUserById($id);
+        return view('home.profile', compact('user'));
     }
 
-    public function showProfile()
+    public function editProfile(\Illuminate\Http\Request $request, $id)
     {
-        return view('home.profile');
+        $user = $this->userService->getUserById($id);
+        return view('home.editProfile', compact('user'));
     }
 
-    public function editProfile(\Illuminate\Http\Request $request)
+    //User/Admin password control section start
+    public function changePassword($id)
     {
-        $name = $request->name;
-        return view('home.editProfile', compact('name'));
+        $user = $this->userService->getUserById($id);
+        return view('home.changepassword', compact('user'));
     }
 
-    public function show(string $id)
+    public function updatePassword(Request $request, $id)
     {
-        //
+        $request->validate([
+            'cp' => 'required',
+            'new_password' => 'required|min:8',
+            'new_password_confirmation' => 'required|same:new_password',
+        ],
+        [
+            'cp.required' => 'Current Password cannot be blank.',
+            'new_password.required' => 'New Password cannot be blank.',
+            'new_password_confirmation.required' => 'New Confirm Password cannot be blank.',
+            'new_password_confirmation.same' => 'New Password and New Confirm Password do not match.',
+        ],
+    );
+
+        // Call the updatePassword method in UserService
+        $result = $this->userService->updatePassword($request, $id);
+        //dd($result['error']);
+        if (isset($result['error'])) {
+            return back()->withErrors(['cp' => $result['error']])->withInput();
+        }
+
+        // Log out the user
+    Auth::logout();
+
+    // Flash the success message to the session
+    session()->flash('success', $result['success']);
+
+    // Redirect to the login page
+    return redirect()->route('login.index');
+    }
+    //Forgot Password session
+    public function forgotPassword()
+    {
+        return view('home.forgotPassword');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function sendResetLink(Request $request)
     {
-        //
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+        // Call the sendResetLink method in UserService
+        $result = $this->userService->sendResetLink($request);
+        if (isset($result['error'])) {
+            return redirect()->back()->with('error', $result['error'])->withInput();
+        }
+
+        return redirect()->route('login.index')->with('success', $result['success']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function showResetForm($token)
     {
-        //
+        return view('home.resetPassword', ['token' => $token]);
+    }
+
+    public function resetPassword(\Illuminate\Http\Request $request)
+    {
+        $request->validate(
+            [
+                'token' => 'required',
+                'rpw' => 'required|min:8',
+            'crpw' => 'required|min:8|same:rpw',
+                //'password' => 'required|string|min:8|confirmed',
+                //'password_confirmation' => 'required|string|min:8',
+            ],
+            [
+                'rpw.required' => 'Password cannot be blank.',
+                'crpw.required' => 'Password confirmation cannot be blank.',
+                'rpw.min' => 'Password must be at least 8 characters.',
+                'crpw.min' => 'Password Confirmation must be at least 8 characters.',
+                //'password.confirmed' => 'Password and password confirmation do not match.',
+                'crpw.same' => 'Password and password confirmation do not match.',
+            ],
+        );
+
+        // Call the resetPassword method in UserService
+        $result = $this->userService->resetPassword($request);
+        if (isset($result['error'])) {
+            return back()->withErrors($result['error'])->withInput();
+        }
+
+        return redirect()->route('login.index')->with('success', $result['success']);
+    }
+//User/Admin password control section end
+
+    //update profile
+    public function updateProfile(Request $request, $id)
+    {
+        // Call the updateProfile method in UserService
+        $result = $this->userService->updateProfile($request, $id);
+        return redirect()->route('displayuser')->with('success', $result['success']);
     }
 
     /**
@@ -108,6 +323,8 @@ class UsersController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->userService->deleteUserById($id);
+
+        return redirect()->route('displayuser')->with('success', 'User deleted successfully');
     }
 }

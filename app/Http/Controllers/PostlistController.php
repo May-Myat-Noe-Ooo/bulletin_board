@@ -3,74 +3,60 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\PostService;
 use App\Models\Postlist;
+use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 class PostlistController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    protected $postService;
+
+    public function __construct(PostService $postService)
     {
-        $postlist = PostList::Paginate(5);
-        // $postlist = Postlist::orderBy('created_at', 'DESC')->get();
-        return view('home.postlist', compact('postlist'));
+        $this->postService = $postService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function index(Request $request)
+{
+   //dd($request->input('search-keyword'));
+    $postlist = $this->postService->getPosts($request);
+    $pageSize = $request->input('page-size', 6);
+    $route = $request->route()->getName();
+    
+    return view('home.postlist', compact('postlist', 'pageSize', 'route'));
+}
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified post.
      */
     public function edit(string $id)
     {
-        $postlist = Postlist::findOrFail($id);
+        $postlist = $this->postService->getPostById($id);
 
         return view('home.editpost', compact('postlist'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified post in storage.
      */
     public function update(Request $request, string $id)
     {
-        $postlist = Postlist::findOrFail($id);
+        $this->postService->updatePost($request,$id);
 
-        $postlist->update($request->all());
-
-        return redirect()->route('postlist.index')->with('success', 'post updated successfully');
+        return redirect()->route('postlist.index')->with('success', 'post edited successfully');
     }
-    //public function update(Request $request, string $id)
-    //{
-    //    //
-    //}
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified post from storage.
      */
     public function destroy(string $id)
-    {
-        //
-    }
+{
+    $this->postService->deletePostById($id);
+
+    return redirect()->route('postlist.index')->with('success', 'Post deleted successfully');
+}
 }
