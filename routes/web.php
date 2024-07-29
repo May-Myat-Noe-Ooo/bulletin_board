@@ -9,6 +9,9 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TranscriptionController;
+use App\Http\Controllers\VoiceRssController;
+use App\Http\Controllers\TextToSpeechController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,18 +40,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
     });
 });
-//Route::post('/posts/{post}/like', [LikeController::class, 'toggleLike'])->middleware('auth')->name('posts.like');
-// routes/web.php
 
 Route::post('/posts/{post}/like', [LikeController::class, 'toggleLike'])->middleware('auth');
 Route::get('/posts/{post}/likes', [LikeController::class, 'getPostLikes'])->middleware('auth');
-
-//Route::resource('/login', UsersController::class);
-
-// Authentication required for post list
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/postlist', [PostlistController::class, 'index'])->name('postlist');
-// });
 
 Route::group(['namespace' => 'App\Http\Controllers'], function () {
     // Authentication routes
@@ -73,19 +67,14 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::post('/registerconfirm', 'UsersController@confirmRegister')->name('registerconfirm');
     Route::post('/store-registeruser', 'UsersController@storeRegisterUser')->name('storeRegisterUser');
 
-    // Route::get('/displayuser', 'UsersController@displayUser')->name('displayuser');
-
     Route::get('/showprofile/{id}', 'UsersController@showProfile')->name('showprofile');
     Route::post('/editprofile/{id}', 'UsersController@editProfile')->name('editprofile');
-    // Route::post('/updateprofile/{id}', 'UsersController@update')->name('update_profile');
     Route::patch('/updateprofile/{id}', [UsersController::class, 'updateProfile'])->name('updateprofile');
 
     //User Password Changing
     Route::get('/change_password/{id}', 'UsersController@changePassword')->name('change_password');
     Route::post('/change_password/{id}', 'UsersController@updatePassword')->name('update_password');
 
-    //Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
-    //Route::get('/reset_password', 'UsersController@resetPassword')->name('reset_password');
     Route::get('/forgot_password', 'UsersController@forgotPassword')->name('forgot_password');
     Route::post('/forgot_password', 'UsersController@sendResetLink')->name('forgot_password.send');
     Route::get('/reset_password/{token}', 'UsersController@showResetForm')->name('reset_password');
@@ -95,3 +84,5 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::post('/upload-csv', 'PostsController@uploadCsv')->name('upload_csv');
     Route::get('/postlists/export', 'PostsController@export')->name('postlists.export');
 });
+//Text to speech Route
+Route::post('/convert-text-to-speech', [TextToSpeechController::class, 'convertToSpeech']);

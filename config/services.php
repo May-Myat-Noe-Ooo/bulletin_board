@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'voicerss' => [
+    'key' => env('VOICE_RSS_API_KEY'),
+    'url' => env('VOICE_RSS_API_URL'),
+],
+
+
 ];
