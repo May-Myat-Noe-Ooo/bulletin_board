@@ -22,7 +22,7 @@ class VoiceRssController extends Controller
     public function convertTextToSpeech(Request $request)
     {
         $request->validate([
-            'text' => 'required|string'
+            'text' => 'required|string',
         ]);
 
         $text = $request->input('text');
@@ -33,7 +33,7 @@ class VoiceRssController extends Controller
         file_put_contents($filePath, $audioContent);
 
         return view('text_to_speech', [
-            'audioFile' => url('audio/' . $filename)
+            'audioFile' => url('audio/' . $filename),
         ]);
     }
 }

@@ -140,7 +140,7 @@
                                                     data-bs-target="#postDetailModal" data-title="{{ $rs->title }}"
                                                     data-description="{{ $rs->description }}"
                                                     data-status="{{ $rs->status }}"
-                                                    data-user="{{ $rs->user ? $rs->user->name: 'N/A' }}"
+                                                    data-user="{{ $rs->user ? $rs->user->name : 'N/A' }}"
                                                     data-created="{{ $rs->created_at }}"
                                                     data-updated="{{ $rs->updated_at }}"
                                                     data-updated-user="{{ $rs->updatedUser ? $rs->updatedUser->name : 'N/A' }}"
@@ -156,7 +156,7 @@
                                         <div class="card-footer d-flex justify-content-between align-items-center">
                                             <span class="likes-count" data-post-id="{{ $rs->id }}"
                                                 data-bs-toggle="modal" data-bs-target="#likesModal" style="cursor:pointer;">
-                                                {{ $rs->likes->count() }} {{ $rs->likes->count() <= 1? 'Like' : 'Likes' }}
+                                                {{ $rs->likes->count() }} {{ $rs->likes->count() <= 1 ? 'Like' : 'Likes' }}
                                             </span>
                                             <button
                                                 class="btn btn-like {{ $rs->likes->contains('user_id', Auth::id()) ? 'liked' : '' }}"
@@ -434,7 +434,8 @@
                         .then(data => {
                             const likesCount = document.querySelector(
                                 `.likes-count[data-post-id="${postId}"]`);
-                            likesCount.textContent = `${data.likes_count} ${data.likes_count <= 1 ? 'Like' : 'Likes'}`;
+                            likesCount.textContent =
+                                `${data.likes_count} ${data.likes_count <= 1 ? 'Like' : 'Likes'}`;
 
                             if (data.liked_by_user) {
                                 likeButton.classList.add('liked');

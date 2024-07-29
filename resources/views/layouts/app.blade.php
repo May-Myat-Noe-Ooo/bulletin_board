@@ -71,27 +71,27 @@
     </form>
 
     @if (session('audioFileUrl'))
-            <audio id="audioPlayer" controls autoplay>
-                <source src="{{ session('audioFileUrl') }}" type="audio/mp3">
-                Your browser does not support the audio element.
-            </audio>
-        @endif
+        <audio id="audioPlayer" controls autoplay>
+            <source src="{{ session('audioFileUrl') }}" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+    @endif
 
-        @if ($errors->any())
-            <div>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-    
+    @if ($errors->any())
+        <div>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
 
     <main class="container py-3">
         @yield('body')
         <!-- Add the Read Aloud button -->
-        
+
     </main>
 
     @include('layouts.footer')
@@ -101,7 +101,7 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
+            //Read Aloud Section 
             const readAloudButton = document.getElementById('readAloudButton');
             const textInput = document.getElementById('text');
 
@@ -135,157 +135,160 @@
                 });
             }
 
+            //Changing Font Size and Changing color count sectioon
+
             const body = document.body;
-        const header = document.querySelector('header');
-        const nav = document.querySelector('nav');
-        const footer = document.querySelector('footer');
-        const resizableElements = document.querySelectorAll('.resizable');
+            const header = document.querySelector('header');
+            const nav = document.querySelector('nav');
+            const footer = document.querySelector('footer');
+            const resizableElements = document.querySelectorAll('.resizable');
 
-        const decreaseFontButton = document.getElementById('decreaseFont');
-        const resetFontButton = document.getElementById('resetFont');
-        const increaseFontButton = document.getElementById('increaseFont');
-        const blueButton = document.getElementById('blueButton');
-        const blackButton = document.getElementById('blackButton');
-        const whiteButton = document.getElementById('whiteButton');
+            const decreaseFontButton = document.getElementById('decreaseFont');
+            const resetFontButton = document.getElementById('resetFont');
+            const increaseFontButton = document.getElementById('increaseFont');
+            const blueButton = document.getElementById('blueButton');
+            const blackButton = document.getElementById('blackButton');
+            const whiteButton = document.getElementById('whiteButton');
 
-        let fontSize = parseInt(localStorage.getItem('fontSize')) || 16;
+            let fontSize = parseInt(localStorage.getItem('fontSize')) || 16;
 
-        // Function to set font size for all resizable elements
-        function setFontSize(size) {
-            body.style.fontSize = size + 'px';
-            footer.style.fontSize = size + 'px';
-            resizableElements.forEach(element => {
-                element.style.fontSize = size + 'px';
-            });
-            localStorage.setItem('fontSize', size); // Save the font size in local storage
-        }
-
-        // Apply the saved font size on page load
-        setFontSize(fontSize);
-
-        // Apply the saved color scheme on page load
-        const savedColorScheme = localStorage.getItem('colorScheme');
-        if (savedColorScheme) {
-            applyColorScheme(savedColorScheme);
-        }
-
-        // Decrease font size
-        decreaseFontButton.addEventListener('click', function() {
-            fontSize = Math.max(10, fontSize - 1); // Prevent font size from being too small
-            setFontSize(fontSize);
-        });
-
-        // Reset font size
-        resetFontButton.addEventListener('click', function() {
-            fontSize = 16;
-            setFontSize(fontSize);
-        });
-
-        // Increase font size
-        increaseFontButton.addEventListener('click', function() {
-            fontSize = Math.min(24, fontSize + 1); // Prevent font size from being too large
-            setFontSize(fontSize);
-        });
-
-        // Function to apply color scheme
-        function applyColorScheme(scheme) {
-            switch (scheme) {
-                case 'blue':
-                    body.style.backgroundColor = 'blue';
-                    header.style.backgroundColor = 'blue';
-                    nav.style.backgroundColor = '#0000AA';
-                    footer.style.backgroundColor = '#0000AA';
-                    body.style.color = 'yellow';
-                    document.querySelectorAll('a').forEach(a => a.style.color = 'white');
-                    document.getElementById('bcard').style.backgroundColor = 'blue';
-                    document.getElementById('bcard').style.borderColor = 'white';
-                    document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
-                        card.style.backgroundColor = '#0000AA';
-                        card.style.color = '#ffffff';
-                    });
-                    document.querySelectorAll('.postlist .card-body').forEach(function(card) {
-                        card.style.backgroundColor = '#0000AA';
-                    });
-                    document.querySelectorAll('.reset-nav a').forEach(function(card) {
-                        card.style.backgroundColor = '#0000AA';
-                    });
-                    document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
-                        element.style.color = 'black';
-                    });
-                    break;
-                case 'black':
-                    body.style.backgroundColor = 'black';
-                    header.style.backgroundColor = 'black';
-                    nav.style.backgroundColor = '#333333';
-                    footer.style.backgroundColor = '#333333';
-                    body.style.color = 'yellow';
-                    footer.style.color = 'yellow';
-                    document.querySelectorAll('a').forEach(a => a.style.color = 'white');
-                    document.getElementById('bcard').style.backgroundColor = 'black';
-                    document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
-                        element.style.color = 'yellow';
-                    });
-                    document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
-                        card.style.backgroundColor = '#333333';
-                        card.style.color = '';
-                    });
-                    document.querySelectorAll('.postlist .card-body').forEach(function(card) {
-                        card.style.backgroundColor = '#333333';
-                    });
-                    document.querySelectorAll('.reset-nav a').forEach(function(card) {
-                        card.style.backgroundColor = '#333333';
-                    });
-                    document.querySelectorAll('.btn-outline-dark').forEach(function(button) {
-                        button.classList.remove('btn-outline-dark');
-                        button.classList.add('btn-outline-light');
-                    });
-                    document.getElementById('bcard').style.borderColor = 'white';
-                    break;
-                case 'white':
-                     default:
-                    // Reset styles to defaults
-                    body.style.backgroundColor = '';
-                    header.style.backgroundColor = 'white';
-                    nav.style.backgroundColor = '';
-                    footer.style.backgroundColor = '';
-                    body.style.color = '';
-                    footer.style.color = '';
-                    document.querySelectorAll('a').forEach(a => a.style.color = '');
-                    document.getElementById('bcard').style.backgroundColor = '';
-                    document.getElementById('bcard').style.borderColor = '';
-                    document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
-                        card.style.backgroundColor = '';
-                        card.style.color = '';
-                    });
-                    document.querySelectorAll('.postlist .card-body').forEach(function(card) {
-                        card.style.backgroundColor = '';
-                    });
-                    document.querySelectorAll('.reset-nav a').forEach(function(card) {
-                        card.style.backgroundColor = '';
-                    });
-                    document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
-                        element.style.color = '';
-                    });
-                    document.querySelectorAll('.btn-outline-light').forEach(function(button) {
-                        button.classList.remove('btn-outline-light');
-                        button.classList.add('btn-outline-dark');
-                    });
-                    break;
+            // Function to set font size for all resizable elements
+            function setFontSize(size) {
+                body.style.fontSize = size + 'px';
+                footer.style.fontSize = size + 'px';
+                resizableElements.forEach(element => {
+                    element.style.fontSize = size + 'px';
+                });
+                localStorage.setItem('fontSize', size); // Save the font size in local storage
             }
-            localStorage.setItem('colorScheme', scheme); // Save the color scheme in local storage
-        }
 
-        // Event listeners for color buttons
-        blueButton.addEventListener('click', function() {
-            applyColorScheme('blue');
-        });
-        blackButton.addEventListener('click', function() {
-            applyColorScheme('black');
-        });
-        whiteButton.addEventListener('click', function() {
-            applyColorScheme('white');
-        });
-        
+            // Apply the saved font size on page load
+            setFontSize(fontSize);
+            console.log(fontSize);
+            // Apply the saved color scheme on page load
+            const savedColorScheme = localStorage.getItem('colorScheme');
+            if (savedColorScheme) {
+                applyColorScheme(savedColorScheme);
+            }
+
+            // Decrease font size
+            decreaseFontButton.addEventListener('click', function() {
+                fontSize = Math.max(10, fontSize - 1); // Prevent font size from being too small
+                setFontSize(fontSize);
+            });
+
+            // Reset font size
+            resetFontButton.addEventListener('click', function() {
+                fontSize = 16;
+                setFontSize(fontSize);
+            });
+
+            // Increase font size
+            increaseFontButton.addEventListener('click', function() {
+                fontSize = Math.min(24, fontSize + 1); // Prevent font size from being too large
+                setFontSize(fontSize);
+            });
+
+            // Function to apply color scheme
+            function applyColorScheme(scheme) {
+                switch (scheme) {
+                    case 'blue':
+                        body.style.backgroundColor = 'blue';
+                        header.style.backgroundColor = 'blue';
+                        nav.style.backgroundColor = '#0000AA';
+                        footer.style.backgroundColor = '#0000AA';
+                        body.style.color = 'yellow';
+                        document.querySelectorAll('a').forEach(a => a.style.color = 'white');
+                        document.getElementById('bcard').style.backgroundColor = 'blue';
+                        document.getElementById('bcard').style.borderColor = 'white';
+                        document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
+                            card.style.backgroundColor = '#0000AA';
+                            card.style.color = '#ffffff';
+                        });
+                        document.querySelectorAll('.postlist .card-body').forEach(function(card) {
+                            card.style.backgroundColor = '#0000AA';
+                        });
+                        document.querySelectorAll('.reset-nav a').forEach(function(card) {
+                            card.style.backgroundColor = '#0000AA';
+                        });
+                        document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
+                            element.style.color = 'black';
+                        });
+                        break;
+                    case 'black':
+                        body.style.backgroundColor = 'black';
+                        header.style.backgroundColor = 'black';
+                        nav.style.backgroundColor = '#333333';
+                        footer.style.backgroundColor = '#333333';
+                        body.style.color = 'yellow';
+                        footer.style.color = 'yellow';
+                        document.querySelectorAll('a').forEach(a => a.style.color = 'white');
+                        document.getElementById('bcard').style.backgroundColor = 'black';
+                        document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
+                            element.style.color = 'yellow';
+                        });
+                        document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
+                            card.style.backgroundColor = '#333333';
+                            card.style.color = '';
+                        });
+                        document.querySelectorAll('.postlist .card-body').forEach(function(card) {
+                            card.style.backgroundColor = '#333333';
+                        });
+                        document.querySelectorAll('.reset-nav a').forEach(function(card) {
+                            card.style.backgroundColor = '#333333';
+                        });
+                        document.querySelectorAll('.btn-outline-dark').forEach(function(button) {
+                            button.classList.remove('btn-outline-dark');
+                            button.classList.add('btn-outline-light');
+                        });
+                        document.getElementById('bcard').style.borderColor = 'white';
+                        break;
+                    case 'white':
+                    default:
+                        // Reset styles to defaults
+                        body.style.backgroundColor = '';
+                        header.style.backgroundColor = 'white';
+                        nav.style.backgroundColor = '';
+                        footer.style.backgroundColor = '';
+                        body.style.color = '';
+                        footer.style.color = '';
+                        document.querySelectorAll('a').forEach(a => a.style.color = '');
+                        document.getElementById('bcard').style.backgroundColor = '';
+                        document.getElementById('bcard').style.borderColor = '';
+                        document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
+                            card.style.backgroundColor = '';
+                            card.style.color = '';
+                        });
+                        document.querySelectorAll('.postlist .card-body').forEach(function(card) {
+                            card.style.backgroundColor = '';
+                        });
+                        document.querySelectorAll('.reset-nav a').forEach(function(card) {
+                            card.style.backgroundColor = '';
+                        });
+                        document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
+                            element.style.color = '';
+                        });
+                        document.querySelectorAll('.btn-outline-light').forEach(function(button) {
+                            button.classList.remove('btn-outline-light');
+                            button.classList.add('btn-outline-dark');
+                        });
+                        break;
+                }
+                localStorage.setItem('colorScheme', scheme); // Save the color scheme in local storage
+            }
+
+            // Event listeners for color buttons
+            blueButton.addEventListener('click', function() {
+                applyColorScheme('blue');
+            });
+            blackButton.addEventListener('click', function() {
+                applyColorScheme('black');
+            });
+            whiteButton.addEventListener('click', function() {
+                applyColorScheme('white');
+            });
+
+
             const dropdownItems = document.querySelectorAll('.dropdown-item');
 
             dropdownItems.forEach(item => {
@@ -298,7 +301,7 @@
                 });
             });
 
-           
+
         });
     </script>
 </body>
