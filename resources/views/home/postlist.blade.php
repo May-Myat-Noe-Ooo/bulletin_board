@@ -23,7 +23,7 @@
             </div>
         </div>
         <!-- Postlist End -->
-        <div class="card" id="bcard">
+        <div class="card">
             @if (Session::has('success'))
                 <div id="success-message" class="alert alert-success" role="alert">
                     {{ Session::get('success') }}

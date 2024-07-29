@@ -135,8 +135,6 @@
                 });
             }
 
-            //Changing Font Size and Changing color count sectioon
-
             const body = document.body;
             const header = document.querySelector('header');
             const nav = document.querySelector('nav');
@@ -164,7 +162,7 @@
 
             // Apply the saved font size on page load
             setFontSize(fontSize);
-            console.log(fontSize);
+
             // Apply the saved color scheme on page load
             const savedColorScheme = localStorage.getItem('colorScheme');
             if (savedColorScheme) {
@@ -195,12 +193,11 @@
                     case 'blue':
                         body.style.backgroundColor = 'blue';
                         header.style.backgroundColor = 'blue';
-                        nav.style.backgroundColor = '#0000AA';
-                        footer.style.backgroundColor = '#0000AA';
                         body.style.color = 'yellow';
+                        nav.style.backgroundColor = '#0000AA';
+                        nav.style.color = 'yellow';
+                        footer.style.backgroundColor = '#0000AA';
                         document.querySelectorAll('a').forEach(a => a.style.color = 'white');
-                        document.getElementById('bcard').style.backgroundColor = 'blue';
-                        document.getElementById('bcard').style.borderColor = 'white';
                         document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
                             card.style.backgroundColor = '#0000AA';
                             card.style.color = '#ffffff';
@@ -214,6 +211,8 @@
                         document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
                             element.style.color = 'black';
                         });
+                        document.querySelector('.card').style.backgroundColor = 'blue';
+                        document.querySelector('.card').style.borderColor = 'white';
                         break;
                     case 'black':
                         body.style.backgroundColor = 'black';
@@ -223,7 +222,8 @@
                         body.style.color = 'yellow';
                         footer.style.color = 'yellow';
                         document.querySelectorAll('a').forEach(a => a.style.color = 'white');
-                        document.getElementById('bcard').style.backgroundColor = 'black';
+                        document.querySelector('.card').style.backgroundColor = 'black';
+                        document.querySelector('.card').style.borderColor = 'white';
                         document.querySelectorAll('.post__text h2, h1').forEach(function(element) {
                             element.style.color = 'yellow';
                         });
@@ -241,7 +241,6 @@
                             button.classList.remove('btn-outline-dark');
                             button.classList.add('btn-outline-light');
                         });
-                        document.getElementById('bcard').style.borderColor = 'white';
                         break;
                     case 'white':
                     default:
@@ -253,8 +252,8 @@
                         body.style.color = '';
                         footer.style.color = '';
                         document.querySelectorAll('a').forEach(a => a.style.color = '');
-                        document.getElementById('bcard').style.backgroundColor = '';
-                        document.getElementById('bcard').style.borderColor = '';
+                        document.querySelector('.card').style.backgroundColor = '';
+                        document.querySelector('.card').style.borderColor = '';
                         document.querySelectorAll('#post-list-inner-card').forEach(function(card) {
                             card.style.backgroundColor = '';
                             card.style.color = '';
