@@ -382,3 +382,45 @@ h1 {
     top: 10px;
     cursor: pointer;
 }
+
+#audioIcon {
+    display: none;
+    position: absolute;
+    z-index: 9999;
+    cursor: pointer;
+}
+
+.highlighted {
+    background-color: yellow;
+}
+
+
+#readAloudButton {
+    color:#000000;
+    position: absolute;
+    display: none;
+    z-index: 1000;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.font-size-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.font-size-controls .btn {
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.btn {
+    margin: 5px;
+    padding: 8px;
+    font-size: larger;
+}

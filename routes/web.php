@@ -9,6 +9,11 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TranscriptionController;
+use App\Http\Controllers\VoiceRssController;
+use App\Http\Controllers\TextToSpeechController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -95,3 +100,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::post('/upload-csv', 'PostsController@uploadCsv')->name('upload_csv');
     Route::get('/postlists/export', 'PostsController@export')->name('postlists.export');
 });
+// Route::post('/convert-text-to-speech', [TextToSpeechController::class, 'convert']);
+
+// Route::get('/text-to-speech', [VoiceRssController::class, 'showForm']);
+// Route::post('/convert-text-to-speech', [VoiceRssController::class, 'convertTextToSpeech']);
+
+
+Route::post('/convert-text-to-speech', [TextToSpeechController::class, 'convertToSpeech']);
+
+

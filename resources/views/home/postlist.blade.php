@@ -23,7 +23,7 @@
             </div>
         </div>
         <!-- Postlist End -->
-        <div class="card">
+        <div class="card" id="bcard">
             @if (Session::has('success'))
                 <div id="success-message" class="alert alert-success" role="alert">
                     {{ Session::get('success') }}
@@ -67,7 +67,7 @@
                     @if ($postlist->count() > 0)
                         @foreach ($postlist as $rs)
                             <div class="postlist col-md-4 mb-4">
-                                <div class="card h-100">
+                                <div class="card h-100" id="post-list-inner-card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <div class="d-flex align-items-center">
                                             <img src="{{ asset($rs->user->profile) }}" alt="error"
